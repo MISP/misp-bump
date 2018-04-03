@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="General">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="This is the KEY"
+            android:summary="This is a SUMMARY "
+            android:title="This ist the TITLE" />
+
+
+        <EditTextPreference
+            android:defaultValue="https://example.foo"
+            android:key="server_url"
+            android:summary="URL for MISP Server"
+            android:title="URL" />
+    </PreferenceCategory>
+</PreferenceScreen>
