@@ -2,8 +2,11 @@ package de.korrelator.overview.mispauth;
 
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ListView;
 
 public class SettingsActivity extends AppCompatActivity {
 
