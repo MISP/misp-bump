@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="MISP Server Configuration">
+    <PreferenceCategory
+        android:title="MISP Server Configuration">
         <EditTextPreference
             android:defaultValue="https://example.foo"
             android:key="server_url"
-            android:summary="Server URL"
-            android:title="URL" />
+            android:summary="https://example.foo"
+            android:title="URL"/>
+
+        <EditTextPreference
+            android:defaultValue="Company Name"
+            android:key="company_name"
+            android:summary="Company XY"
+            android:title="Organization Name"/>
     </PreferenceCategory>
+
+    <!--<PreferenceCategory android:layout="@layout/preference_divider"/>-->
 
     <PreferenceCategory android:title="About">
         <Preference

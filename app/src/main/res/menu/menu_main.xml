@@ -8,5 +8,5 @@
         android:orderInCategory="100"
         android:title="Setttings"
         android:icon="@drawable/ic_settings"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 </menu>
