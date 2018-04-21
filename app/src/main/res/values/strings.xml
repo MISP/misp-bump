@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MispAuth</string>
+
+    //main
+    <string name="sync_events">Synchronise Events</string>
+    <string name="share_events">Share Events</string>
+    <string name="receive_events">Receive Events</string>
+
+</resources>
