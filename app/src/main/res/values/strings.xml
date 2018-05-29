@@ -1,9 +1,18 @@
 <resources>
-    <string name="app_name">MispAuth</string>
+    <string name="app_name">MISPauth</string>
 
-    //main
-    <string name="sync_events">Synchronise Events</string>
-    <string name="share_events">Share Events</string>
-    <string name="receive_events">Receive Events</string>
+    <string name="empty_ext_org_dataset">No External Organisations available</string>
+    <string name="empty_local_org_dataset">No Local Information Available</string>
+
+    // Settings
+
+    <string name="settings_server_url">Server URL</string>
+    <string name="settings_api_key">API Key</string>
+    <string name="title_activity_sync">SyncActivity</string>
+
+    // Preferences
+
+    <string name="key_server_url">key_server_url</string>
+    <string name="key_server_api_key">key_server_api_key</string>
 
 </resources>
