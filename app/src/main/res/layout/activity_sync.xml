@@ -27,46 +27,92 @@
             android:background="@drawable/background_rounded_main"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-    </android.support.design.widget.AppBarLayout>
+        <LinearLayout
+            android:background="@color/colorPrimary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-    <android.support.constraint.ConstraintLayout
-        android:padding="16dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:background="@drawable/background_rounded_main"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Scan"
+                android:textAlignment="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Share"
+                android:textAlignment="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Upload"
+                android:textAlignment="center" />
+        </LinearLayout>
 
         <ProgressBar
             android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/button_generate_qr"
-            style="@style/CustomButton"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="Generate QR"
-            app:layout_constraintBottom_toTopOf="@+id/button_scan_qr"
-            tools:layout_editor_absoluteX="16dp" />
+            android:background="@color/colorPrimary"
+            android:indeterminate="false"
+            android:max="100"
+            android:paddingBottom="8dp"
+            android:paddingEnd="60dp"
+            android:paddingStart="60dp"
+            android:paddingTop="8dp"
+            android:progress="2"
+            android:progressTint="@color/colorAccent"
+            android:visibility="visible" />
+    </android.support.design.widget.AppBarLayout>
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/button_scan_qr"
-            style="@style/CustomButton"
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_rounded_main"
+        android:padding="0dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:orientation="vertical">-->
+
+        <!--<FrameLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent">-->
+
+            <!--<ImageView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:adjustViewBounds="true"-->
+                <!--android:cropToPadding="true"-->
+                <!--android:scaleType="centerCrop"-->
+                <!--android:src="@drawable/test_image_low_res" />-->
+
+            <!--<ImageView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:src="@drawable/ic_qr_aim"-->
+                <!--android:tint="@color/colorPrimary" />-->
+
+        <!--</FrameLayout>-->
+
+        <ImageView
+            android:id="@+id/sync_my_qr"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="Scan QR"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:layout_editor_absoluteX="3dp" />
+            android:layout_height="match_parent"
+            android:adjustViewBounds="false"
+            android:cropToPadding="false"
+            android:scaleType="center"/>
 
+        <!--</LinearLayout>-->
     </android.support.constraint.ConstraintLayout>
 
 </android.support.design.widget.CoordinatorLayout>
