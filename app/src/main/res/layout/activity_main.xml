@@ -68,11 +68,11 @@
         app:srcCompat="@drawable/ic_add_white" />
 
     <android.support.design.widget.FloatingActionButton
-        android:visibility="gone"
         android:id="@+id/fab_sync"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="100dp"
+        android:visibility="gone"
         app:fabSize="mini"
         app:layout_anchor="@+id/fab_add"
         app:layout_anchorGravity="top|center_horizontal"
