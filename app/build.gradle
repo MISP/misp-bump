@@ -30,5 +30,4 @@ dependencies {
 
     implementation 'com.android.volley:volley:1.1.0'
     implementation 'com.github.kenglxn.QRGen:android:2.4.0'
-    implementation 'com.kofigyan.stateprogressbar:stateprogressbar:0.0.9'
 }

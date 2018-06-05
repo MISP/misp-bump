@@ -36,13 +36,13 @@ public class SyncActivity extends AppCompatActivity {
     }
 
     private void generateMyQR() {
-        ImageView qrImageView = findViewById(R.id.sync_my_qr);
+//        ImageView qrImageView = findViewById(R.id.sync_my_qr);
 
         Bitmap myBitmap = QRCode.from("This is my organisation information!")
                 .withColor(0xFF000000, 0x00000000)
                 .withSize(512,512)
                 .bitmap();
 
-        qrImageView.setImageBitmap(myBitmap);
+//        qrImageView.setImageBitmap(myBitmap);
     }
 }

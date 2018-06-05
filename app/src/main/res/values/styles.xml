@@ -19,7 +19,6 @@
     </style>
 
     <style name="CustomButton" parent="Widget.AppCompat.Button">
-        <item name="background">@color/colorPrimary</item>
         <item name="android:background">@color/colorPrimary</item>
         <item name="android:textColor">@color/color_text_foreground</item>
     </style>
