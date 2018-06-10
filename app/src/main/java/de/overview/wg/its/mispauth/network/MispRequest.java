@@ -10,6 +10,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import de.overview.wg.its.mispauth.auxiliary.PreferenceManager;
+import de.overview.wg.its.mispauth.auxiliary.ReadableError;
 import de.overview.wg.its.mispauth.model.Organisation;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,7 +48,7 @@ public class MispRequest {
 	 * @param orgId    organisation ID on the MISP-Instance
 	 * @param callback returns a single Organisation-JSON
 	 */
-	public void OrganisationInformation(int orgId, final OrganisationCallback callback) {
+	public void getOrganisation(int orgId, final OrganisationCallback callback) {
 
 		Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
 			@Override
@@ -162,6 +163,31 @@ public class MispRequest {
 		requestQueue.add(r);
 	}
 
+	public void getServers(ServerCallback callback) {
+		Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				Log.d(TAG, "onResponse: " + response.toString());
+			}
+		};
+
+		Response.ErrorListener errorListener = new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				Log.d(TAG, "onErrorResponse: " + ReadableError.toReadable(error));
+			}
+		};
+
+		Request r = objectRequest(
+				Request.Method.GET,
+				serverUrl + "/servers/view/",
+				null,
+				listener,
+				errorListener);
+
+		requestQueue.add(r);
+	}
+
 
 	private JsonObjectRequest objectRequest(int method,
 	                                        String url,
@@ -205,16 +231,18 @@ public class MispRequest {
 
 		void onError(VolleyError volleyError);
 	}
-
 	public interface OrganisationCallback {
 		void onResult(JSONObject organisationInformation);
 
 		void onError(VolleyError volleyError);
 	}
-
 	public interface UserCallback {
 		void onResult(JSONObject myOrganisationInformation);
 
+		void onError(VolleyError volleyError);
+	}
+	public interface ServerCallback {
+		void onResult(JSONObject servers);
 		void onError(VolleyError volleyError);
 	}
 }

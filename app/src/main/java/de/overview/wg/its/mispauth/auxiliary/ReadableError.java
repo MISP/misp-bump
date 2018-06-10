@@ -2,6 +2,7 @@ package de.overview.wg.its.mispauth.auxiliary;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NoConnectionError;
+import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,8 +36,10 @@ public class ReadableError {
 			return "Connection failed";
 		} else if (volleyError instanceof AuthFailureError) {
 			return "Authentication failed";
+		} else if (volleyError instanceof ServerError) {
+			return "Server error";
 		}
 
-		return "Unknown error";
+		return volleyError.toString();
 	}
 }

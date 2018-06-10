@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 		a.setDescription("Ferrari has nothing to share");
 		a.setSector("Fast cars");
 		a.setNationality("Italy");
-		a.setLocal(false);
+		a.setLocal(true);
 
 		externalOrganisations = new Organisation[]{a};
 	}

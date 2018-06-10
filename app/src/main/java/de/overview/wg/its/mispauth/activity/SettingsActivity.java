@@ -163,7 +163,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             	int orgID = user.getOrgId();
 
-                request.OrganisationInformation(orgID, new MispRequest.OrganisationCallback() {
+                request.getOrganisation(orgID, new MispRequest.OrganisationCallback() {
 
                 	@Override
                     public void onResult(JSONObject organisationInformation) {
