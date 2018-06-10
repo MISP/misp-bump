@@ -1,0 +1,14 @@
+<resources>
+	<string name="app_name">MISPauth</string>
+
+	<string name="empty_ext_org_dataset">No External Organisations available</string>
+	<string name="empty_local_org_dataset">No Local Information Available</string>
+
+	// Settings
+
+	<string name="settings_server_url">Server URL</string>
+	<string name="settings_api_key">API Key</string>
+	<string name="title_activity_settings">Settings</string>
+	<string name="title_activity_sync">Synchronise</string>
+
+</resources>

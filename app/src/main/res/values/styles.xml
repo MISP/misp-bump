@@ -1,0 +1,28 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="TextLabel" parent="TextAppearance.AppCompat">
+
+        <item name="android:textColorHint">@color/color_text_foreground</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColorPrimary">@color/color_text_foreground</item>
+
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlNormal">@color/color_text_foreground</item>
+        <item name="colorControlActivated">@color/colorAccent</item>
+    </style>
+
+    <style name="CustomButton" parent="Widget.AppCompat.Button">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:textColor">@color/color_text_foreground</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>
