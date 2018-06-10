@@ -58,7 +58,6 @@ public class Organisation {
 			e.printStackTrace();
 		}
 	}
-
 	public JSONObject toJSON() {
 		JSONObject org = new JSONObject();
 

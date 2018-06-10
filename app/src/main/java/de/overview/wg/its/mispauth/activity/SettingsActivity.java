@@ -153,7 +153,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        request.myUserInformation(new MispRequest.UserInformationCallback() {
+        request.myUserInformation(new MispRequest.UserCallback() {
 
             @Override
             public void onResult(JSONObject myUserInformation) {
@@ -163,7 +163,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             	int orgID = user.getOrgId();
 
-                request.OrganisationInformation(orgID, new MispRequest.OrganisationInformationCallback() {
+                request.OrganisationInformation(orgID, new MispRequest.OrganisationCallback() {
 
                 	@Override
                     public void onResult(JSONObject organisationInformation) {

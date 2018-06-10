@@ -12,108 +12,114 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+import com.android.volley.VolleyError;
 import de.overview.wg.its.mispauth.R;
 import de.overview.wg.its.mispauth.adapter.ExtOrgAdapter;
 import de.overview.wg.its.mispauth.auxiliary.PreferenceManager;
+import de.overview.wg.its.mispauth.auxiliary.ReadableError;
 import de.overview.wg.its.mispauth.model.Organisation;
+import de.overview.wg.its.mispauth.network.MispRequest;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
 	private Organisation[] externalOrganisations;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+		Toolbar toolbar = findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
 
-        getExternalOrganisations();
-        setUpRecyclerView();
+		getExternalOrganisations();
+		setUpRecyclerView();
 
-        FloatingActionButton fabAdd = findViewById(R.id.fab_add);
-        final FloatingActionButton fabSync = findViewById(R.id.fab_sync);
+		FloatingActionButton fabAdd = findViewById(R.id.fab_add);
+		final FloatingActionButton fabSync = findViewById(R.id.fab_sync);
 
-        fabAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(fabSync.getVisibility() == View.GONE){
-                    fabSync.setVisibility(View.VISIBLE);
-                } else {
-                    fabSync.setVisibility(View.GONE);
-                }
-            }
-        });
+		fabAdd.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (fabSync.getVisibility() == View.GONE) {
+					fabSync.setVisibility(View.VISIBLE);
+				} else {
+					fabSync.setVisibility(View.GONE);
+				}
+			}
+		});
 
-        fabSync.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startSyncActivity();
-            }
-        });
-    }
+		fabSync.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startSyncActivity();
+			}
+		});
+	}
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.menu_main, menu);
+		return true;
+	}
 
-        if (id == R.id.menu_item_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
-        }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
 
-        return super.onOptionsItemSelected(item);
-    }
+		if (id == R.id.menu_item_settings) {
+			startActivity(new Intent(this, SettingsActivity.class));
+			return true;
+		}
 
-    private void setUpRecyclerView() {
-	    RecyclerView orgRecyclerView = findViewById(R.id.orgRecyclerView);
-	    orgRecyclerView.setHasFixedSize(true);
+		return super.onOptionsItemSelected(item);
+	}
 
-	    RecyclerView.LayoutManager orgLayoutManager = new LinearLayoutManager(this);
-	    orgRecyclerView.setLayoutManager(orgLayoutManager);
+	private void setUpRecyclerView() {
+		RecyclerView orgRecyclerView = findViewById(R.id.orgRecyclerView);
+		orgRecyclerView.setHasFixedSize(true);
 
-	    DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(orgRecyclerView.getContext(), 1);
-	    orgRecyclerView.addItemDecoration(dividerItemDecoration);
+		RecyclerView.LayoutManager orgLayoutManager = new LinearLayoutManager(this);
+		orgRecyclerView.setLayoutManager(orgLayoutManager);
 
-	    RecyclerView.Adapter orgAdapter = new ExtOrgAdapter(this, externalOrganisations);
-	    orgRecyclerView.setAdapter(orgAdapter);
+		DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(orgRecyclerView.getContext(), 1);
+		orgRecyclerView.addItemDecoration(dividerItemDecoration);
 
-	    if(externalOrganisations.length == 0){
-		    orgRecyclerView.setVisibility(View.GONE);
-		    findViewById(R.id.empty_view).setVisibility(View.VISIBLE);
-	    } else {
-		    orgRecyclerView.setVisibility(View.VISIBLE);
-		    findViewById(R.id.empty_view).setVisibility(View.GONE);
-	    }
+		RecyclerView.Adapter orgAdapter = new ExtOrgAdapter(this, externalOrganisations);
+		orgRecyclerView.setAdapter(orgAdapter);
 
-	    final SwipeRefreshLayout refreshLayout = findViewById(R.id.recycler_refresh);
-	    refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-		    @Override
-		    public void onRefresh() {
-			    // TODO do stuff
-			    // refreshLayout.setRefreshing(false);
-		    }
-	    });
-    }
+		if (externalOrganisations.length == 0) {
+			orgRecyclerView.setVisibility(View.GONE);
+			findViewById(R.id.empty_view).setVisibility(View.VISIBLE);
+		} else {
+			orgRecyclerView.setVisibility(View.VISIBLE);
+			findViewById(R.id.empty_view).setVisibility(View.GONE);
+		}
 
-    private void getExternalOrganisations(){
-	    Organisation a = new Organisation();
-	    a.setName("Ferrari");
-	    a.setDescription("Ferrari has nothing to share");
-	    a.setSector("Fast cars");
-	    a.setNationality("Italy");
-	    a.setUserCount(67);
+		final SwipeRefreshLayout refreshLayout = findViewById(R.id.recycler_refresh);
+		refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+			@Override
+			public void onRefresh() {
+				// TODO do stuff
+				// refreshLayout.setRefreshing(false);
+			}
+		});
+	}
 
-	    externalOrganisations = new Organisation[] {a};
-    }
+	private void getExternalOrganisations() {
+		Organisation a = new Organisation();
+		a.setName("Ferrari");
+		a.setDescription("Ferrari has nothing to share");
+		a.setSector("Fast cars");
+		a.setNationality("Italy");
+		a.setLocal(false);
 
-    private void startSyncActivity(){
-        startActivity(new Intent(this, SyncActivity.class));
-    }
+		externalOrganisations = new Organisation[]{a};
+	}
+
+	private void startSyncActivity() {
+		startActivity(new Intent(this, SyncActivity.class));
+	}
 }
