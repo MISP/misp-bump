@@ -39,7 +39,7 @@ public class OrganisationDialog {
 		TextView userCount = dialogContent.findViewById(R.id.organisation_user_count);
 		userCount.setText("" + org.getUserCount());
 
-		dialogBuilder.setPositiveButton("OK", null);
+//		dialogBuilder.setPositiveButton("OK", null);
 		dialogBuilder.show();
 	}
 }
