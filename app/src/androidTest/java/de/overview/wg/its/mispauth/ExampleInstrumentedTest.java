@@ -1,4 +1,4 @@
-package de.overview.wg.its.misp_authentificator;
+package de.overview.wg.its.mispauth;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -17,10 +17,10 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
     @Test
-    public void useAppContext() {
+    public void useAppContext() throws Exception {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("de.overview.wg.its.misp_authentificator", appContext.getPackageName());
+        assertEquals("de.overview.wg.its.mispauth", appContext.getPackageName());
     }
 }

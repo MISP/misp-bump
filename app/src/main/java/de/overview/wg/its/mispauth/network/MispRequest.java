@@ -1,23 +1,20 @@
-package de.overview.wg.its.misp_authentificator.network;
+package de.overview.wg.its.mispauth.network;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-
+import de.overview.wg.its.mispauth.auxiliary.PreferenceManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import de.overview.wg.its.misp_authentificator.PreferenceManager;
 
 /**
  * Simple JSON based API to communicate with MISP-Instances
@@ -33,7 +30,6 @@ public class MispRequest {
     private String serverUrl, apiKey;
 
     /**
-     *
      * @param context for Volley and PreferenceManager
      */
     private MispRequest(Context context) {
@@ -42,7 +38,6 @@ public class MispRequest {
     }
 
     /**
-     *
      * @param orgId organisation ID on the MISP-Instance
      * @param callback returns a single Organisation-JSON
      */

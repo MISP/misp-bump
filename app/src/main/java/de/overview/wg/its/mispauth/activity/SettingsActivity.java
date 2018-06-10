@@ -1,37 +1,39 @@
-package de.overview.wg.its.misp_authentificator.activity;
+package de.overview.wg.its.mispauth.activity;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.NoConnectionError;
+import android.widget.TextView;
 import com.android.volley.VolleyError;
-
-import org.json.JSONException;
+import de.overview.wg.its.mispauth.R;
+import de.overview.wg.its.mispauth.auxiliary.PreferenceManager;
+import de.overview.wg.its.mispauth.auxiliary.ReadableError;
+import de.overview.wg.its.mispauth.model.Organisation;
+import de.overview.wg.its.mispauth.model.User;
+import de.overview.wg.its.mispauth.network.MispRequest;
 import org.json.JSONObject;
-
-import de.overview.wg.its.misp_authentificator.PreferenceManager;
-import de.overview.wg.its.misp_authentificator.R;
-import de.overview.wg.its.misp_authentificator.network.MispRequest;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private static final String TAG = "MISP-TAG";
+    private static final String TAG = "DEBUG";
 
     private PreferenceManager preferenceManager;
     private ProgressBar progressBar;
     private TextInputLayout serverUrlLayout, apiKeyLayout;
     private EditText serverUrlText, apiKeyText;
+
+    private Organisation org;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,16 +50,24 @@ public class SettingsActivity extends AppCompatActivity {
         apiKeyLayout = findViewById(R.id.input_layout_api_key);
         serverUrlText = findViewById(R.id.edit_server_url);
         apiKeyText = findViewById(R.id.edit_api_key);
-
         progressBar = findViewById(R.id.progressBar);
 
-        FloatingActionButton fabDlOrgInfo = findViewById(R.id.fab_download_own_org_info);
-
-        fabDlOrgInfo.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab_download_own_org_info).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 downloadMyOrgInfo();
             }
+        });
+
+        apiKeyText.setOnKeyListener(new View.OnKeyListener() {
+	        public boolean onKey(View v, int keyCode, KeyEvent event) {
+		        if (keyCode == 66) {
+		        	hideKeyboard(v);
+		        	apiKeyText.clearFocus();
+			        return true;
+		        }
+		        return false;
+	        }
         });
 
         restoreSavedValues();
@@ -68,7 +78,6 @@ public class SettingsActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_settings, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -83,15 +92,39 @@ public class SettingsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void setOrganisation(Organisation org) {
+
+    	if(org == null) {
+    		return;
+	    }
+
+		TextView title = findViewById(R.id.organisation_title);
+		TextView uuid = findViewById(R.id.organisation_uuid);
+		TextView description = findViewById(R.id.organisation_description);
+	    TextView nationality = findViewById(R.id.organisation_nationality);
+	    TextView sector = findViewById(R.id.organisation_sector);
+		TextView userCount = findViewById(R.id.organisation_user_count);
+
+		title.setText(org.getName());
+		uuid.setText(org.getUuid());
+		description.setText(org.getDescription());
+		nationality.setText(org.getNationality());
+		sector.setText(org.getSector());
+		userCount.setText("" + org.getUserCount());
+    }
 
     private void restoreSavedValues() {
         preferenceManager = PreferenceManager.Instance(this);
 
         serverUrlText.setText(preferenceManager.getMyServerUrl());
         apiKeyText.setText(preferenceManager.getMyServerApiKey());
+
+        setOrganisation(preferenceManager.getMyOrganisation());
     }
 
     private void downloadMyOrgInfo(){
+	    user = new User();
+	    org = new Organisation();
 
         boolean failed = false;
 
@@ -110,70 +143,69 @@ public class SettingsActivity extends AppCompatActivity {
 
         if(failed) {
             return;
+        } else {
+        	serverUrlLayout.setError(null);
+        	apiKeyLayout.setError(null);
         }
 
         final MispRequest request = MispRequest.Instance(this);
-
         request.setServerCredentials(tmpServerUrl, tmpApiKey);
 
         progressBar.setVisibility(View.VISIBLE);
 
         request.myUserInformation(new MispRequest.UserInformationCallback() {
+
             @Override
             public void onResult(JSONObject myUserInformation) {
 
-                int orgID;
+            	user.fromJSON(myUserInformation);
+                preferenceManager.setMyUser(user);
 
-                try {
-                    orgID = myUserInformation.getInt("org_id");
+            	int orgID = user.getOrgId();
 
-                    request.OrganisationInformation(orgID, new MispRequest.OrganisationInformationCallback() {
-                        @Override
-                        public void onResult(JSONObject organisationInformation) {
-                            progressBar.setVisibility(View.GONE);
-                            Log.i(TAG, "onResult: " + organisationInformation.toString());
-                        }
+                request.OrganisationInformation(orgID, new MispRequest.OrganisationInformationCallback() {
 
-                        @Override
-                        public void onError(VolleyError volleyError) {
-                            progressBar.setVisibility(View.GONE);
-                            Log.e(TAG, "onError: " + volleyError.toString());
-                        }
-                    });
+                	@Override
+                    public void onResult(JSONObject organisationInformation) {
+                        progressBar.setVisibility(View.GONE);
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                        org.fromJSON(organisationInformation);
+
+                        preferenceManager.setMyOrganisation(org);
+
+		                setOrganisation(org);
+                    }
+
+                    @Override
+                    public void onError(VolleyError volleyError) {
+                        progressBar.setVisibility(View.GONE);
+                        MakeSnackbar(ReadableError.toReadable(volleyError));
+                        Log.e(TAG, "onError: " + volleyError.toString());
+                    }
+                });
             }
 
             @Override
             public void onError(VolleyError volleyError) {
                 progressBar.setVisibility(View.GONE);
-
-                if(volleyError instanceof NoConnectionError) {
-                    MakeAlert("No connection to server");
-                } else if(volleyError instanceof AuthFailureError) {
-                    MakeAlert("Wrong API key");
-                }
+                MakeSnackbar(ReadableError.toReadable(volleyError));
             }
         });
 
         // If auth was successful: save new credentials
         preferenceManager.setMyServerUrl(tmpServerUrl);
         preferenceManager.setMyServerApiKey(tmpApiKey);
-
     }
 
-    private void MakeAlert(String msg){
-
+    private void MakeSnackbar(String msg){
         View contextView = findViewById(R.id.coordinator);
-
-        Snackbar.make(contextView, msg, Snackbar.LENGTH_LONG)
-                .addCallback(new Snackbar.Callback(){
-                    @Override
-                    public void onShown(Snackbar sb) {
-                        progressBar.setVisibility(View.GONE);
-                    }
-                }).show();
+        Snackbar.make(contextView, msg, Snackbar.LENGTH_LONG).show();
     }
+
+	private void hideKeyboard(View view) {
+		InputMethodManager manager = (InputMethodManager) view.getContext().getSystemService(INPUT_METHOD_SERVICE);
+		if (manager != null) {
+			manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+		}
+	}
 }
