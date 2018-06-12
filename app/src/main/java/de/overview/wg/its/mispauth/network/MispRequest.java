@@ -7,11 +7,13 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import de.overview.wg.its.mispauth.auxiliary.PreferenceManager;
 import de.overview.wg.its.mispauth.auxiliary.ReadableError;
 import de.overview.wg.its.mispauth.model.Organisation;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -163,11 +165,25 @@ public class MispRequest {
 		requestQueue.add(r);
 	}
 
-	public void getServers(ServerCallback callback) {
-		Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+	public void getOrganisations(final OrganisationsCallback callback) {
+		Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
 			@Override
-			public void onResponse(JSONObject response) {
-				Log.d(TAG, "onResponse: " + response.toString());
+			public void onResponse(JSONArray response) {
+
+				JSONArray resultArray = new JSONArray();
+
+				int orgCount = response.length();
+
+				for(int i = 0; i < orgCount; i++) {
+					try {
+						resultArray.put(response.getJSONObject(i).getJSONObject("Organisation"));
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+
+				callback.onResult(resultArray);
+				Log.d(TAG, "onResponse: " + resultArray.toString());
 			}
 		};
 
@@ -178,9 +194,9 @@ public class MispRequest {
 			}
 		};
 
-		Request r = objectRequest(
+		Request r = arrayRequestWithJsonObject(
 				Request.Method.GET,
-				serverUrl + "/servers/view/",
+				serverUrl + "/organisations/index",
 				null,
 				listener,
 				errorListener);
@@ -188,15 +204,12 @@ public class MispRequest {
 		requestQueue.add(r);
 	}
 
+	private JsonArrayRequestWithJsonObject arrayRequestWithJsonObject(int method, String url,
+	                                                                  @Nullable JSONObject body,
+	                                                                  Response.Listener<JSONArray> listener,
+	                                                                  Response.ErrorListener errorListener) {
 
-	private JsonObjectRequest objectRequest(int method,
-	                                        String url,
-	                                        @Nullable JSONObject body,
-	                                        Response.Listener<JSONObject> listener,
-	                                        Response.ErrorListener errorListener) {
-
-		return new JsonObjectRequest(method, url, body, listener, errorListener) {
-
+		return new JsonArrayRequestWithJsonObject(method, url, body, listener, errorListener) {
 			@Override
 			public Map<String, String> getHeaders() {
 				Map<String, String> params = new HashMap<>();
@@ -207,10 +220,27 @@ public class MispRequest {
 
 				return params;
 			}
-
 		};
 	}
 
+	private JsonObjectRequest objectRequest(int method, String url,
+	                                        @Nullable JSONObject body,
+	                                        Response.Listener<JSONObject> listener,
+	                                        Response.ErrorListener errorListener) {
+
+		return new JsonObjectRequest(method, url, body, listener, errorListener) {
+			@Override
+			public Map<String, String> getHeaders() {
+				Map<String, String> params = new HashMap<>();
+
+				params.put("Authorization", apiKey);
+				params.put("Accept", "application/json");
+				params.put("Content-Type", "application/json; utf-8");
+
+				return params;
+			}
+		};
+	}
 
 	public void setServerCredentials(String serverUrl, String apiKey) {
 		this.serverUrl = serverUrl;
@@ -225,15 +255,12 @@ public class MispRequest {
 		return instance;
 	}
 
-
-	public interface IntegerCallback {
-		void onResult(int result);
-
+	public interface OrganisationsCallback {
+		void onResult(JSONArray organisations);
 		void onError(VolleyError volleyError);
 	}
 	public interface OrganisationCallback {
 		void onResult(JSONObject organisationInformation);
-
 		void onError(VolleyError volleyError);
 	}
 	public interface UserCallback {
