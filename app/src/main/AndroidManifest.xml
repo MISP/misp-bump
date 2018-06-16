@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.overview.wg.its.mispauth">
 
+	<uses-permission android:name="android.permission.CAMERA"/>
 	<uses-permission android:name="android.permission.INTERNET"/>
 
 	<application
@@ -26,6 +27,7 @@
 				android:parentActivityName=".activity.MainActivity"/>
 
 		<activity
+				android:screenOrientation="portrait"
 				android:name=".activity.SyncActivity"
 				android:label="@string/title_activity_sync"
 				android:parentActivityName=".activity.MainActivity"/>

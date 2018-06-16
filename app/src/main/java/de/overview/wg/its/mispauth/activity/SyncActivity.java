@@ -1,35 +1,38 @@
 package de.overview.wg.its.mispauth.activity;
 
+import android.content.DialogInterface;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import com.android.volley.VolleyError;
 import de.overview.wg.its.mispauth.R;
+import de.overview.wg.its.mispauth.auxiliary.OrganisationDialog;
 import de.overview.wg.its.mispauth.auxiliary.PreferenceManager;
 import de.overview.wg.its.mispauth.fragment.ScanQrFragment;
 import de.overview.wg.its.mispauth.fragment.ShowQrFragment;
 import de.overview.wg.its.mispauth.fragment.SyncStartFragment;
 import de.overview.wg.its.mispauth.fragment.UploadFragment;
 import de.overview.wg.its.mispauth.model.Organisation;
-import de.overview.wg.its.mispauth.network.MispRequest;
-import de.overview.wg.its.mispauth.custom_viewpager.ExtendedViewPager;
-import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class SyncActivity extends AppCompatActivity {
 
+	private static final String TAG = "DEBUG";
+
 	private PreferenceManager preferenceManager;
 
-	private static final int PAGE_COUNT = 3;
-	private ExtendedViewPager viewPager;
-	private PagerAdapter pagerAdapter;
-	private LinearLayout bottomLayout;
+	private Button prevButton, nextButton;
+	private int partnerChoice = -1;
+	private String scannedQrString = "";
+
+	private int currentFragmentPosition = 0;
 
 
 	@Override
@@ -37,107 +40,131 @@ public class SyncActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sync);
 
+		Toolbar toolbar = findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 		preferenceManager = PreferenceManager.Instance(this);
 
-		setupViewPager();
+		nextButton = findViewById(R.id.nextButton);
+		prevButton = findViewById(R.id.backButton);
+
+		nextButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				getFragment(currentFragmentPosition + 1, true);
+			}
+		});
+		prevButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				getFragment(currentFragmentPosition - 1, true);
+			}
+		});
+
+		getFragment(0, false);
 	}
 
-	private void setupViewPager() {
-		bottomLayout = findViewById(R.id.linearLayout);
+	private void getFragment(int position, boolean animate) {
 
-		pagerAdapter = new SimplePagerAdapter(getSupportFragmentManager());
+		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-		viewPager = findViewById(R.id.viewPager);
-		viewPager.setPagingEnabled(false);
-		viewPager.setAdapter(pagerAdapter);
+		if (animate) {
+			if (position > currentFragmentPosition) {
+				transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right);
+			} else {
+				transaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right, R.anim.enter_from_right, R.anim.exit_to_left);
+			}
+		}
 
-		viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+		currentFragmentPosition = position;
 
-			@Override
-			public void onPageSelected(int position) {
-				if (position == 0) {
-					bottomLayout.setVisibility(View.GONE);
+		switch (position) {
+
+			case 0:
+				prevButton.setEnabled(false);
+				nextButton.setEnabled(false);
+				transaction.replace(R.id.fragmentContainer, new SyncStartFragment());
+				break;
+
+			case 1:
+
+				prevButton.setEnabled(true);
+
+				if (partnerChoice == 1) {
+
+					nextButton.setEnabled(false);
+					transaction.replace(R.id.fragmentContainer, new ScanQrFragment(), "FRAGMENT_SCAN");
+
 				} else {
-					bottomLayout.setVisibility(View.VISIBLE);
+
+					nextButton.setEnabled(true);
+					transaction.replace(R.id.fragmentContainer, new ShowQrFragment(), "FRAGMENT_SHOW");
+
 				}
-			}
+				break;
 
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+			case 2:
+				if (partnerChoice == 1) {
 
-			}
+					prevButton.setEnabled(true);
+					nextButton.setEnabled(true);
+					transaction.replace(R.id.fragmentContainer, new ShowQrFragment(), "FRAGMENT_SHOW");
 
-			// SCROLL_STATE_IDLE, SCROLL_STATE_DRAGGING, SCROLL_STATE_SETTLING
-			@Override
-			public void onPageScrollStateChanged(int state) {
+				} else {
 
-			}
-		});
+					prevButton.setEnabled(true);
+					nextButton.setEnabled(false);
 
-		Button next = findViewById(R.id.nextButton);
-		Button back = findViewById(R.id.backButton);
+					transaction.replace(R.id.fragmentContainer, new ScanQrFragment(), "FRAGMENT_SCAN");
+				}
+				break;
 
-		next.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
-			}
-		});
+			case 3:
 
-		back.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
-			}
-		});
+				nextButton.setText("Finish");
+				nextButton.setEnabled(false);
+
+				transaction.replace(R.id.fragmentContainer, new UploadFragment());
+
+				break;
+
+			default:
+				break;
+		}
+		transaction.commit();
 	}
 
-	private class SimplePagerAdapter extends FragmentStatePagerAdapter {
+	public void setPartnerChoice(int choice) {
 
-		public SimplePagerAdapter(FragmentManager fm) {
-			super(fm);
-		}
+		partnerChoice = choice;
 
-		@Override
-		public Fragment getItem(int position) {
-
-			switch (position) {
-				case 0:
-					return new SyncStartFragment(); // start fragment
-
-				case 1:
-					return new ScanQrFragment(); // scan fragment
-
-				case 2:
-					return new ShowQrFragment(); // show QR fragment
-
-				case 3:
-					return new UploadFragment(); // show upload fragment
-
-				default:
-					return null; // This should not be happening
-			}
-		}
-
-		@Override
-		public int getCount() {
-			return PAGE_COUNT;
+		if (choice != -1) {
+			nextButton.setEnabled(true);
+		} else {
+			nextButton.setEnabled(false);
 		}
 	}
 
-	private void uploadOrganisation(Organisation org) {
-		MispRequest mispRequest = MispRequest.Instance(this);
+	public void setScannedQr(String qr) {
 
-		mispRequest.getOrganisations(new MispRequest.OrganisationsCallback() {
-			@Override
-			public void onResult(JSONArray organisations) {
+		final FragmentManager manager = getSupportFragmentManager();
+		final ScanQrFragment scanFragment = (ScanQrFragment) manager.findFragmentByTag("FRAGMENT_SCAN");
 
-			}
+		scanFragment.setReadQr(false);
+		try {
+			OrganisationDialog d = new OrganisationDialog(this);
+			Organisation o = new Organisation();
+			o.fromJSON(new JSONObject(qr));
+			d.createDialog(o);
 
-			@Override
-			public void onError(VolleyError volleyError) {
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 
-			}
-		});
+	}
+
+	public void uploadReady() {
+		nextButton.setEnabled(true);
 	}
 }

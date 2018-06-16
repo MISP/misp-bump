@@ -5,32 +5,69 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
 
-	<ImageView
-			android:id="@+id/sync_image"
-			android:src="@drawable/ic_sync_alpha"
+	<RadioGroup
+			android:id="@+id/radioGroup"
+			android:padding="16dp"
 			android:layout_width="match_parent"
-			android:layout_height="128dp"/>
+			android:layout_height="wrap_content" android:layout_marginBottom="8dp"
+			android:layout_marginTop="8dp"
+			app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+			android:layout_marginStart="8dp" android:layout_marginEnd="8dp" app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintBottom_toBottomOf="parent">
 
-	<TextView
-			android:gravity="center"
-			android:id="@+id/help_text_sync"
-			android:text="I am partner"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			app:layout_constraintTop_toBottomOf="@+id/sync_image"/>
+		<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="8dp"
+				android:textSize="20sp"
+				android:textStyle="bold"
+				android:text="How would you like to start?"/>
 
-	<Button style="@style/CustomButton"
-	        android:id="@+id/button_scan"
-	        android:text="Scan"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content" android:layout_marginBottom="8dp"
-	        app:layout_constraintBottom_toTopOf="@+id/button_share"/>
+		<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="16dp"
+				android:textSize="17sp"
+				android:text="Make sure your partner will choose the opposite option."/>
 
-	<Button style="@style/CustomButton"
-	        android:id="@+id/button_share"
-	        android:text="Share"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content" android:layout_marginBottom="8dp"
-	        app:layout_constraintBottom_toBottomOf="parent"/>
+		<RadioButton
+				android:layout_width="match_parent"
+				android:layout_height="56dp"
+				android:text="Scan QR-Code first"/>
+
+		<RadioButton
+				android:layout_width="match_parent"
+				android:layout_height="56dp"
+				android:text="Share QR-Code first"/>
+	</RadioGroup>
+
+
+	<!--<ImageView-->
+	<!--android:id="@+id/sync_image"-->
+	<!--android:src="@drawable/ic_sync_alpha"-->
+	<!--android:layout_width="match_parent"-->
+	<!--android:layout_height="128dp"/>-->
+
+	<!--<TextView-->
+	<!--android:gravity="center"-->
+	<!--android:id="@+id/help_text_sync"-->
+	<!--android:text="I am partner"-->
+	<!--android:layout_width="match_parent"-->
+	<!--android:layout_height="wrap_content"-->
+	<!--app:layout_constraintTop_toBottomOf="@+id/sync_image"/>-->
+
+	<!--<Button style="@style/CustomButton"-->
+	<!--android:id="@+id/button_scan"-->
+	<!--android:text="Scan"-->
+	<!--android:layout_width="match_parent"-->
+	<!--android:layout_height="wrap_content" android:layout_marginBottom="8dp"-->
+	<!--app:layout_constraintBottom_toTopOf="@+id/button_share"/>-->
+
+	<!--<Button style="@style/CustomButton"-->
+	<!--android:id="@+id/button_share"-->
+	<!--android:text="Share"-->
+	<!--android:layout_width="match_parent"-->
+	<!--android:layout_height="wrap_content" android:layout_marginBottom="8dp"-->
+	<!--app:layout_constraintBottom_toBottomOf="parent"/>-->
 
 </android.support.constraint.ConstraintLayout>

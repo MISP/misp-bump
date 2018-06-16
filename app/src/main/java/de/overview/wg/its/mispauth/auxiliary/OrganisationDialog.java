@@ -27,6 +27,9 @@ public class OrganisationDialog {
 		TextView title = dialogContent.findViewById(R.id.organisation_title);
 		title.setText(org.getName());
 
+		TextView uuid = dialogContent.findViewById(R.id.organisation_uuid);
+		uuid.setText(org.getUuid());
+
 		TextView description = dialogContent.findViewById(R.id.organisation_description);
 		description.setText(org.getDescription());
 
@@ -39,7 +42,9 @@ public class OrganisationDialog {
 		TextView userCount = dialogContent.findViewById(R.id.organisation_user_count);
 		userCount.setText("" + org.getUserCount());
 
-//		dialogBuilder.setPositiveButton("OK", null);
+		dialogBuilder.setCancelable(false);
+		dialogBuilder.setNegativeButton("REJECT", null);
+		dialogBuilder.setPositiveButton("ACCEPT", null);
 		dialogBuilder.show();
 	}
 }
