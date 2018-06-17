@@ -18,7 +18,6 @@ public class SyncActivity extends AppCompatActivity {
 
 	private Button prevButton, nextButton;
 	private int partnerChoice = -1;
-	private String scannedQrString = "";
 
 	private int currentFragmentPosition = 0;
 
@@ -51,6 +50,10 @@ public class SyncActivity extends AppCompatActivity {
 		});
 
 		getFragment(0, false);
+	}
+
+	private void getNextFragment() {
+		getFragment(currentFragmentPosition + 1, true);
 	}
 
 	private void getFragment(int position, boolean animate) {
@@ -104,10 +107,10 @@ public class SyncActivity extends AppCompatActivity {
 					prevButton.setEnabled(true);
 					nextButton.setEnabled(true);
 
-					prevButton.setText(R.string.back);
-					nextButton.setText(R.string.next);
+					prevButton.setText(R.string.reject);
+					nextButton.setText(R.string.accept);
 
-					transaction.replace(R.id.fragmentContainer, new ShowQrFragment(), "FRAGMENT_SHOW");
+					transaction.replace(R.id.fragmentContainer, new ReviewQrFragment());
 
 				} else {
 
@@ -122,13 +125,24 @@ public class SyncActivity extends AppCompatActivity {
 				break;
 
 			case 3:
-				prevButton.setEnabled(true);
-				nextButton.setEnabled(true);
 
-				prevButton.setText(R.string.reject);
-				nextButton.setText(R.string.accept);
+				if (partnerChoice == 1) {
+					prevButton.setEnabled(true);
+					nextButton.setEnabled(true);
 
-				transaction.replace(R.id.fragmentContainer, new ReviewQrFragment());
+					prevButton.setText(R.string.back);
+					nextButton.setText(R.string.next);
+
+					transaction.replace(R.id.fragmentContainer, new ShowQrFragment(), "FRAGMENT_SHOW");
+				} else {
+					prevButton.setEnabled(true);
+					nextButton.setEnabled(true);
+
+					prevButton.setText(R.string.reject);
+					nextButton.setText(R.string.accept);
+
+					transaction.replace(R.id.fragmentContainer, new ReviewQrFragment());
+				}
 				break;
 
 			case 4:
@@ -136,13 +150,18 @@ public class SyncActivity extends AppCompatActivity {
 				nextButton.setText(R.string.done);
 				nextButton.setEnabled(true);
 
+				nextButton.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						finish();
+					}
+				});
+
 				transaction.replace(R.id.fragmentContainer, new UploadFragment());
 
 				break;
-
-			default:
-				break;
 		}
+
 		transaction.commit();
 	}
 
@@ -162,7 +181,11 @@ public class SyncActivity extends AppCompatActivity {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				getFragment(3, true);
+				if (partnerChoice == 1) {
+					getFragment(2, true);
+				} else {
+					getFragment(3, true);
+				}
 			}
 		});
 
