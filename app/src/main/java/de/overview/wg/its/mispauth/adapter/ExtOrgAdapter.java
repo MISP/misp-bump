@@ -2,7 +2,6 @@ package de.overview.wg.its.mispauth.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +38,7 @@ public class ExtOrgAdapter extends RecyclerView.Adapter<ExtOrgAdapter.ViewHolder
 	        @Override
 	        public void onClick(View v) {
 		        OrganisationDialog d = new OrganisationDialog(context);
-		        d.createDialog(dataSet[position]);
+		        d.createInfoDialog(dataSet[position]);
 	        }
         });
     }

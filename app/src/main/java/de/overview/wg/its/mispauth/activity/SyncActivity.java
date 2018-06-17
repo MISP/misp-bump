@@ -1,26 +1,14 @@
 package de.overview.wg.its.mispauth.activity;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import de.overview.wg.its.mispauth.R;
-import de.overview.wg.its.mispauth.auxiliary.OrganisationDialog;
 import de.overview.wg.its.mispauth.auxiliary.PreferenceManager;
-import de.overview.wg.its.mispauth.fragment.ScanQrFragment;
-import de.overview.wg.its.mispauth.fragment.ShowQrFragment;
-import de.overview.wg.its.mispauth.fragment.SyncStartFragment;
-import de.overview.wg.its.mispauth.fragment.UploadFragment;
-import de.overview.wg.its.mispauth.model.Organisation;
-import org.json.JSONException;
-import org.json.JSONObject;
+import de.overview.wg.its.mispauth.fragment.*;
 
 public class SyncActivity extends AppCompatActivity {
 
@@ -84,12 +72,18 @@ public class SyncActivity extends AppCompatActivity {
 			case 0:
 				prevButton.setEnabled(false);
 				nextButton.setEnabled(false);
+
+				prevButton.setText(R.string.back);
+				nextButton.setText(R.string.next);
+
 				transaction.replace(R.id.fragmentContainer, new SyncStartFragment());
 				break;
 
 			case 1:
-
 				prevButton.setEnabled(true);
+
+				prevButton.setText(R.string.back);
+				nextButton.setText(R.string.next);
 
 				if (partnerChoice == 1) {
 
@@ -109,6 +103,10 @@ public class SyncActivity extends AppCompatActivity {
 
 					prevButton.setEnabled(true);
 					nextButton.setEnabled(true);
+
+					prevButton.setText(R.string.back);
+					nextButton.setText(R.string.next);
+
 					transaction.replace(R.id.fragmentContainer, new ShowQrFragment(), "FRAGMENT_SHOW");
 
 				} else {
@@ -116,14 +114,27 @@ public class SyncActivity extends AppCompatActivity {
 					prevButton.setEnabled(true);
 					nextButton.setEnabled(false);
 
+					prevButton.setText(R.string.back);
+					nextButton.setText(R.string.next);
+
 					transaction.replace(R.id.fragmentContainer, new ScanQrFragment(), "FRAGMENT_SCAN");
 				}
 				break;
 
 			case 3:
+				prevButton.setEnabled(true);
+				nextButton.setEnabled(true);
 
-				nextButton.setText("Finish");
-				nextButton.setEnabled(false);
+				prevButton.setText(R.string.reject);
+				nextButton.setText(R.string.accept);
+
+				transaction.replace(R.id.fragmentContainer, new ReviewQrFragment());
+				break;
+
+			case 4:
+
+				nextButton.setText(R.string.done);
+				nextButton.setEnabled(true);
 
 				transaction.replace(R.id.fragmentContainer, new UploadFragment());
 
@@ -148,19 +159,33 @@ public class SyncActivity extends AppCompatActivity {
 
 	public void setScannedQr(String qr) {
 
-		final FragmentManager manager = getSupportFragmentManager();
-		final ScanQrFragment scanFragment = (ScanQrFragment) manager.findFragmentByTag("FRAGMENT_SCAN");
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				getFragment(3, true);
+			}
+		});
 
-		scanFragment.setReadQr(false);
-		try {
-			OrganisationDialog d = new OrganisationDialog(this);
-			Organisation o = new Organisation();
-			o.fromJSON(new JSONObject(qr));
-			d.createDialog(o);
-
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			OrganisationDialog d = new OrganisationDialog(this);
+//			Organisation o = new Organisation();
+//			o.fromJSON(new JSONObject(qr));
+//			d.createAcceptDialog(o, new OrganisationDialog.DialogCallback() {
+//				@Override
+//				public void onAccept() {
+//					nextButton.setEnabled(true);
+//				}
+//
+//				@Override
+//				public void onReject() {
+//					scanFragment.setReadQr(true);
+//					scanFragment.openCamera();
+//				}
+//			});
+//
+//		} catch (JSONException e) {
+//			e.printStackTrace();
+//		}
 
 	}
 
