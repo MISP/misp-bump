@@ -164,7 +164,10 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 		}
 
 		if (myUser != null) {
+
+			myUser.clearForStorage();
 			preferenceManager.setMyUser(myUser);
+
 		}
 
 		if (myOrganisation != null) {
@@ -243,20 +246,13 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 	private void downloadOrgInfo() {
 
 		if (myOrganisation != null) {
-
 			DialogInterface.OnClickListener pos = new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					downloadOrgInfo();
 				}
 			};
-
 			new DialogFactory(this).createOverrideDialog(pos, null).show();
-
-		} else {
-
-			downloadOrgInfo();
-
 		}
 
 		if (!validCredentials()) {

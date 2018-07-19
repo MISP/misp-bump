@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 		emptyPartnerListView = findViewById(R.id.empty);
 		syncedPartnerRecyclerView = findViewById(R.id.recyclerView);
 
-		syncedPartnerAdapter = new SyncedPartnerAdapter(this, syncedPartnerList);
+		syncedPartnerAdapter = new SyncedPartnerAdapter(syncedPartnerList);
 		RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
 		syncedPartnerRecyclerView.setLayoutManager(mLayoutManager);
 		syncedPartnerRecyclerView.setItemAnimator(new DefaultItemAnimator());

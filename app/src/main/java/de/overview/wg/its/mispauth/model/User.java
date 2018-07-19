@@ -63,8 +63,8 @@ public class User {
 	private String dateCreated;
 	private String dateModified;
 
-	public User() {
-	}
+	public User() {}
+
 	public User(JSONObject user) throws JSONException {
 		fromJSON(user);
 	}
@@ -136,6 +136,12 @@ public class User {
 		}
 
 		return user;
+	}
+
+	public void clearForStorage() {
+		setAuthkey("");
+		setGpgKey("");
+		setCertifPublic("");
 	}
 
 
