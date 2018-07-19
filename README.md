@@ -4,7 +4,7 @@ With MISPBump it is easy to share events on your MISP instance with other instan
 
 # Security
 
-A keyagreement is realized with Diffie Hellman (Elliptic Curve 256 Bit), and the data sent afterwards is encrypted with AES.  
+A keyagreement is realized with Diffie Hellman (Elliptic Curve 256 Bit), sensible data is encrypted with AES.  
 
 # How does it work?
 
