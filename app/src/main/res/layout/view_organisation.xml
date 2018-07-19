@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.LinearLayoutCompat
+		android:id="@+id/myOrganisationView"
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical"
+		android:padding="16dp">
+
+	<TextView
+			android:id="@+id/organisation_title"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="left"
+			android:textSize="20sp"
+			android:textStyle="bold"
+			android:text="Title"/>
+
+	<TextView
+			android:id="@+id/organisation_uuid"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="left"
+			android:textStyle="italic"
+			android:text="uuid"/>
+
+	<GridLayout
+			android:orientation="horizontal"
+			android:layout_height="match_parent"
+			android:layout_width="match_parent"
+			android:rowCount="5"
+			android:columnCount="2">
+
+		<TextView
+				android:paddingTop="32dp"
+				android:text="Description"
+				android:textStyle="bold"/>
+
+		<TextView
+				android:layout_width="0dip"
+				android:layout_gravity="fill_horizontal"
+				android:paddingLeft="16dp"
+				android:id="@+id/organisation_description"
+				android:text="Description"/>
+
+		<TextView
+				android:paddingTop="16dp"
+				android:text="Nationality"
+				android:textStyle="bold"/>
+
+		<TextView
+				android:layout_width="0dip"
+				android:layout_gravity="fill_horizontal"
+				android:paddingLeft="16dp"
+				android:id="@+id/organisation_nationality"
+				android:text="Germany"/>
+
+		<TextView
+				android:paddingTop="16dp"
+				android:text="Sector"
+				android:textStyle="bold"/>
+
+		<TextView
+				android:layout_width="0dip"
+				android:layout_gravity="fill_horizontal"
+				android:paddingLeft="16dp"
+				android:id="@+id/organisation_sector"
+				android:text="Software"/>
+
+		<TextView
+				android:paddingTop="16dp"
+				android:text="Users"
+				android:textStyle="bold"/>
+
+		<TextView
+				android:layout_width="0dip"
+				android:layout_gravity="fill_horizontal"
+				android:paddingLeft="16dp"
+				android:id="@+id/organisation_user_count"
+				android:text="0"/>
+
+	</GridLayout>
+
+</android.support.v7.widget.LinearLayoutCompat>

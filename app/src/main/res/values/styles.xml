@@ -6,23 +6,16 @@
 		<item name="colorAccent">@color/colorAccent</item>
 	</style>
 
-    <style name="TextLabel" parent="TextAppearance.AppCompat">
+	<style name="AppTheme.Fullscreen" parent="AppTheme">
+		<item name="android:windowTranslucentNavigation">true</item>
+	</style>
 
-        <item name="android:textColorHint">@color/color_text_foreground</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:textColorPrimary">@color/color_text_foreground</item>
+	<style name="DialogAnimation">
+		<item name="android:windowEnterAnimation">@anim/slide_up</item>
+		<item name="android:windowExitAnimation">@anim/slide_down</item>
+	</style>
 
-        <item name="android:background">@color/colorPrimary</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorControlNormal">@color/color_text_foreground</item>
-        <item name="colorControlActivated">@color/colorAccent</item>
-    </style>
+	<style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+	<style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="CustomButton" parent="Widget.AppCompat.Button">
-        <item name="android:background">@color/colorPrimary</item>
-        <item name="android:textColor">@color/color_text_foreground</item>
-    </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

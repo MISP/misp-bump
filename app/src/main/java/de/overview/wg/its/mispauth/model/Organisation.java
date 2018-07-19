@@ -5,6 +5,8 @@ import org.json.JSONObject;
 
 public class Organisation {
 
+	public static final String ROOT_KEY = "Organisation";
+
 	private static String ID_KEY = "id";
 	private static String NAME_KEY = "name";
 	private static String DATE_CREATED_KEY = "date_created";
@@ -34,48 +36,57 @@ public class Organisation {
 	private int createdBy;
 	private int userCount;
 
-	public Organisation() {}
-
-	public void fromJSON(JSONObject org) {
-
-		try {
-			id = org.getInt(ID_KEY);
-			dateCreated = org.getString(DATE_CREATED_KEY);
-			dateModified = org.getString(DATE_MODIFIED_KEY);
-			name = org.getString(NAME_KEY);
-			type = org.getString(TYPE_KEY);
-			nationality = org.getString(NATIONALITY_KEY);
-			sector = org.getString(SECTOR_KEY);
-			contacts = org.getString(CONTACTS_KEY);
-			description = org.getString(DESCRIPTION_KEY);
-			local = org.getBoolean(LOCAL_KEY);
-			uuid = org.getString(UUID_KEY);
-			restrictedToDomain = org.getString(RESTRICTED_TO_DOMAIN_KEY);
-			createdBy = org.getInt(CREATED_BY_KEY);
-			userCount = org.getInt(USER_COUNT_KEY);
-
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+	public Organisation() {
 	}
+
+	public Organisation(JSONObject json) throws JSONException {
+		fromJSON(json);
+	}
+
+	public void fromJSON(JSONObject org) throws JSONException {
+
+		id = org.optInt(ID_KEY, -1);
+		dateCreated = org.optString(DATE_CREATED_KEY);
+		dateModified = org.optString(DATE_MODIFIED_KEY);
+		name = org.optString(NAME_KEY);
+		type = org.optString(TYPE_KEY);
+		nationality = org.optString(NATIONALITY_KEY);
+		sector = org.optString(SECTOR_KEY);
+		contacts = org.optString(CONTACTS_KEY);
+		description = org.optString(DESCRIPTION_KEY);
+		local = org.optBoolean(LOCAL_KEY, true);
+		uuid = org.optString(UUID_KEY);
+		restrictedToDomain = org.optString(RESTRICTED_TO_DOMAIN_KEY);
+		createdBy = org.optInt(CREATED_BY_KEY, -1);
+		userCount = org.optInt(USER_COUNT_KEY);
+
+	}
+
 	public JSONObject toJSON() {
+		return toJSON(false);
+	}
+
+	public JSONObject toJSON(boolean minimal) {
 		JSONObject org = new JSONObject();
 
 		try {
-			org.put(ID_KEY, id);
-			org.put(NAME_KEY, name);
-			org.put(DATE_CREATED_KEY, dateCreated);
-			org.put(DATE_MODIFIED_KEY, dateModified);
-			org.put(TYPE_KEY, type);
-			org.put(NATIONALITY_KEY, nationality);
-			org.put(SECTOR_KEY, sector);
-			org.put(CONTACTS_KEY, contacts);
-			org.put(DESCRIPTION_KEY, description);
-			org.put(LOCAL_KEY, local);
-			org.put(UUID_KEY, uuid);
-			org.put(RESTRICTED_TO_DOMAIN_KEY, restrictedToDomain);
-			org.put(CREATED_BY_KEY, createdBy);
-			org.put(USER_COUNT_KEY, userCount);
+			org.putOpt(NAME_KEY, name);
+			org.putOpt(DESCRIPTION_KEY, description);
+			org.putOpt(NATIONALITY_KEY, nationality);
+			org.putOpt(SECTOR_KEY, sector);
+			org.putOpt(USER_COUNT_KEY, userCount);
+
+			if (!minimal) {
+				org.putOpt(ID_KEY, id);
+				org.putOpt(UUID_KEY, uuid);
+				org.putOpt(TYPE_KEY, type);
+				org.putOpt(CONTACTS_KEY, contacts);
+				org.putOpt(DATE_CREATED_KEY, dateCreated);
+				org.putOpt(DATE_MODIFIED_KEY, dateModified);
+				org.putOpt(LOCAL_KEY, local);
+				org.putOpt(RESTRICTED_TO_DOMAIN_KEY, restrictedToDomain);
+				org.putOpt(CREATED_BY_KEY, createdBy);
+			}
 
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -88,13 +99,15 @@ public class Organisation {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getName(){
+
+	public String getName() {
 		return name;
 	}
 
 	public String getDescription() {
 		return description;
 	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -102,6 +115,7 @@ public class Organisation {
 	public String getSector() {
 		return sector;
 	}
+
 	public void setSector(String sector) {
 		this.sector = sector;
 	}
@@ -109,6 +123,7 @@ public class Organisation {
 	public String getNationality() {
 		return nationality;
 	}
+
 	public void setNationality(String nationality) {
 		this.nationality = nationality;
 	}
@@ -116,6 +131,7 @@ public class Organisation {
 	public int getId() {
 		return id;
 	}
+
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -123,6 +139,7 @@ public class Organisation {
 	public String getDateCreated() {
 		return dateCreated;
 	}
+
 	public void setDateCreated(String dateCreated) {
 		this.dateCreated = dateCreated;
 	}
@@ -130,6 +147,7 @@ public class Organisation {
 	public String getDateModified() {
 		return dateModified;
 	}
+
 	public void setDateModified(String dateModified) {
 		this.dateModified = dateModified;
 	}
@@ -137,6 +155,7 @@ public class Organisation {
 	public String getType() {
 		return type;
 	}
+
 	public void setType(String type) {
 		this.type = type;
 	}
@@ -144,6 +163,7 @@ public class Organisation {
 	public String getContacts() {
 		return contacts;
 	}
+
 	public void setContacts(String contacts) {
 		this.contacts = contacts;
 	}
@@ -151,6 +171,7 @@ public class Organisation {
 	public boolean isLocal() {
 		return local;
 	}
+
 	public void setLocal(boolean local) {
 		this.local = local;
 	}
@@ -158,6 +179,7 @@ public class Organisation {
 	public String getUuid() {
 		return uuid;
 	}
+
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
@@ -165,6 +187,7 @@ public class Organisation {
 	public String getRestrictedToDomain() {
 		return restrictedToDomain;
 	}
+
 	public void setRestrictedToDomain(String restrictedToDomain) {
 		this.restrictedToDomain = restrictedToDomain;
 	}
@@ -172,6 +195,7 @@ public class Organisation {
 	public int getCreatedBy() {
 		return createdBy;
 	}
+
 	public void setCreatedBy(int createdBy) {
 		this.createdBy = createdBy;
 	}
@@ -179,6 +203,7 @@ public class Organisation {
 	public int getUserCount() {
 		return userCount;
 	}
+
 	public void setUserCount(int userCount) {
 		this.userCount = userCount;
 	}

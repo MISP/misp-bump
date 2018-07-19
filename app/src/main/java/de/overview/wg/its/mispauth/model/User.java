@@ -5,6 +5,18 @@ import org.json.JSONObject;
 
 public class User {
 
+	// todo: must be configable? Roles can be edited on instance
+	public interface RoleId {
+		int ADMIN = 1;
+		int ORG_ADMIN = 2;
+		int USER = 3;
+		int PUBLISHER = 4;
+		int SYNC_USER = 5;
+		int READ_ONLY = 6;
+	}
+
+	public static final String ROOT_KEY = "User";
+
 	private static String ID_KEY = "id";
 	private static String PASSWORD_KEY = "password";
 	private static String ORG_ID_KEY = "org_id";
@@ -51,79 +63,85 @@ public class User {
 	private String dateCreated;
 	private String dateModified;
 
-	public User() {}
-
-	public void fromJSON(JSONObject user) {
-		try {
-
-			id = user.getInt(ID_KEY);
-			password = user.getString(PASSWORD_KEY);
-			orgId = user.getInt(ORG_ID_KEY);
-			email = user.getString(EMAIL_KEY);
-			autoAlert = user.getBoolean(AUTOALERT_KEY);
-			authkey = user.getString(AUTHKEY_KEY);
-			invitedBy = user.getInt(INVITED_BY_KEY);
-			gpgKey = user.getString(GPGKEY_KEY);
-			certifPublic = user.getString(CERTIF_PUBLIC);
-			nidsSid = user.getInt(NIDS_SID);
-			termsAccepted = user.getBoolean(TERMS_ACCEPTED_KEY);
-			newsRead = user.getInt(NEWSREAD_KEY);
-			roleId = user.getInt(ROLE_ID_KEY);
-			changePw = user.getString(CHANGE_PW_KEY);
-			contactAlert = user.getBoolean(CONTACT_ALERT_KEY);
-			disabled = user.getBoolean(DISABLED_KEY);
-			expiration = user.getString(EXPIRATION_KEY);
-			currentLogin = user.getString(CURRENT_LOGIN_KEY);
-			lastLogin = user.getString(LAST_LOGIN_KEY);
-			forceLogout = user.getBoolean(FORCE_LOGOUT_KEY);
-			dateCreated = user.getString(DATE_CREATED_KEY);
-			dateModified = user.getString(DATE_MODIFIED_KEY);
-
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
+	public User() {
+	}
+	public User(JSONObject user) throws JSONException {
+		fromJSON(user);
 	}
 
+	public void fromJSON(JSONObject user) throws JSONException {
+
+		id = user.optInt(ID_KEY, -1);
+		password = user.optString(PASSWORD_KEY);
+		orgId = user.optInt(ORG_ID_KEY, -1);
+		email = user.optString(EMAIL_KEY);
+		autoAlert = user.optBoolean(AUTOALERT_KEY);
+		authkey = user.optString(AUTHKEY_KEY);
+		invitedBy = user.optInt(INVITED_BY_KEY, -1);
+		gpgKey = user.optString(GPGKEY_KEY);
+		certifPublic = user.optString(CERTIF_PUBLIC);
+		nidsSid = user.optInt(NIDS_SID);
+		termsAccepted = user.optBoolean(TERMS_ACCEPTED_KEY, false);
+		newsRead = user.optInt(NEWSREAD_KEY);
+		roleId = user.optInt(ROLE_ID_KEY, -1);
+		changePw = user.optString(CHANGE_PW_KEY);
+		contactAlert = user.optBoolean(CONTACT_ALERT_KEY, true);
+		disabled = user.optBoolean(DISABLED_KEY, false);
+		expiration = user.optString(EXPIRATION_KEY);
+		currentLogin = user.optString(CURRENT_LOGIN_KEY);
+		lastLogin = user.optString(LAST_LOGIN_KEY);
+		forceLogout = user.optBoolean(FORCE_LOGOUT_KEY);
+		dateCreated = user.optString(DATE_CREATED_KEY);
+		dateModified = user.optString(DATE_MODIFIED_KEY);
+
+	}
 	public JSONObject toJSON() {
+		return toJSON(false);
+	}
+	public JSONObject toJSON(boolean forSyncQR) {
 		JSONObject user = new JSONObject();
 
 		try {
 
-			user.put(ID_KEY, id);
-			user.put(PASSWORD_KEY, password);
-			user.put(ORG_ID_KEY, orgId);
-			user.put(EMAIL_KEY, email);
-			user.put(AUTOALERT_KEY, autoAlert);
-			user.put(AUTHKEY_KEY, authkey);
-			user.put(INVITED_BY_KEY, invitedBy);
-			user.put(GPGKEY_KEY, gpgKey);
-			user.put(CERTIF_PUBLIC, certifPublic);
-			user.put(NIDS_SID, nidsSid);
-			user.put(TERMS_ACCEPTED_KEY, termsAccepted);
-			user.put(NEWSREAD_KEY, newsRead);
-			user.put(ROLE_ID_KEY, roleId);
-			user.put(CHANGE_PW_KEY, changePw);
-			user.put(CONTACT_ALERT_KEY, contactAlert);
-			user.put(DISABLED_KEY, disabled);
-			user.put(EXPIRATION_KEY, expiration);
-			user.put(CURRENT_LOGIN_KEY, currentLogin);
-			user.put(LAST_LOGIN_KEY, lastLogin);
-			user.put(FORCE_LOGOUT_KEY, forceLogout);
-			user.put(DATE_CREATED_KEY, dateCreated);
-			user.put(DATE_MODIFIED_KEY, dateModified);
+			user.putOpt(EMAIL_KEY, email);
+
+			if (!forSyncQR) {
+
+				user.putOpt(ID_KEY, id);
+				user.putOpt(ORG_ID_KEY, orgId);
+				user.putOpt(AUTHKEY_KEY, authkey);
+				user.putOpt(ROLE_ID_KEY, roleId);
+				user.putOpt(PASSWORD_KEY, password);
+				user.putOpt(CHANGE_PW_KEY, changePw);
+				user.putOpt(TERMS_ACCEPTED_KEY, termsAccepted);
+				user.putOpt(CERTIF_PUBLIC, certifPublic);
+				user.putOpt(GPGKEY_KEY, gpgKey);
+				user.putOpt(AUTOALERT_KEY, autoAlert);
+				user.putOpt(INVITED_BY_KEY, invitedBy);
+				user.putOpt(NIDS_SID, nidsSid);
+				user.putOpt(NEWSREAD_KEY, newsRead);
+				user.putOpt(CONTACT_ALERT_KEY, contactAlert);
+				user.putOpt(DISABLED_KEY, disabled);
+				user.putOpt(EXPIRATION_KEY, expiration);
+				user.putOpt(CURRENT_LOGIN_KEY, currentLogin);
+				user.putOpt(LAST_LOGIN_KEY, lastLogin);
+				user.putOpt(FORCE_LOGOUT_KEY, forceLogout);
+				user.putOpt(DATE_CREATED_KEY, dateCreated);
+				user.putOpt(DATE_MODIFIED_KEY, dateModified);
+
+			}
 
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 
-		return  user;
+		return user;
 	}
+
 
 	public int getId() {
 		return id;
 	}
-
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -131,7 +149,6 @@ public class User {
 	public String getPassword() {
 		return password;
 	}
-
 	public void setPassword(String password) {
 		this.password = password;
 	}
@@ -139,7 +156,6 @@ public class User {
 	public int getOrgId() {
 		return orgId;
 	}
-
 	public void setOrgId(int orgId) {
 		this.orgId = orgId;
 	}
@@ -147,7 +163,6 @@ public class User {
 	public String getEmail() {
 		return email;
 	}
-
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -155,7 +170,6 @@ public class User {
 	public boolean isAutoAlert() {
 		return autoAlert;
 	}
-
 	public void setAutoAlert(boolean autoAlert) {
 		this.autoAlert = autoAlert;
 	}
@@ -163,7 +177,6 @@ public class User {
 	public String getAuthkey() {
 		return authkey;
 	}
-
 	public void setAuthkey(String authkey) {
 		this.authkey = authkey;
 	}
@@ -171,7 +184,6 @@ public class User {
 	public int getInvitedBy() {
 		return invitedBy;
 	}
-
 	public void setInvitedBy(int invitedBy) {
 		this.invitedBy = invitedBy;
 	}
@@ -179,7 +191,6 @@ public class User {
 	public String getGpgKey() {
 		return gpgKey;
 	}
-
 	public void setGpgKey(String gpgKey) {
 		this.gpgKey = gpgKey;
 	}
@@ -187,7 +198,6 @@ public class User {
 	public String getCertifPublic() {
 		return certifPublic;
 	}
-
 	public void setCertifPublic(String certifPublic) {
 		this.certifPublic = certifPublic;
 	}
@@ -195,7 +205,6 @@ public class User {
 	public int getNidsSid() {
 		return nidsSid;
 	}
-
 	public void setNidsSid(int nidsSid) {
 		this.nidsSid = nidsSid;
 	}
@@ -203,7 +212,6 @@ public class User {
 	public boolean isTermsAccepted() {
 		return termsAccepted;
 	}
-
 	public void setTermsAccepted(boolean termsAccepted) {
 		this.termsAccepted = termsAccepted;
 	}
@@ -211,7 +219,6 @@ public class User {
 	public int getNewsRead() {
 		return newsRead;
 	}
-
 	public void setNewsRead(int newsRead) {
 		this.newsRead = newsRead;
 	}
@@ -219,7 +226,6 @@ public class User {
 	public int getRoleId() {
 		return roleId;
 	}
-
 	public void setRoleId(int roleId) {
 		this.roleId = roleId;
 	}
@@ -227,7 +233,6 @@ public class User {
 	public String getChangePw() {
 		return changePw;
 	}
-
 	public void setChangePw(String changePw) {
 		this.changePw = changePw;
 	}
@@ -235,7 +240,6 @@ public class User {
 	public boolean isContactAlert() {
 		return contactAlert;
 	}
-
 	public void setContactAlert(boolean contactAlert) {
 		this.contactAlert = contactAlert;
 	}
@@ -243,7 +247,6 @@ public class User {
 	public boolean isDisabled() {
 		return disabled;
 	}
-
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
 	}
@@ -251,7 +254,6 @@ public class User {
 	public String getExpiration() {
 		return expiration;
 	}
-
 	public void setExpiration(String expiration) {
 		this.expiration = expiration;
 	}
@@ -259,7 +261,6 @@ public class User {
 	public String getCurrentLogin() {
 		return currentLogin;
 	}
-
 	public void setCurrentLogin(String currentLogin) {
 		this.currentLogin = currentLogin;
 	}
@@ -267,7 +268,6 @@ public class User {
 	public String getLastLogin() {
 		return lastLogin;
 	}
-
 	public void setLastLogin(String lastLogin) {
 		this.lastLogin = lastLogin;
 	}
@@ -275,7 +275,6 @@ public class User {
 	public boolean isForceLogout() {
 		return forceLogout;
 	}
-
 	public void setForceLogout(boolean forceLogout) {
 		this.forceLogout = forceLogout;
 	}
@@ -283,7 +282,6 @@ public class User {
 	public String getDateCreated() {
 		return dateCreated;
 	}
-
 	public void setDateCreated(String dateCreated) {
 		this.dateCreated = dateCreated;
 	}
@@ -291,7 +289,6 @@ public class User {
 	public String getDateModified() {
 		return dateModified;
 	}
-
 	public void setDateModified(String dateModified) {
 		this.dateModified = dateModified;
 	}
