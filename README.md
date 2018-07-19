@@ -6,7 +6,13 @@ With MISPBump it is easy to share events on your MISP instance with other instan
 
 A key agreement is realized with Diffie Hellman (Elliptic Curve 256 Bit), sensible data is encrypted with AES.  
 
+(how are credentials stored in app, keystore?)
+
+
+
 # How does it work?
+
+1. Main screen (no changes)
 
 1. Gather your organisation information from your MISP instance
 ![Gather Information](./Screenshots/sync-profile.png)
