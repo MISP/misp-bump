@@ -148,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
 			emptyPartnerListView.setVisibility(View.VISIBLE);
 			syncedPartnerRecyclerView.setVisibility(View.GONE);
 		} else {
+			emptyPartnerListView.setVisibility(View.GONE);
 			syncedPartnerAdapter.setSyncedPartnerList(syncedPartnerList);
 		}
 	}
