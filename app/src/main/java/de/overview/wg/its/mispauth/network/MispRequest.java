@@ -40,7 +40,6 @@ import java.util.Map;
  */
 public class MispRequest {
 
-	private static final String TAG = "DEBUG";
 	private static MispRequest instance;
 
 	private RequestQueue requestQueue;
@@ -50,11 +49,13 @@ public class MispRequest {
 	/**
 	 * @param context for Volley and PreferenceManager
 	 */
-	private MispRequest(Context context) {
+	private MispRequest(Context context, boolean loadSavedCredentials) {
 		requestQueue = Volley.newRequestQueue(context);
-		preferenceManager = PreferenceManager.Instance(context);
 
-		loadSavedCredentials();
+		if (loadSavedCredentials) {
+			preferenceManager = PreferenceManager.Instance(context);
+			loadSavedCredentials();
+		}
 	}
 
 	private void loadSavedCredentials() {
@@ -121,13 +122,11 @@ public class MispRequest {
 		Response.ErrorListener errorListener = new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				Log.e(TAG, "onErrorResponse: " + error.toString());
 				callback.onError(error);
 			}
 		};
 
 		if (serverUrl.isEmpty() || apiKey.isEmpty()) {
-			Log.e(TAG, "getMyUser: server or api key is empty!");
 			return;
 		}
 
@@ -193,14 +192,13 @@ public class MispRequest {
 				}
 
 				callback.onResult(resultArray);
-				Log.d(TAG, "onResponse: " + resultArray.toString());
 			}
 		};
 
 		Response.ErrorListener errorListener = new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				Log.d(TAG, "onErrorResponse: " + ReadableError.toReadable(error));
+				callback.onError(error);
 			}
 		};
 
@@ -324,75 +322,10 @@ public class MispRequest {
 		this.apiKey = apiKey;
 	}
 
-//	private SSLSocketFactory getSocketFactory(Context context) {
-//
-//		CertificateFactory cf = null;
-//		try {
-//			cf = CertificateFactory.getInstance("X.509");
-//			InputStream caInput = context.getResources().openRawResource(R.raw.server);
-//			Certificate ca;
-//			try {
-//				ca = cf.generateCertificate(caInput);
-//				Log.e("CERT", "ca=" + ((X509Certificate) ca).getSubjectDN());
-//			} finally {
-//				caInput.close();
-//			}
-//
-//
-//			String keyStoreType = KeyStore.getDefaultType();
-//			KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-//			keyStore.load(null, null);
-//			keyStore.setCertificateEntry("ca", ca);
-//
-//
-//			String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-//			TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-//			tmf.init(keyStore);
-//
-//
-//			HostnameVerifier hostnameVerifier = new HostnameVerifier() {
-//				@Override
-//				public boolean verify(String hostname, SSLSession session) {
-//
-//					Log.e("CipherUsed", session.getCipherSuite());
-//					return hostname.compareTo("192.168.1.10")==0; //The Hostname of your server
-//
-//				}
-//			};
-//
-//
-//			HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
-//			SSLContext context = null;
-//			context = SSLContext.getInstance("TLS");
-//
-//			context.init(null, tmf.getTrustManagers(), null);
-//			HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
-//
-//			SSLSocketFactory sf = context.getSocketFactory();
-//
-//
-//			return sf;
-//
-//		} catch (CertificateException e) {
-//			e.printStackTrace();
-//		} catch (NoSuchAlgorithmException e) {
-//			e.printStackTrace();
-//		} catch (KeyStoreException e) {
-//			e.printStackTrace();
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} catch (KeyManagementException e) {
-//			e.printStackTrace();
-//		}
-//
-//		return  null;
-//	}
+	public static MispRequest Instance(Context context, boolean loadSavedCredentials) {
 
-	public static MispRequest Instance(Context context) {
 		if (instance == null) {
-			instance = new MispRequest(context);
+			instance = new MispRequest(context, loadSavedCredentials);
 		}
 
 		return instance;

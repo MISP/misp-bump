@@ -7,6 +7,7 @@ import java.util.Random;
 
 public class RandomString {
 
+	@SuppressWarnings("SpellCheckingInspection")
 	private static final String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private static final String lower = upper.toLowerCase(Locale.ROOT);
 	private static final String digits = "0123456789";
@@ -16,7 +17,7 @@ public class RandomString {
 	private final char[] symbols;
 	private final char[] buf;
 
-	public RandomString(int length, Random random, String symbols) {
+	private RandomString(int length, Random random, String symbols) {
 
 		if (length < 1) {
 			throw new IllegalArgumentException();
@@ -30,11 +31,9 @@ public class RandomString {
 		this.buf = new char[length];
 
 	}
-
-	public RandomString(int length, Random random) {
+	private RandomString(int length, Random random) {
 		this(length, random, alphaNum);
 	}
-
 	public RandomString(int length) {
 		this(length, new SecureRandom());
 	}

@@ -1,9 +1,6 @@
 package de.overview.wg.its.mispauth.auxiliary;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.NoConnectionError;
-import com.android.volley.ServerError;
-import com.android.volley.VolleyError;
+import com.android.volley.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,7 +18,7 @@ public class ReadableError {
 				String name = response.getString("name");
 				String errorName = error.getJSONArray("name").get(0).toString();
 
-				if(!errorName.equals("")) {
+				if (!errorName.equals("")) {
 					return errorName;
 				} else if (!name.equals("")) {
 					return name;
@@ -34,12 +31,19 @@ public class ReadableError {
 
 		if (volleyError instanceof NoConnectionError) {
 			return "Connection failed";
+		} else if (volleyError instanceof TimeoutError) {
+			return "Connection timed out";
+		} else if (volleyError instanceof NetworkError) {
+			return "Network error";
 		} else if (volleyError instanceof AuthFailureError) {
 			return "Authentication failed";
 		} else if (volleyError instanceof ServerError) {
 			return "Server error";
+		} else if (volleyError instanceof ParseError) {
+			return "Parsing error";
 		}
 
 		return volleyError.toString();
 	}
+
 }

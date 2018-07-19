@@ -1,6 +1,5 @@
 package de.overview.wg.its.mispauth.adapter;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,9 +15,10 @@ public class SyncedPartnerAdapter extends RecyclerView.Adapter<SyncedPartnerAdap
 
 	private List<SyncedPartner> syncedPartnerList;
 
-	public class MyViewHolder extends RecyclerView.ViewHolder {
-		public TextView title, dateAdded, url;
-		public MyViewHolder(View view) {
+	class MyViewHolder extends RecyclerView.ViewHolder {
+		TextView title, dateAdded, url;
+
+		MyViewHolder(View view) {
 			super(view);
 			title = view.findViewById(R.id.title);
 			dateAdded = view.findViewById(R.id.dateSynced);
@@ -26,7 +26,7 @@ public class SyncedPartnerAdapter extends RecyclerView.Adapter<SyncedPartnerAdap
 		}
 	}
 
-	public SyncedPartnerAdapter(Context context, List<SyncedPartner> syncedPartnerList) {
+	public SyncedPartnerAdapter(List<SyncedPartner> syncedPartnerList) {
 		this.syncedPartnerList = syncedPartnerList;
 	}
 

@@ -2,9 +2,8 @@
 <resources>
 	<string name="app_name">MISPBump</string>
 
-	<string name="nav_exit">Verlassen</string>
-	<string name="bottom_nav_next">Weiter</string>
-	<string name="bottom_nav_prev">Zurück</string>
+	<string name="exit">Verlassen</string>
+	<string name="previous">Zurück</string>
 	<string name="empty_sync_list">Sie haben bisher keine Instanzen verknüpft</string>
 	<string name="empty_my_org">Keine lokalen Informationen vorhanden</string>
 	<string name="save_authkey">Autorisierungschlüssel speichern (potentielles Sicherheitsrisiko)</string>
@@ -37,4 +36,7 @@
 	<string name="credential_settings">Autentifizierungseinstellungen</string>
 
 	<string name="sync_info_let_scan">Drücken Sie weiter, wenn dieser QR-Code gescannt wurde</string>
+
+	<string name="error_url_required">Url Ihrer MISP Instanz benötigt</string>
+	<string name="error_api_required">Autorisierungsschlüssel Ihrer MISP Instanz benötigt</string>
 </resources>

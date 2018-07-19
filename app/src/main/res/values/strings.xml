@@ -1,14 +1,13 @@
 <resources>
 	<string name="app_name">MISPBump</string>
 
-	// Bottom Navigation
-	<string name="nav_exit">Exit</string>
+	<string name="exit">Exit</string>
 	<string name="bottom_nav_next">Next</string>
-	<string name="bottom_nav_prev">Back</string>
+	<string name="previous">Back</string>
 
 	<string name="empty_sync_list">You have not synced any instances yet</string>
 	<string name="empty_my_org">No local information available</string>
-	<string name="save_authkey">Save authkey (potential security risk)</string>
+	<string name="save_authkey">Save auth-key (potential security risk)</string>
 	<string name="unsaved_changes">Unsaved changes</string>
 	<string name="save_changes">Do you want to save the changes?</string>
 	<string name="save">Save</string>
@@ -24,17 +23,16 @@
 	<string name="str_continue">continue</string>
 	<string name="delete">delete</string>
 	<string name="delete_local_data">Delete local data</string>
-	<string name="delete_local_data_msg">The URL, Authkey and your local data will be removed.\nThis information is needed for synchronisation.</string>
+	<string name="delete_local_data_msg">The URL, authentication key and your local data will be removed.\nThis information is needed for synchronisation.</string>
 	<string name="override">override</string>
 	<string name="override_local_data">Override local data</string>
 	<string name="override_local_data_msg">Do you really want to override the local information stored on this device?</string>
-
 	<string name="credentials_activity">Sync Profile</string>
-
 	<string name="server_url">Server URL</string>
 	<string name="authkey">Authkey</string>
-
 	<string name="credential_settings">Credential Settings</string>
-
 	<string name="sync_info_let_scan">Press continue if this QR-Code was scanned</string>
+
+	<string name="error_url_required">Enter MISP base url</string>
+	<string name="error_api_required">Enter MISP api key</string>
 </resources>

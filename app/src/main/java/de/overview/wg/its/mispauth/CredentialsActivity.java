@@ -36,7 +36,9 @@ import org.json.JSONObject;
 public class CredentialsActivity extends AppCompatActivity implements View.OnClickListener {
 
 	private boolean changesMade;
-	private boolean saveAuthkey, saveAuthkeyPrefSet;
+	private boolean saveAuthKey;
+
+	private PreferenceManager preferenceManager;
 
 	private TextInputLayout urlLayout, apiLayout;
 	private TextView emptyView;
@@ -48,12 +50,63 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_credentials);
+
+		preferenceManager = PreferenceManager.Instance(this);
 
 		initializeViews();
 		loadPreferences();
 		addSaveChangesListener();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.menu_credentials, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		int id = item.getItemId();
+
+		switch (id) {
+			case android.R.id.home:
+				exitSafely();
+				return true;
+
+			case R.id.load_config:
+
+				// MOTOROLA
+				if (Build.VERSION.SDK_INT <= 25) {
+					urlLayout.getEditText().setText("http://192.168.178.200");
+					apiLayout.getEditText().setText("dcfgDrNy3SyASmo9WRqyJ4LhsN1xWJ7phfTjklFa");
+				} else {
+					urlLayout.getEditText().setText("http://192.168.178.201");
+					apiLayout.getEditText().setText("5BGhMzdHIWvaxyrTUUVNk2NflDPzXJRZQvOa3CE2");
+				}
+				break;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onBackPressed() {
+		exitSafely();
+	}
+
+	@Override
+	public void onClick(View v) {
+		int id = v.getId();
+
+		switch (id) {
+			case R.id.fab_download_own_org_info:
+				downloadOrgInfo();
+				break;
+		}
 	}
 
 	private void initializeViews() {
@@ -64,24 +117,21 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 		progressBar = findViewById(R.id.progressBar);
-
 		urlLayout = findViewById(R.id.input_layout_server_url);
 		apiLayout = findViewById(R.id.input_layout_api_key);
-
-		FloatingActionButton fab = findViewById(R.id.fab_download_own_org_info);
-		fab.setOnClickListener(this);
-
 		emptyView = findViewById(R.id.empty);
 		organisationView = findViewById(R.id.myOrganisationView);
 
+		FloatingActionButton fab = findViewById(R.id.fab_download_own_org_info);
+		fab.setOnClickListener(this);
 	}
 
+	/**
+	 * Loads preferences
+	 */
 	private void loadPreferences() {
 
-		PreferenceManager preferenceManager = PreferenceManager.Instance(this);
-
-		saveAuthkeyPrefSet = preferenceManager.saveAuthkeyEnabledExists();
-		saveAuthkey = preferenceManager.saveAuthkeyEnabled();
+		saveAuthKey = preferenceManager.saveAuthKeyEnabled();
 
 		urlLayout.getEditText().setText(preferenceManager.getMyServerUrl());
 		apiLayout.getEditText().setText(preferenceManager.getMyServerApiKey());
@@ -102,15 +152,12 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 
 		}
 	}
-
 	private void savePreferences() {
 
-		PreferenceManager preferenceManager = PreferenceManager.Instance(this);
-
 		preferenceManager.setMyServerUrl(urlLayout.getEditText().getText().toString());
-		preferenceManager.setSaveAuthkeyEnabled(saveAuthkey);
+		preferenceManager.setSaveAuthKeyEnabled(saveAuthKey);
 
-		if (saveAuthkey) {
+		if (saveAuthKey) {
 			preferenceManager.setMyServerApiKey(apiLayout.getEditText().getText().toString());
 		} else {
 			preferenceManager.setMyServerApiKey("");
@@ -127,6 +174,9 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 		changesMade = false;
 	}
 
+	/**
+	 * Checks whether changes were made to the URL or the API Key
+	 */
 	private void addSaveChangesListener() {
 		urlLayout.getEditText().addTextChangedListener(new TextWatcher() {
 			@Override
@@ -163,7 +213,34 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 		});
 	}
 
-	private void tryDownloadOrgInfo() {
+	private boolean validCredentials() {
+
+		boolean inputError = false;
+
+		String url = urlLayout.getEditText().getText().toString();
+		String auth = apiLayout.getEditText().getText().toString();
+
+		if (url.equals("")) {
+			urlLayout.setError(getResources().getString(R.string.error_url_required));
+			inputError = true;
+		}
+
+		if (auth.equals("")) {
+			apiLayout.setError(getResources().getString(R.string.error_api_required));
+			inputError = true;
+		}
+
+		if (inputError) {
+			return false;
+		}
+
+		urlLayout.setError(null);
+		apiLayout.setError(null);
+
+		return true;
+	}
+
+	private void downloadOrgInfo() {
 
 		if (myOrganisation != null) {
 
@@ -181,34 +258,6 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 			downloadOrgInfo();
 
 		}
-	}
-
-	private boolean validCredentials() {
-		boolean inputError = false;
-		String url = urlLayout.getEditText().getText().toString();
-		String auth = apiLayout.getEditText().getText().toString();
-
-		if (url.equals("")) {
-			urlLayout.setError("Required");
-			inputError = true;
-		}
-
-		if (auth.equals("")) {
-			apiLayout.setError("Required");
-			inputError = true;
-		}
-
-		if (inputError) {
-			return false;
-		}
-
-		urlLayout.setError(null);
-		apiLayout.setError(null);
-
-		return true;
-	}
-
-	private void downloadOrgInfo() {
 
 		if (!validCredentials()) {
 			return;
@@ -220,7 +269,8 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 		progressBar.setVisibility(View.VISIBLE);
 		emptyView.setVisibility(View.GONE);
 
-		final MispRequest mispRequest = MispRequest.Instance(this);
+		final MispRequest mispRequest = MispRequest.Instance(this, false);
+
 		mispRequest.setServerCredentials(urlLayout.getEditText().getText().toString(), apiLayout.getEditText().getText().toString());
 
 		mispRequest.getMyUser(new MispRequest.UserCallback() {
@@ -295,75 +345,9 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 
 	}
 
-	@Override
-	public void onClick(View v) {
-		int id = v.getId();
-
-		switch (id) {
-			case R.id.fab_download_own_org_info:
-				tryDownloadOrgInfo();
-				break;
-		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.menu_credentials, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-
-		int id = item.getItemId();
-
-		switch (id) {
-			case android.R.id.home:
-				exitSafely();
-				return true;
-
-//			case R.id.menu_item_deleteData:
-//				DialogInterface.OnClickListener pos = new DialogInterface.OnClickListener() {
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						PreferenceManager.Instance(getApplicationContext()).clearCredentialPreferences();
-//						urlLayout.getEditText().setText("");
-//						apiLayout.getEditText().setText("");
-//						myOrganisation = null;
-//						myUser = null;
-//						emptyView.setVisibility(View.VISIBLE);
-//						organisationView.setVisibility(View.GONE);
-//					}
-//				};
-//
-//				new DialogFactory(this).createDeleteDialog(pos, null).show();
-//
-//				break;
-
-			case R.id.load_config:
-
-				// MOTOROLA
-				if (Build.VERSION.SDK_INT <= 25) {
-					urlLayout.getEditText().setText("http://192.168.178.200");
-					apiLayout.getEditText().setText("dcfgDrNy3SyASmo9WRqyJ4LhsN1xWJ7phfTjklFa");
-				} else {
-					urlLayout.getEditText().setText("http://192.168.178.201");
-					apiLayout.getEditText().setText("5BGhMzdHIWvaxyrTUUVNk2NflDPzXJRZQvOa3CE2");
-				}
-				break;
-		}
-
-		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
-	public void onBackPressed() {
-		exitSafely();
-	}
-
 	private void exitSafely() {
 
-		if (changesMade || !saveAuthkeyPrefSet) {
+		if (changesMade || !preferenceManager.saveAuthKeyEnabledExists()) {
 			saveDialog(new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -394,12 +378,11 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 		@SuppressLint("InflateParams")
 		View checkBoxView = getLayoutInflater().inflate(R.layout.dialog_save_authkey, null);
 		CheckBox c = checkBoxView.findViewById(R.id.checkbox);
-		c.setChecked(saveAuthkey);
-
+		c.setChecked(saveAuthKey);
 		c.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				saveAuthkey = isChecked;
+				saveAuthKey = isChecked;
 			}
 		});
 

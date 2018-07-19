@@ -47,7 +47,7 @@ public class UploadActivity extends AppCompatActivity implements View.OnClickLis
 
 		partnerInformation = new Gson().fromJson(info, SyncInformationQr.class);
 
-		mispRequest = MispRequest.Instance(this);
+		mispRequest = MispRequest.Instance(this, true);
 
 		initializeViews();
 

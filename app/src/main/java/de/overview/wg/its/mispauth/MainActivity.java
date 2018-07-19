@@ -22,6 +22,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import de.overview.wg.its.mispauth.adapter.SyncedPartnerAdapter;
 import de.overview.wg.its.mispauth.auxiliary.PreferenceManager;
+import de.overview.wg.its.mispauth.cam.DialogFactory;
 import de.overview.wg.its.mispauth.model.SyncedPartner;
 
 import java.util.ArrayList;

@@ -50,13 +50,13 @@ public class PreferenceManager {
 		editor.apply();
     }
 
-    public boolean saveAuthkeyEnabledExists() {
+    public boolean saveAuthKeyEnabledExists() {
 	    return userPreferences.contains(PREF_KEY_SAVE_AUTHKEY_ENABLED);
     }
-    public boolean saveAuthkeyEnabled() {
+    public boolean saveAuthKeyEnabled() {
 		return userPreferences.getBoolean(PREF_KEY_SAVE_AUTHKEY_ENABLED, false);
     }
-	public void setSaveAuthkeyEnabled(boolean save) {
+	public void setSaveAuthKeyEnabled(boolean save) {
     	SharedPreferences.Editor editor = userPreferences.edit();
     	editor.putBoolean(PREF_KEY_SAVE_AUTHKEY_ENABLED, save);
     	editor.apply();

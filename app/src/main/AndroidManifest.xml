@@ -21,21 +21,21 @@
 				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
 		</activity>
-
 		<activity
-				android:screenOrientation="portrait"
 				android:name=".SyncActivity"
 				android:label="Sync"
 				android:parentActivityName=".MainActivity"
+				android:screenOrientation="portrait"
 				android:theme="@style/AppTheme.Fullscreen">
 		</activity>
-
 		<activity
-				android:screenOrientation="portrait"
 				android:name=".CredentialsActivity"
 				android:label="@string/credentials_activity"
-				android:parentActivityName=".MainActivity"/>
+				android:parentActivityName=".MainActivity"
+				android:screenOrientation="portrait"/>
+
 		<activity android:name=".UploadActivity"/>
+
 	</application>
 
 </manifest>

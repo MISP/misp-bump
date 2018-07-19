@@ -32,7 +32,7 @@ public class DialogFactory {
 		View title = inflater.inflate(R.layout.dialog_public_key, null);
 		adb.setCustomTitle(title);
 
-		adb.setMessage("\nYou received a Public Key from " + pkqr.getOrganisation() + " (" + pkqr.getUser() + ")");
+		adb.setMessage("\nOrganisation: " + pkqr.getOrganisation() + "\nEmail: " + pkqr.getEmail());
 
 		adb.setPositiveButton(context.getResources().getString(R.string.accept), positiveListener);
 		adb.setNegativeButton(context.getResources().getString(R.string.reject), negativeListener);
@@ -81,36 +81,6 @@ public class DialogFactory {
 		Dialog d = adb.create();
 		d.getWindow().setWindowAnimations(R.style.DialogAnimation);
 		d.getWindow().setDimAmount(0.8f);
-		return d;
-	}
-
-
-	public Dialog createDeleteDialog(DialogInterface.OnClickListener pos,
-	                                 DialogInterface.OnClickListener neg) {
-		adb.setTitle(context.getResources().getString(R.string.delete_local_data));
-		adb.setMessage(context.getResources().getString(R.string.delete_local_data_msg));
-
-		adb.setPositiveButton(context.getResources().getString(R.string.delete), pos);
-		adb.setNegativeButton(android.R.string.cancel, neg);
-
-		adb.setCancelable(true);
-		Dialog d = adb.create();
-		d.getWindow().setWindowAnimations(R.style.DialogAnimation);
-		return d;
-	}
-
-	public Dialog createSelectDeleteDialog(DialogInterface.OnClickListener pos,
-	                                       DialogInterface.OnClickListener neg) {
-
-		adb.setTitle("Delete local data");
-		adb.setMessage("");
-
-		adb.setPositiveButton(context.getResources().getString(R.string.delete), pos);
-		adb.setNegativeButton(android.R.string.cancel, neg);
-
-		adb.setCancelable(true);
-		Dialog d = adb.create();
-		d.getWindow().setWindowAnimations(R.style.DialogAnimation);
 		return d;
 	}
 
