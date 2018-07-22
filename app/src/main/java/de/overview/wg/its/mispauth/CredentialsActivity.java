@@ -10,6 +10,9 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,14 +25,19 @@ import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.android.volley.VolleyError;
+import de.overview.wg.its.mispauth.adapter.OrganisationInfoEntryAdapter;
 import de.overview.wg.its.mispauth.auxiliary.PreferenceManager;
 import de.overview.wg.its.mispauth.auxiliary.ReadableError;
 import de.overview.wg.its.mispauth.cam.DialogFactory;
 import de.overview.wg.its.mispauth.model.Organisation;
+import de.overview.wg.its.mispauth.model.StringPair;
 import de.overview.wg.its.mispauth.model.User;
 import de.overview.wg.its.mispauth.network.MispRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("ConstantConditions")
 @SuppressLint("SetTextI18n")
@@ -42,11 +50,15 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 
 	private TextInputLayout urlLayout, apiLayout;
 	private TextView emptyView;
-	private ViewGroup organisationView;
+//	private ViewGroup organisationView;
 	private ProgressBar progressBar;
 
 	private Organisation myOrganisation;
 	private User myUser;
+
+	private RecyclerView recyclerView;
+	private OrganisationInfoEntryAdapter adapter;
+	private List<StringPair> orgInfoEntries = new ArrayList<>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -120,10 +132,17 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 		urlLayout = findViewById(R.id.input_layout_server_url);
 		apiLayout = findViewById(R.id.input_layout_api_key);
 		emptyView = findViewById(R.id.empty);
-		organisationView = findViewById(R.id.myOrganisationView);
+//		organisationView = findViewById(R.id.myOrganisationView);
 
 		FloatingActionButton fab = findViewById(R.id.fab_download_own_org_info);
 		fab.setOnClickListener(this);
+
+		recyclerView = findViewById(R.id.recyclerView);
+		adapter = new OrganisationInfoEntryAdapter();
+		RecyclerView.LayoutManager manager = new LinearLayoutManager(this);
+		recyclerView.setLayoutManager(manager);
+		recyclerView.setItemAnimator(new DefaultItemAnimator());
+		recyclerView.setAdapter(adapter);
 	}
 
 	/**
@@ -141,15 +160,16 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 		if (myOrganisation == null) {
 
 			emptyView.setVisibility(View.VISIBLE);
-			organisationView.setVisibility(View.GONE);
+//			organisationView.setVisibility(View.GONE);
+			recyclerView.setVisibility(View.GONE);
 
 		} else {
 
 			emptyView.setVisibility(View.GONE);
-			organisationView.setVisibility(View.VISIBLE);
+//			organisationView.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.VISIBLE);
 
 			visualizeOrganisation();
-
 		}
 	}
 	private void savePreferences() {
@@ -164,7 +184,10 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 		}
 
 		if (myUser != null) {
+
+			myUser.clearForStorage();
 			preferenceManager.setMyUser(myUser);
+
 		}
 
 		if (myOrganisation != null) {
@@ -243,20 +266,13 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 	private void downloadOrgInfo() {
 
 		if (myOrganisation != null) {
-
 			DialogInterface.OnClickListener pos = new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					downloadOrgInfo();
 				}
 			};
-
 			new DialogFactory(this).createOverrideDialog(pos, null).show();
-
-		} else {
-
-			downloadOrgInfo();
-
 		}
 
 		if (!validCredentials()) {
@@ -294,7 +310,8 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 							return;
 						}
 
-						organisationView.setVisibility(View.VISIBLE);
+						recyclerView.setVisibility(View.VISIBLE);
+//						organisationView.setVisibility(View.VISIBLE);
 						emptyView.setVisibility(View.GONE);
 
 						progressBar.setVisibility(View.GONE);
@@ -305,7 +322,8 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 					public void onError(VolleyError volleyError) {
 						makeSnackBar(ReadableError.toReadable(volleyError));
 						progressBar.setVisibility(View.GONE);
-						organisationView.setVisibility(View.GONE);
+						recyclerView.setVisibility(View.GONE);
+//						organisationView.setVisibility(View.GONE);
 						emptyView.setVisibility(View.VISIBLE);
 					}
 				});
@@ -315,7 +333,8 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 			public void onError(VolleyError volleyError) {
 				makeSnackBar(ReadableError.toReadable(volleyError));
 				progressBar.setVisibility(View.GONE);
-				organisationView.setVisibility(View.GONE);
+				recyclerView.setVisibility(View.GONE);
+//				organisationView.setVisibility(View.GONE);
 				emptyView.setVisibility(View.VISIBLE);
 			}
 		});
@@ -324,25 +343,32 @@ public class CredentialsActivity extends AppCompatActivity implements View.OnCli
 
 	private void visualizeOrganisation() {
 
-		TextView title = organisationView.findViewById(R.id.organisation_title);
-		title.setText(myOrganisation.getName());
+		orgInfoEntries.add(new StringPair("Name", myOrganisation.getName()));
+//		TextView title = organisationView.findViewById(R.id.organisation_title);
+//		TextView title = findViewById(R.id.org_title);
+//		title.setText(myOrganisation.getName());
 
-		TextView uuid = organisationView.findViewById(R.id.organisation_uuid);
-		uuid.setText(myOrganisation.getUuid());
+		orgInfoEntries.add(new StringPair("UUID", myOrganisation.getUuid()));
+//		TextView uuid = organisationView.findViewById(R.id.organisation_uuid);
+//		uuid.setText(myOrganisation.getUuid());
 
-		TextView description = organisationView.findViewById(R.id.organisation_description);
-		description.setText(myOrganisation.getDescription());
+		orgInfoEntries.add(new StringPair("Description", myOrganisation.getDescription()));
+//		TextView description = organisationView.findViewById(R.id.organisation_description);
+//		description.setText(myOrganisation.getDescription());
 
-		TextView nationality = organisationView.findViewById(R.id.organisation_nationality);
-		nationality.setText(myOrganisation.getNationality());
+		orgInfoEntries.add(new StringPair("Nationality", myOrganisation.getNationality()));
+//		TextView nationality = organisationView.findViewById(R.id.organisation_nationality);
+//		nationality.setText(myOrganisation.getNationality());
 
-		TextView sector = findViewById(R.id.organisation_sector);
-		sector.setText(myOrganisation.getSector());
+		orgInfoEntries.add(new StringPair("Sector", myOrganisation.getSector()));
+//		TextView sector = findViewById(R.id.organisation_sector);
+//		sector.setText(myOrganisation.getSector());
 
-		TextView users = findViewById(R.id.organisation_user_count);
+		orgInfoEntries.add(new StringPair("User Count", "" + myOrganisation.getUserCount()));
+//		TextView users = findViewById(R.id.organisation_user_count);
+//		users.setText("" + myOrganisation.getUserCount());
 
-		users.setText("" + myOrganisation.getUserCount());
-
+		adapter.setList(orgInfoEntries);
 	}
 
 	private void exitSafely() {

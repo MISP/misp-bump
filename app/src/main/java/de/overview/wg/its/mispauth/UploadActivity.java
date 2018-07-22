@@ -92,17 +92,16 @@ public class UploadActivity extends AppCompatActivity implements View.OnClickLis
 	}
 
 	private List<UploadState> syncUploadStates = new ArrayList<>();
-
 	private void SyncUpload() {
 
 		partnerOrganisation = partnerInformation.getOrganisation();
 		partnerSyncUser = partnerInformation.getUser();
 		partnerServer = partnerInformation.getServer();
 
-		syncUploadStates.add(new UploadState("Add local organisation"));
-		syncUploadStates.add(new UploadState("Add sync user to organisation"));
-		syncUploadStates.add(new UploadState("Add external organisation"));
-		syncUploadStates.add(new UploadState("Add sync server"));
+		syncUploadStates.add(new UploadState("Create local organisation"));
+		syncUploadStates.add(new UploadState("Create sync user & add to organisation"));
+		syncUploadStates.add(new UploadState("Create external organisation"));
+		syncUploadStates.add(new UploadState("Create sync server"));
 
 		uploadStateAdapter.setStateList(syncUploadStates);
 

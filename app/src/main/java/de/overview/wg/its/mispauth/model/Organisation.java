@@ -36,13 +36,11 @@ public class Organisation {
 	private int createdBy;
 	private int userCount;
 
-	public Organisation() {
-	}
+	public Organisation() {}
 
 	public Organisation(JSONObject json) throws JSONException {
 		fromJSON(json);
 	}
-
 	public void fromJSON(JSONObject org) throws JSONException {
 
 		id = org.optInt(ID_KEY, -1);
@@ -65,7 +63,6 @@ public class Organisation {
 	public JSONObject toJSON() {
 		return toJSON(false);
 	}
-
 	public JSONObject toJSON(boolean minimal) {
 		JSONObject org = new JSONObject();
 
@@ -99,7 +96,6 @@ public class Organisation {
 	public void setName(String name) {
 		this.name = name;
 	}
-
 	public String getName() {
 		return name;
 	}
@@ -107,7 +103,6 @@ public class Organisation {
 	public String getDescription() {
 		return description;
 	}
-
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -115,7 +110,6 @@ public class Organisation {
 	public String getSector() {
 		return sector;
 	}
-
 	public void setSector(String sector) {
 		this.sector = sector;
 	}
@@ -123,7 +117,6 @@ public class Organisation {
 	public String getNationality() {
 		return nationality;
 	}
-
 	public void setNationality(String nationality) {
 		this.nationality = nationality;
 	}
@@ -131,7 +124,6 @@ public class Organisation {
 	public int getId() {
 		return id;
 	}
-
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -139,7 +131,6 @@ public class Organisation {
 	public String getDateCreated() {
 		return dateCreated;
 	}
-
 	public void setDateCreated(String dateCreated) {
 		this.dateCreated = dateCreated;
 	}
@@ -147,7 +138,6 @@ public class Organisation {
 	public String getDateModified() {
 		return dateModified;
 	}
-
 	public void setDateModified(String dateModified) {
 		this.dateModified = dateModified;
 	}
@@ -155,7 +145,6 @@ public class Organisation {
 	public String getType() {
 		return type;
 	}
-
 	public void setType(String type) {
 		this.type = type;
 	}
@@ -163,7 +152,6 @@ public class Organisation {
 	public String getContacts() {
 		return contacts;
 	}
-
 	public void setContacts(String contacts) {
 		this.contacts = contacts;
 	}
@@ -171,7 +159,6 @@ public class Organisation {
 	public boolean isLocal() {
 		return local;
 	}
-
 	public void setLocal(boolean local) {
 		this.local = local;
 	}
@@ -179,7 +166,6 @@ public class Organisation {
 	public String getUuid() {
 		return uuid;
 	}
-
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
@@ -187,7 +173,6 @@ public class Organisation {
 	public String getRestrictedToDomain() {
 		return restrictedToDomain;
 	}
-
 	public void setRestrictedToDomain(String restrictedToDomain) {
 		this.restrictedToDomain = restrictedToDomain;
 	}
@@ -195,7 +180,6 @@ public class Organisation {
 	public int getCreatedBy() {
 		return createdBy;
 	}
-
 	public void setCreatedBy(int createdBy) {
 		this.createdBy = createdBy;
 	}
@@ -203,7 +187,6 @@ public class Organisation {
 	public int getUserCount() {
 		return userCount;
 	}
-
 	public void setUserCount(int userCount) {
 		this.userCount = userCount;
 	}
