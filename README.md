@@ -1,5 +1,5 @@
 
-![MispBump Logo](./images/mispbump.svg)
+![MispBump Logo](./images/mispbump.svg)  
 
 # MISPBump
 
