@@ -1,5 +1,4 @@
-
-![MispBump Logo](./images/mispbump.svg)
+![MispBump Logo](./images/mispbump.svg?sanitize=true)
 
 # MISPBump
 
