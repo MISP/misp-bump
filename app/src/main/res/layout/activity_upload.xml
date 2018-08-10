@@ -36,13 +36,35 @@
 	</android.support.constraint.ConstraintLayout>
 
 	<android.support.design.widget.FloatingActionButton
-			android:id="@+id/fab"
+			android:id="@+id/fab_finish"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			app:fabSize="normal"
 			android:tint="@color/colorWhite"
 			android:src="@drawable/icon_check"
-			android:layout_gravity="bottom|right|end"
+			android:layout_gravity="bottom|end"
+			android:layout_margin="16dp"/>
+
+	<android.support.design.widget.FloatingActionButton
+			android:id="@+id/fab_retry"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			app:fabSize="normal"
+			android:tint="@color/colorWhite"
+			android:src="@drawable/icon_retry"
+			app:layout_anchor="@id/fab_finish"
+			app:layout_anchorGravity="start|center_vertical"
+			android:layout_gravity="start|center_vertical"
+			android:layout_margin="16dp"/>
+
+	<android.support.design.widget.FloatingActionButton
+			android:id="@+id/fab_start"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			app:fabSize="normal"
+			android:tint="@color/colorWhite"
+			android:src="@drawable/icon_cloud_upload"
+			android:layout_gravity="bottom|end"
 			android:layout_margin="16dp"/>
 
 </android.support.design.widget.CoordinatorLayout>

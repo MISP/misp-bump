@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="#000"
+		android:fitsSystemWindows="false">
+
+	<FrameLayout
+			android:id="@+id/fragment_container"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"/>
+
+	<FrameLayout
+			android:id="@+id/qr_container"
+			android:layout_width="match_parent" android:layout_height="match_parent"
+			android:background="#96000000">
+
+			<LinearLayout
+					android:id="@+id/qr_background"
+					android:orientation="vertical"
+					android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:layout_gravity="center"
+					android:background="@drawable/rounded_square">
+
+				<TextView
+						android:id="@+id/info"
+						android:paddingTop="10dp"
+						android:layout_marginBottom="-15dp"
+						android:textColor="#000"
+						android:text="Public Key"
+						android:textStyle="normal"
+						android:textSize="20sp"
+						android:gravity="center_horizontal"
+						android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+				<ImageView
+						android:contentDescription="@string/qr_code"
+						android:id="@+id/qr_imageView"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"/>
+			</LinearLayout>
+
+	</FrameLayout>
+
+	<ImageButton
+			android:id="@+id/close"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:padding="16dp"
+			android:tint="@color/colorWhite" android:src="@drawable/icon_close"
+			android:background="?android:selectableItemBackgroundBorderless"/>
+
+	<android.support.design.widget.FloatingActionButton
+			android:id="@+id/fab_continue_sync_info"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_margin="16dp"
+			android:layout_gravity="bottom|end"
+			android:src="@drawable/icon_arrow_right"/>
+
+	<android.support.design.widget.FloatingActionButton
+			android:id="@+id/fab_continue_sync_upload"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_margin="16dp"
+			android:layout_gravity="bottom|end"
+			android:tint="@color/colorWhite"
+			android:src="@drawable/icon_cloud_upload"/>
+
+</android.support.design.widget.CoordinatorLayout>
