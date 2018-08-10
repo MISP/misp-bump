@@ -240,11 +240,12 @@ public class MyOrganisationActivity extends AppCompatActivity implements View.On
 
         List<StringPair> orgInfoEntries = new ArrayList<>();
 
-        orgInfoEntries.add(new StringPair("UUID", org.getUuid()));
         orgInfoEntries.add(new StringPair("Description", org.getDescription()));
         orgInfoEntries.add(new StringPair("Nationality", org.getNationality()));
         orgInfoEntries.add(new StringPair("Sector", org.getSector()));
         orgInfoEntries.add(new StringPair("User Count", "" + org.getUserCount()));
+        orgInfoEntries.add(new StringPair("Email", user.getEmail()));
+        orgInfoEntries.add(new StringPair("UUID", org.getUuid()));
 
         adapter.setList(orgInfoEntries);
 

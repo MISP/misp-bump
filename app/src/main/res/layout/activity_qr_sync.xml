@@ -25,7 +25,7 @@
 					android:background="@drawable/rounded_square">
 
 				<TextView
-						android:id="@+id/info"
+						android:id="@+id/qr_info"
 						android:paddingTop="10dp"
 						android:layout_marginBottom="-15dp"
 						android:textColor="#000"

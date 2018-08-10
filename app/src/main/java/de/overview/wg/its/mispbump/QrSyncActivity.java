@@ -120,6 +120,11 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
 
     private void startPublicKeyExchange() {
 
+        cameraFragment.setReadQrEnabled(true);
+
+        TextView info = findViewById(R.id.qr_info);
+        info.setText("Public Key");
+
         currentScanState = ScanState.public_key;
 
         User myUser = preferenceManager.getMyUser();
@@ -129,8 +134,6 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
         PublicKeyQr publicKeyQr = new PublicKeyQr(myOrg.getName(), myUser.getEmail(), pubKey);
 
         showQr(publicKeyQr.toJSON().toString());
-
-        cameraFragment.setReadQrEnabled(true);
     }
 
     private void receivedPublicKey(PublicKeyQr publicKeyQr) {
@@ -145,6 +148,11 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void startSyncInformationExchange() {
+
+        cameraFragment.setReadQrEnabled(true);
+
+        TextView info = findViewById(R.id.qr_info);
+        info.setText("Sync Information");
 
         currentScanState = ScanState.information;
 
@@ -167,8 +175,6 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
 
 
         showQr(cryptography.encrypt(siqr.toJSON().toString()));
-
-        cameraFragment.setReadQrEnabled(true);
 
     }
 

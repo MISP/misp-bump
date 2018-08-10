@@ -74,7 +74,7 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
     /**
      * Tag for the {@link Log}.
      */
-    private static final String TAG = "MISP_LOGGING";
+    private static final String TAG = "MISP_LOG";
 
     /**
      * Max preview width that is guaranteed by Camera2 API
@@ -385,7 +385,7 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
                 // For still image captures, we use the largest available size.
                 Size largest = Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.YUV_420_888)), new CompareSizesByArea());
 
-                mImageReader = ImageReader.newInstance(largest.getWidth() / 16, largest.getHeight() / 16, ImageFormat.YUV_420_888, 2);
+                mImageReader = ImageReader.newInstance(largest.getWidth() / 8, largest.getHeight() / 8, ImageFormat.YUV_420_888, 2);
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
                 // Find out if we need to swap dimension to get the preview size relative to sensor coordinate.
@@ -763,6 +763,9 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
     }
 
     public void setReadQrEnabled(boolean enabled) {
+
+        Log.d(TAG, "setReadQrEnabled() called with: enabled = [" + enabled + "]");
+
         readQrEnabled = enabled;
     }
 

@@ -145,11 +145,15 @@ public class MainActivity extends AppCompatActivity {
 	private void refreshSyncedPartnerList() {
 //		syncedPartnerList = PreferenceManager.Instance(this).getSyncedPartnerList();
 
-		SyncedPartner sp = new SyncedPartner("Main Organisation A", "http://192.168.178.200");
+		SyncedPartner sp = new SyncedPartner("Example Organisation 1", "https://www.organisationa1.de");
         sp.generateTimeStamp();
         syncedPartnerList.add(sp);
 
-		if (syncedPartnerList == null) {
+        sp = new SyncedPartner("Example Organisation 2", "https://www.organisation2.de");
+        sp.generateTimeStamp();
+        syncedPartnerList.add(sp);
+
+		if (syncedPartnerList == null || syncedPartnerList.size() < 1) {
 			emptyPartnerListView.setVisibility(View.VISIBLE);
 			syncedPartnerRecyclerView.setVisibility(View.GONE);
 		} else {
