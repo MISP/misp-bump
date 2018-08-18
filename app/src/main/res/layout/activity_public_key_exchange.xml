@@ -42,7 +42,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textColor="@color/colorWhite"
-				android:text="@string/sync_info_let_scan"/>
+				android:text="@string/sync_information"/>
 
 		<ImageButton
 				android:contentDescription="@string/exit"

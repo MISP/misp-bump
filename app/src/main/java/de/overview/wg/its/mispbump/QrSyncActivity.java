@@ -123,7 +123,7 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
         cameraFragment.setReadQrEnabled(true);
 
         TextView info = findViewById(R.id.qr_info);
-        info.setText("Public Key");
+        info.setText(getText(R.string.public_key));
 
         currentScanState = ScanState.public_key;
 
@@ -152,7 +152,7 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
         cameraFragment.setReadQrEnabled(true);
 
         TextView info = findViewById(R.id.qr_info);
-        info.setText("Sync Information");
+        info.setText(getString(R.string.sync_information));
 
         currentScanState = ScanState.information;
 

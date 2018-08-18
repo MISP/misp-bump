@@ -35,7 +35,7 @@
 
 	<string name="credential_settings">Autentifizierungseinstellungen</string>
 
-	<string name="sync_info_let_scan">Drücken Sie weiter, wenn dieser QR-Code gescannt wurde</string>
+	<string name="sync_information">Sync Informationen</string>
 
 	<string name="error_url_required">MISP Url benötigt</string>
 	<string name="error_automation_key">MISP Automatisierungsschlüssel benötigt</string>
