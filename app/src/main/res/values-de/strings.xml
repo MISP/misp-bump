@@ -44,4 +44,9 @@
 	<string name="dialog_open_browser_title">Im Browser öffnen</string>
 	<string name="open">öffnen</string>
 	<string name="settings">Einstellungen</string>
+	<string name="request_scanned_pk">Wurde Ihr Öffentlicher Schlüssel bereits von Ihrem Partner gescannt?</string>
+	<string name="request_scanned_si">Wurden Ihre Synchronisations Informationen bereits von Ihrem Partner gescannt?</string>
+	<string name="yes">Ja</string>
+	<string name="no">Nein</string>
+	<string name="proceed">Fortfahren</string>
 </resources>

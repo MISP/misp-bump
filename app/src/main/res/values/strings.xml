@@ -43,6 +43,11 @@
 	<string name="dialog_open_browser_title">Open in browser</string>
 	<string name="open">open</string>
 	<string name="settings">Settings</string>
+	<string name="request_scanned_pk">Has your sync partner scanned your Public Key?</string>
+	<string name="request_scanned_si">Has your sync partner scanned your Sync Information?</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
+	<string name="proceed">Proceed</string>
 
 
 </resources>

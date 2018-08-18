@@ -356,16 +356,16 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
 
         AlertDialog.Builder adb = new AlertDialog.Builder(this);
 
-        adb.setTitle("Proceed");
+        adb.setTitle(getString(R.string.proceed));
 
         if (currentScanState == ScanState.public_key) {
-            adb.setMessage("Did your sync partner already scan your Public Key?");
+            adb.setMessage(getString(R.string.request_scanned_pk));
         } else {
-            adb.setMessage("Did your sync partner already scan your Sync Information?");
+            adb.setMessage(getString(R.string.request_scanned_si));
         }
 
-        adb.setPositiveButton("Yes", posListener);
-        adb.setNegativeButton("No", null);
+        adb.setPositiveButton(getString(R.string.yes), posListener);
+        adb.setNegativeButton(getString(R.string.no), null);
 
         adb.create().show();
     }
