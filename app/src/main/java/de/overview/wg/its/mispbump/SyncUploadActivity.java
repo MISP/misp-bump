@@ -203,15 +203,15 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
 
         boolean errorFound = false;
 
-        for (int i = 0; i < uploadStates.length; i++) {
+        for(UploadState state : uploadStates) {
 
-            if (!errorFound && uploadStates[i].getCurrentState() == UploadState.State.ERROR) {
+            if (!errorFound && state.getCurrentState() == UploadState.State.ERROR) {
                 errorFound = true;
                 continue;
             }
 
             if (errorFound) {
-                uploadStates[i].setFollowError();
+                state.setFollowError();
             }
         }
     }
@@ -233,8 +233,13 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
             partnerServer = partnerInformation.getServer();
             partnerSyncUser = partnerInformation.getUser();
 
-            state.setDone();
-            executeNextTask();
+            if (partnerOrganisation == null || partnerServer == null || partnerSyncUser == null) {
+                state.setError("Partners information format is incorrect");
+                setApplicationError(false);
+            } else {
+                state.setDone();
+                executeNextTask();
+            }
 
         } else {
             state.setError("Partners information format is incorrect");
@@ -260,6 +265,7 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void createOrganisation(final UploadState state, boolean undo) {
+
         state.setInProgress();
 
         if (!undo) {
@@ -268,11 +274,7 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
                 public void onResult(JSONObject organisationInformation) {
                     try {
 
-                        int orgId = new Organisation(organisationInformation).getId();
-
-                        partnerSyncUser.setOrgId(orgId);
-                        partnerSyncUser.setAuthkey(TempAuth.TMP_AUTH_KEY);
-                        partnerSyncUser.setRoleId(User.RoleId.SYNC_USER);
+                        partnerSyncUser.setOrgId(new Organisation(organisationInformation).getId());
 
                         state.setDone();
                         executeNextTask();
@@ -290,11 +292,27 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
                     setApplicationError(true);
                 }
             });
+        } else {
+            mispRequest.removeOrganisation(partnerOrganisation.getId(), new MispRequest.DeleteCallback() {
+                @Override
+                public void onSuccess() {
+                    state.setDone();
+                }
+
+                @Override
+                public void onError(VolleyError volleyError) {
+                    state.setError(ReadableError.toReadable(volleyError));
+                }
+            });
         }
     }
 
     private void createSyncUser(final UploadState state, boolean undo) {
+
         state.setInProgress();
+
+        partnerSyncUser.setAuthkey(TempAuth.TMP_AUTH_KEY);
+        partnerSyncUser.setRoleId(User.RoleId.SYNC_USER);
 
         if (!undo) {
             mispRequest.addUser(partnerSyncUser, new MispRequest.UserCallback() {
@@ -308,6 +326,18 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
                 public void onError(VolleyError volleyError) {
                     state.setError(ReadableError.toReadable(volleyError));
                     setApplicationError(true);
+                }
+            });
+        } else {
+            mispRequest.removeUser(partnerSyncUser.getId(), new MispRequest.DeleteCallback() {
+                @Override
+                public void onSuccess() {
+                    state.setDone();
+                }
+
+                @Override
+                public void onError(VolleyError volleyError) {
+                    state.setError(ReadableError.toReadable(volleyError));
                 }
             });
         }
@@ -350,6 +380,18 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
                     setApplicationError(true);
                 }
             });
+        } else {
+            mispRequest.removeOrganisation(partnerOrganisation.getId(), new MispRequest.DeleteCallback() {
+                @Override
+                public void onSuccess() {
+                    state.setDone();
+                }
+
+                @Override
+                public void onError(VolleyError volleyError) {
+                    state.setError(ReadableError.toReadable(volleyError));
+                }
+            });
         }
     }
 
@@ -369,6 +411,12 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
                     state.setError(ReadableError.toReadable(volleyError));
                 }
             });
+        } else {
+
         }
+    }
+
+    private void addToSyncedList() {
+        // todo implementation
     }
 }

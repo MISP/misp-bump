@@ -213,11 +213,7 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
                     syncInformationReceivedDialog(new SyncInformationQr(cryptography.decrypt(qrData)));
 
                 } catch (JSONException e) {
-
-                    Log.e("MISP_LOG", "onReadQrCode: ", e);
-
                     notExpectedFormatDialog();
-
                 }
 
                 break;
