@@ -79,10 +79,15 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
 
         fabStart = findViewById(R.id.fab_start);
         fabStart.setVisibility(View.VISIBLE);
+        fabStart.setOnClickListener(this);
+
         fabFinish = findViewById(R.id.fab_finish);
         fabFinish.setVisibility(View.GONE);
+        fabFinish.setOnClickListener(this);
+
         fabRetry = findViewById(R.id.fab_retry);
         fabRetry.setVisibility(View.GONE);
+        fabRetry.setOnClickListener(this);
 
         // RecyclerView
 
@@ -97,12 +102,12 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
 
         uploadStates = new UploadState[6];
 
-        uploadStates[0].setTitle("Validate upload information");
-        uploadStates[1].setTitle("Check connection to server");
-        uploadStates[2].setTitle("Create local organisation");
-        uploadStates[3].setTitle("Create sync user & add to organisation");
-        uploadStates[4].setTitle("Create external organisation");
-        uploadStates[5].setTitle("Create sync server");
+        uploadStates[0] = new UploadState("Validate upload information");
+        uploadStates[1] = new UploadState("Check connection to server");
+        uploadStates[2] = new UploadState("Create local organisation");
+        uploadStates[3] = new UploadState("Create sync user & add to organisation");
+        uploadStates[4] = new UploadState("Create external organisation");
+        uploadStates[5] = new UploadState("Create sync server");
 
         uploadStateAdapter.setStates(uploadStates);
 
@@ -139,6 +144,7 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void executeTask(int index) {
+
         switch (index) {
             case 0:
                 checkBundle(uploadStates[index]);
@@ -170,6 +176,7 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void executeNextTask() {
+
         currentTask++;
 
         if (currentTask > uploadStates.length) {
@@ -180,10 +187,32 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void setApplicationError(boolean canRetry) {
+
+        setErrorOnRemainingTasks();
+
+        uploadStateAdapter.notifyDataSetChanged();
+
         fabFinish.setVisibility(View.VISIBLE);
 
         if (canRetry) {
             fabRetry.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setErrorOnRemainingTasks() {
+
+        boolean errorFound = false;
+
+        for (int i = 0; i < uploadStates.length; i++) {
+
+            if (!errorFound && uploadStates[i].getCurrentState() == UploadState.State.ERROR) {
+                errorFound = true;
+                continue;
+            }
+
+            if (errorFound) {
+                uploadStates[i].setFollowError();
+            }
         }
     }
 

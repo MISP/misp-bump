@@ -203,7 +203,6 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
                 SparseArray<Barcode> barcodes = barcodeDetector.detect(frame);
 
                 if (barcodes.size() > 0) {
-                    Log.d(TAG, "onImageAvailable: " + barcodes.valueAt(0).rawValue);
                     parentActivity.onReadQrCode(barcodes.valueAt(0).rawValue);
                 }
             }

@@ -12,6 +12,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
@@ -120,12 +121,12 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
 
     private void startPublicKeyExchange() {
 
+        currentScanState = ScanState.public_key;
         cameraFragment.setReadQrEnabled(true);
 
         TextView info = findViewById(R.id.qr_info);
         info.setText(getText(R.string.public_key));
 
-        currentScanState = ScanState.public_key;
 
         User myUser = preferenceManager.getMyUser();
         Organisation myOrg = preferenceManager.getMyOrganisation();
@@ -149,12 +150,11 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
 
     private void startSyncInformationExchange() {
 
+        currentScanState = ScanState.information;
         cameraFragment.setReadQrEnabled(true);
 
         TextView info = findViewById(R.id.qr_info);
         info.setText(getString(R.string.sync_information));
-
-        currentScanState = ScanState.information;
 
         Organisation myOrg = preferenceManager.getMyOrganisation();
 
@@ -210,9 +210,11 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
 
                 try {
 
-                    syncInformationReceivedDialog(new SyncInformationQr(qrData));
+                    syncInformationReceivedDialog(new SyncInformationQr(cryptography.decrypt(qrData)));
 
                 } catch (JSONException e) {
+
+                    Log.e("MISP_LOG", "onReadQrCode: ", e);
 
                     notExpectedFormatDialog();
 
@@ -264,8 +266,6 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
 
     private void publicKeyReceivedDialog(final PublicKeyQr pkqr) {
 
-        cameraFragment.setReadQrEnabled(false);
-
         AlertDialog.Builder adb = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
 
@@ -299,8 +299,6 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void syncInformationReceivedDialog(final SyncInformationQr siqr) {
-
-        cameraFragment.setReadQrEnabled(false);
 
         AlertDialog.Builder adb = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();

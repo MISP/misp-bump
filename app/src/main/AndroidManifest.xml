@@ -28,8 +28,10 @@
 				android:screenOrientation="portrait"
 				android:theme="@style/AppTheme.Fullscreen">
 		</activity>
-		<activity android:name=".UploadActivity"/>
-		<activity android:name=".SyncUploadActivity"/>
+
+		<activity android:name=".SyncUploadActivity"
+				android:label="@string/upload"/>
+
 		<activity
 				android:name=".MyOrganisationActivity"
 				android:label="@string/credentials_activity"

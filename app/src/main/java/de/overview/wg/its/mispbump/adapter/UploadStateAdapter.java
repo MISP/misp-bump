@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.overview.wg.its.mispbump.R;
 import de.overview.wg.its.mispbump.model.UploadState;
@@ -20,7 +21,8 @@ public class UploadStateAdapter extends RecyclerView.Adapter<UploadStateAdapter.
 	class MyViewHolder extends RecyclerView.ViewHolder {
 
 		private TextView title, error;
-		private ImageView pendingIcon, errorIcon, doneIcon, inProgressIcon;
+		private ImageView pendingIcon, errorIcon, doneIcon;
+		private ProgressBar progressBar;
 
 		private MyViewHolder(View view) {
 
@@ -32,7 +34,8 @@ public class UploadStateAdapter extends RecyclerView.Adapter<UploadStateAdapter.
 			pendingIcon = view.findViewById(R.id.state_pending);
 			errorIcon = view.findViewById(R.id.state_error);
 			doneIcon = view.findViewById(R.id.state_done);
-			inProgressIcon = view.findViewById(R.id.state_in_progress);
+			progressBar = view.findViewById(R.id.state_in_progress);
+
 		}
 
 		private void setState(UploadState.State state) {
@@ -41,7 +44,7 @@ public class UploadStateAdapter extends RecyclerView.Adapter<UploadStateAdapter.
 			errorIcon.setVisibility(View.GONE);
 			pendingIcon.setVisibility(View.GONE);
 			doneIcon.setVisibility(View.GONE);
-			inProgressIcon.setVisibility(View.GONE);
+			progressBar.setVisibility(View.GONE);
 
 			switch (state) {
 				case PENDING:
@@ -49,7 +52,7 @@ public class UploadStateAdapter extends RecyclerView.Adapter<UploadStateAdapter.
 					break;
 
 				case IN_PROGRESS:
-					inProgressIcon.setVisibility(View.VISIBLE);
+					progressBar.setVisibility(View.VISIBLE);
 					break;
 
 				case DONE:
@@ -60,6 +63,10 @@ public class UploadStateAdapter extends RecyclerView.Adapter<UploadStateAdapter.
 					errorIcon.setVisibility(View.VISIBLE);
 					error.setVisibility(View.VISIBLE);
 					break;
+
+                case FOLLOW_ERROR:
+                    errorIcon.setVisibility(View.VISIBLE);
+                    break;
 			}
 		}
 	}
@@ -72,8 +79,10 @@ public class UploadStateAdapter extends RecyclerView.Adapter<UploadStateAdapter.
 	@NonNull
 	@Override
 	public UploadStateAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
 		View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_upload_state, parent, false);
 		return new UploadStateAdapter.MyViewHolder(itemView);
+
 	}
 
 	@Override
