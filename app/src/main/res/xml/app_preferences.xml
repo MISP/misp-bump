@@ -1,0 +1,35 @@
+<android.support.v7.preference.PreferenceScreen
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<android.support.v7.preference.PreferenceCategory
+			android:title="Language">
+
+		<android.support.v7.preference.SwitchPreferenceCompat
+				android:key="key1"
+				android:title="System Default"
+				android:summary="Use the systems default language"
+				android:defaultValue="true"/>
+
+		<android.support.v7.preference.ListPreference
+				android:dependency="key1"
+				android:key="key4"
+				android:title="Language"
+				android:summary="Englisch"
+				android:entries="@array/languages"
+				android:entryValues="@array/languages" />
+
+	</android.support.v7.preference.PreferenceCategory>
+
+	<android.support.v7.preference.PreferenceCategory
+			android:title="Other">
+
+		<android.support.v7.preference.SwitchPreferenceCompat
+				android:key="key9"
+				android:title="Debug"
+				android:summary="Enable Debug Mode"
+				android:defaultValue="true"/>
+
+	</android.support.v7.preference.PreferenceCategory>
+
+</android.support.v7.preference.PreferenceScreen>

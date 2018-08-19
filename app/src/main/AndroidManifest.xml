@@ -28,15 +28,16 @@
 				android:screenOrientation="portrait"
 				android:theme="@style/AppTheme.Fullscreen">
 		</activity>
-
-		<activity android:name=".SyncUploadActivity"
+		<activity
+				android:name=".SyncUploadActivity"
 				android:label="@string/upload"/>
-
 		<activity
 				android:name=".MyOrganisationActivity"
 				android:label="@string/credentials_activity"
 				android:parentActivityName=".MainActivity"/>
 		<activity android:name=".QrSyncActivity">
+		</activity>
+		<activity android:name=".preferences.AppPreferenceActivity">
 		</activity>
 	</application>
 
