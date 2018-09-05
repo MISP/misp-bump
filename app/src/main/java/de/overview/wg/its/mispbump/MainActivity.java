@@ -21,11 +21,13 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import de.overview.wg.its.mispbump.adapter.SyncedPartnerAdapter;
+import de.overview.wg.its.mispbump.auxiliary.AESSecurity;
 import de.overview.wg.its.mispbump.auxiliary.PreferenceManager;
 import de.overview.wg.its.mispbump.model.SyncedPartner;
 import de.overview.wg.its.mispbump.preferences.AppPreferenceActivity;
 import de.overview.wg.its.mispbump.preferences.AppPreferenceFragment;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,6 +81,29 @@ public class MainActivity extends AppCompatActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
+
+	private void testAESSecurity() {
+
+	    String data = "This is the secret message";
+
+        AESSecurity aesA = AESSecurity.getInstance();
+        AESSecurity aesB = AESSecurity.getInstance();
+
+        PublicKey pubA = aesA.getPublicKey();
+        PublicKey pubB = aesB.getPublicKey();
+
+        aesA.setForeignPublicKey(pubB);
+        aesB.setForeignPublicKey(pubA);
+
+        emptyPartnerListView.setText("ORIGINAL: " + data + "\n");
+
+        String encrypted = aesA.encrypt(data);
+        emptyPartnerListView.append("ENCRYPTED BY A: " + encrypted + "\n");
+
+        String decrypted = aesB.decrypt(encrypted);
+        emptyPartnerListView.append("DECRYPTED BY B: " + decrypted);
+
+    }
 
 	private void initializeViews() {
 
@@ -149,15 +174,8 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void refreshSyncedPartnerList() {
-//		syncedPartnerList = PreferenceManager.Instance(this).getSyncedPartnerList();
-
-		SyncedPartner sp = new SyncedPartner("Example Organisation 1", "https://www.organisationa1.de");
-        sp.generateTimeStamp();
-        syncedPartnerList.add(sp);
-
-        sp = new SyncedPartner("Example Organisation 2", "https://www.organisation2.de");
-        sp.generateTimeStamp();
-        syncedPartnerList.add(sp);
+	    // todo: uncomment
+        // syncedPartnerList = PreferenceManager.Instance(this).getSyncedPartnerList();
 
 		if (syncedPartnerList == null || syncedPartnerList.size() < 1) {
 			emptyPartnerListView.setVisibility(View.VISIBLE);
