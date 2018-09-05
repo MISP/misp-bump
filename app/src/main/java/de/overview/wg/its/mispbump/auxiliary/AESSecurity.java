@@ -148,14 +148,10 @@ public class AESSecurity {
 
 	public static AESSecurity getInstance() {
 
-	    //todo: make singleton again
+		if(instance == null) {
+			instance = new AESSecurity();
+		}
 
-//		if(instance == null) {
-//			instance = new AESSecurity();
-//		}
-//
-//		return instance;
-
-        return new AESSecurity();
+		return instance;
 	}
 }

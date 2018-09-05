@@ -1,3 +1,3 @@
 # MISPBump
 
-![Alt text](./screenshots/MispBump-poster-10.svg)
+![Alt text](./screenshots/poster-png.png)
