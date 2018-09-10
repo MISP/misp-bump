@@ -21,13 +21,9 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import de.overview.wg.its.mispbump.adapter.SyncedPartnerAdapter;
-import de.overview.wg.its.mispbump.auxiliary.AESSecurity;
 import de.overview.wg.its.mispbump.auxiliary.PreferenceManager;
 import de.overview.wg.its.mispbump.model.SyncedPartner;
-import de.overview.wg.its.mispbump.preferences.AppPreferenceActivity;
-import de.overview.wg.its.mispbump.preferences.AppPreferenceFragment;
 
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,38 +68,11 @@ public class MainActivity extends AppCompatActivity {
 			case R.id.menu_item_delete_local_data:
 				createSelectDeleteDialog();
 				return true;
-
-            case R.id.main_menu_settings:
-                startActivity(new Intent(this, AppPreferenceActivity.class));
-                return true;
 		}
 
 		return super.onOptionsItemSelected(item);
 	}
 
-
-	private void testAESSecurity() {
-
-	    String data = "This is the secret message";
-
-        AESSecurity aesA = AESSecurity.getInstance();
-        AESSecurity aesB = AESSecurity.getInstance();
-
-        PublicKey pubA = aesA.getPublicKey();
-        PublicKey pubB = aesB.getPublicKey();
-
-        aesA.setForeignPublicKey(pubB);
-        aesB.setForeignPublicKey(pubA);
-
-        emptyPartnerListView.setText("ORIGINAL: " + data + "\n");
-
-        String encrypted = aesA.encrypt(data);
-        emptyPartnerListView.append("ENCRYPTED BY A: " + encrypted + "\n");
-
-        String decrypted = aesB.decrypt(encrypted);
-        emptyPartnerListView.append("DECRYPTED BY B: " + decrypted);
-
-    }
 
 	private void initializeViews() {
 

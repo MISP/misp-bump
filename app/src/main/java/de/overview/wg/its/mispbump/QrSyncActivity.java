@@ -265,10 +265,19 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
         AlertDialog.Builder adb = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
 
-        @SuppressLint("InflateParams") View title = inflater.inflate(R.layout.dialog_public_key, null);
+        @SuppressLint("InflateParams")
+        View title = inflater.inflate(R.layout.dialog_public_key, null);
         adb.setCustomTitle(title);
 
-        adb.setMessage("\nOrganisation: " + pkqr.getOrganisation() + "\nEmail: " + pkqr.getEmail());
+        View pkInfoView = inflater.inflate(R.layout.view_pk_info, null);
+
+        TextView name = pkInfoView.findViewById(R.id.pk_info_organisation_name);
+        name.setText(pkqr.getOrganisation());
+
+        TextView email = pkInfoView.findViewById(R.id.pk_info_email);
+        email.setText(pkqr.getEmail());
+
+        adb.setView(pkInfoView);
 
         adb.setPositiveButton(getString(R.string.accept), new DialogInterface.OnClickListener() {
             @Override
@@ -299,10 +308,12 @@ public class QrSyncActivity extends AppCompatActivity implements View.OnClickLis
         AlertDialog.Builder adb = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
 
-        @SuppressLint("InflateParams") View title = inflater.inflate(R.layout.dialog_sync_info, null);
+        @SuppressLint("InflateParams")
+        View title = inflater.inflate(R.layout.dialog_sync_info, null);
         adb.setCustomTitle(title);
 
-        @SuppressLint("InflateParams") View orgView = inflater.inflate(R.layout.view_organisation, null);
+        @SuppressLint("InflateParams")
+        View orgView = inflater.inflate(R.layout.view_organisation, null);
 
         TextView orgTitle = orgView.findViewById(R.id.organisation_title);
         orgTitle.setText(siqr.getOrganisation().getName());

@@ -11,12 +11,15 @@ import android.view.View;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import de.overview.wg.its.mispbump.adapter.UploadStateAdapter;
+import de.overview.wg.its.mispbump.auxiliary.PreferenceManager;
 import de.overview.wg.its.mispbump.auxiliary.ReadableError;
 import de.overview.wg.its.mispbump.auxiliary.TempAuth;
 import de.overview.wg.its.mispbump.model.*;
 import de.overview.wg.its.mispbump.network.MispRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 public class SyncUploadActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -33,6 +36,14 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
     private UploadStateAdapter uploadStateAdapter;
     private UploadState[] uploadStates;
     private int currentTask = 0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_upload);
+
+        initializeContent();
+    }
 
     @Override
     public void onClick(View v) {
@@ -53,14 +64,6 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
         if (id == R.id.fab_finish) {
             finish();
         }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_upload);
-
-        initializeContent();
     }
 
 
@@ -105,7 +108,7 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
         uploadStates[0] = new UploadState("Validate upload information");
         uploadStates[1] = new UploadState("Check connection to server");
         uploadStates[2] = new UploadState("Create local organisation");
-        uploadStates[3] = new UploadState("Create sync user & add to organisation");
+        uploadStates[3] = new UploadState("Create sync user / add to organisation");
         uploadStates[4] = new UploadState("Create external organisation");
         uploadStates[5] = new UploadState("Create sync server");
 
@@ -180,7 +183,7 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
         currentTask++;
 
         if (currentTask > uploadStates.length) {
-            return;
+            addToSyncedList();
         }
 
         executeTask(currentTask);
@@ -221,6 +224,13 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
     private void checkBundle(UploadState state) {
         state.setInProgress();
 
+        state.setDone();
+        executeNextTask();
+
+        if(true) {
+            return;
+        }
+
         Bundle b = getIntent().getExtras();
 
         if (b != null) {
@@ -249,6 +259,12 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
 
     private void checkConnection(final UploadState state) {
         state.setInProgress();
+        state.setDone();
+        executeNextTask();
+
+        if(true) {
+            return;
+        }
 
         mispRequest.testConnection(new MispRequest.ConnectionCallback() {
             @Override
@@ -267,6 +283,12 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
     private void createOrganisation(final UploadState state, boolean undo) {
 
         state.setInProgress();
+        state.setDone();
+        executeNextTask();
+
+        if (true) {
+            return;
+        }
 
         if (!undo) {
             mispRequest.addOrganisation(partnerOrganisation, new MispRequest.OrganisationCallback() {
@@ -310,6 +332,11 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
     private void createSyncUser(final UploadState state, boolean undo) {
 
         state.setInProgress();
+        state.setDone();
+        executeNextTask();
+        if (true) {
+            return;
+        }
 
         partnerSyncUser.setAuthkey(TempAuth.TMP_AUTH_KEY);
         partnerSyncUser.setRoleId(User.RoleId.SYNC_USER);
@@ -345,9 +372,15 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
 
     private void createExternalOrganisation(final UploadState state, boolean undo) {
 
-        final String originalOrgName = partnerOrganisation.getName();
 
         state.setInProgress();
+
+//        executeNextTask();
+        if (true) {
+            return;
+        }
+
+        final String originalOrgName = partnerOrganisation.getName();
 
         if (!undo) {
             partnerOrganisation.setName(partnerOrganisation.getName() + " (Remote)");
@@ -363,7 +396,7 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
                         partnerServer.setRemoteOrgId(extOrgId);
                         partnerServer.setPush(true);
 
-                        // Reset partner organisation name TODO why?
+                        // Reset partner organisation name because it will show as (remote) name in syncedList
                         partnerOrganisation.setName(originalOrgName);
 
                         state.setDone();
@@ -398,6 +431,10 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
     private void createSyncServer(final UploadState state, boolean undo) {
         state.setInProgress();
 
+        if (true) {
+            return;
+        }
+
         if (!undo) {
             mispRequest.addServer(partnerServer, new MispRequest.ServerCallback() {
                 @Override
@@ -411,12 +448,23 @@ public class SyncUploadActivity extends AppCompatActivity implements View.OnClic
                     state.setError(ReadableError.toReadable(volleyError));
                 }
             });
-        } else {
-
         }
     }
 
     private void addToSyncedList() {
-        // todo implementation
+
+        if(true) {
+            return;
+        }
+
+        PreferenceManager preferenceManager = PreferenceManager.Instance(this);
+
+        List<SyncedPartner> syncedPartnerList = preferenceManager.getSyncedPartnerList();
+
+        SyncedPartner sp = new SyncedPartner(partnerOrganisation.getName(), partnerServer.getUrl());
+        sp.generateTimeStamp();
+
+        syncedPartnerList.add(sp);
+        preferenceManager.setSyncedPartnerList(syncedPartnerList);
     }
 }
