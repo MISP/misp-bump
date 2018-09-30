@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Simple JSON based API to communicate with MISP-Instances
+ * JSON based API to communicate with MISP-Instances
  */
 public class MispRequest {
 
@@ -31,7 +31,7 @@ public class MispRequest {
     private String serverUrl, automationKey;
 
     /**
-     * @param context for Volley and PreferenceManager
+     * @param context for Volley Request Q and PreferenceManager
      */
     private MispRequest(Context context, boolean loadSavedCredentials) {
         requestQueue = Volley.newRequestQueue(context);

@@ -27,6 +27,10 @@ import de.overview.wg.its.mispbump.model.SyncedPartner;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 
+ **/
+
 @SuppressWarnings("ConstantConditions")
 public class MainActivity extends AppCompatActivity {
 
