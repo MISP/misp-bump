@@ -40,10 +40,17 @@ public class KeyStoreWrapper {
 
     private String KEYSTORE_ALIAS;
 
+    /**
+     * Wraps the android key store to easily encrypt and decrypt sensitive data.
+     * @param alias identifies a key store entry (see public static ALIAS variables).
+     */
     public KeyStoreWrapper(String alias) {
         KEYSTORE_ALIAS = alias;
     }
 
+    /**
+     * @return wheter an entry for this alias already exists.
+     */
     private boolean isInitialized() {
         try {
             KeyStore ks = KeyStore.getInstance(KEYSTORE_PROVIDER);
@@ -66,6 +73,10 @@ public class KeyStoreWrapper {
     }
 
 
+    /**
+     *
+     * @return SecretKey associated with the given alias.
+     */
     private SecretKey getStoredKey() {
         try {
 
@@ -88,6 +99,10 @@ public class KeyStoreWrapper {
         return null;
     }
 
+    /**
+     * Generates a new key.
+     * @return the newly generated key.
+     */
     private SecretKey generateKey() {
         try {
 
@@ -117,7 +132,9 @@ public class KeyStoreWrapper {
         return null;
     }
 
-
+    /**
+     * Deletes the key associated with the current alias.
+     */
     public void deleteStoredKey() {
         try {
             KeyStore ks = KeyStore.getInstance(KEYSTORE_PROVIDER);
@@ -134,6 +151,16 @@ public class KeyStoreWrapper {
         }
     }
 
+    /**
+     * Encrypt data with given algorithm and key associated with alias.
+     * @param data data to encrypt.
+     * @return encrypted data as String.
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     */
     public String encrypt(String data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         SecretKey secretKey;
 
@@ -153,6 +180,17 @@ public class KeyStoreWrapper {
         return ivString + ":::" + encryptedDataString;
     }
 
+    /**
+     * Decrypts data with given algorithm and key associated with alias.
+     * @param input encrypted data.
+     * @return decrypted data as String.
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidAlgorithmParameterException
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     */
     public String decrypt(String input) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
 
         // extract iv from save data
@@ -169,7 +207,10 @@ public class KeyStoreWrapper {
         return new String(cipher.doFinal(data), StandardCharsets.UTF_8);
     }
 
-
+    /**
+     * Removes all aliases and the associated keys.
+     * Note: all encrypted data cannot be decrypted anymore!
+     */
     public static void deleteAllStoredKeys() {
         try {
 

@@ -25,6 +25,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Implementation of the RetroFit2 Misp client.
+ * In order to conveniently use this api some wrapper interfaces are implemented to return the requested API endpoint as java object.
+ */
 public class MispRestClient {
 
     // callbacks and interfaces
@@ -81,7 +85,7 @@ public class MispRestClient {
     }
 
     /**
-     * For development only!
+     * NOTE: for development only!
      * Accepts all certificates so self signed certs are also accepted.
      * @return OkHttpClient which accepts all certificates
      */

@@ -18,6 +18,7 @@ public class AESSecurity {
     private static final String KEY_PAIR_ALGORITHM = "EC";
     private static final int KEY_SIZE = 521; // 224 | 256 | 384 | 521
     private static final String KEY_AGREEMENT_ALGORITHM = "ECDH";
+    private static final String KEY_FACTORY_ALGORITHM = "EC";
 
     private static AESSecurity instance;
 
@@ -31,9 +32,9 @@ public class AESSecurity {
         initialize();
     }
 
-    /***
-     * Generates a public and a private key using an elliptic curve algorithm (256 bit)
-     * The private key is fed into the key agreement instance
+    /**
+     * Generates a public and a private key using an elliptic curve algorithm.
+     * The private key is fed into the key agreement instance.
      */
     private void initialize() {
 
@@ -52,9 +53,9 @@ public class AESSecurity {
         }
     }
 
-    /***
-     * Generates a shared secret with a given public key
-     * @param publickey
+    /**
+     * Generates a shared secret and derives an initialisation vector from it.
+     * @param publickey public key of the sync partner
      */
     public void setForeignPublicKey(PublicKey publickey) {
 
@@ -72,6 +73,11 @@ public class AESSecurity {
         }
     }
 
+    /**
+     *
+     * @param data
+     * @return
+     */
     public String encrypt(String data) {
         try {
 
@@ -93,6 +99,11 @@ public class AESSecurity {
         return data;
     }
 
+    /**
+     *
+     * @param data
+     * @return
+     */
     public String decrypt(String data) {
         try {
             Key key = generateKey();
@@ -119,9 +130,7 @@ public class AESSecurity {
     }
 
     private Key generateKey() {
-
         return new SecretKeySpec(sharedSecret, ENCRYPT_ALGORITHM);
-
     }
 
     public static String publicKeyToString(PublicKey key) {
@@ -129,11 +138,10 @@ public class AESSecurity {
     }
 
     public static PublicKey publicKeyFromString(String key) {
-
         try {
 
             byte[] input = Base64.decode(key, Base64.DEFAULT);
-            return KeyFactory.getInstance("EC").generatePublic(new X509EncodedKeySpec(input));
+            return KeyFactory.getInstance(KEY_FACTORY_ALGORITHM).generatePublic(new X509EncodedKeySpec(input));
 
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             e.printStackTrace();
@@ -143,12 +151,9 @@ public class AESSecurity {
     }
 
     public static AESSecurity getInstance() {
-
         if(instance == null) {
             instance = new AESSecurity();
         }
-
         return instance;
     }
 }
-

@@ -8,6 +8,9 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
+/**
+ * RetroFit2 interface for communication with misp instances
+ */
 public interface MispRestService {
 
     // user routes

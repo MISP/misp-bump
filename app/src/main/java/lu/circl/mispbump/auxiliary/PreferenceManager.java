@@ -5,10 +5,14 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -39,11 +43,12 @@ public class PreferenceManager {
 
     /**
      * Helper class to save and retrieve (sensitive) information to and from SharedPreferences.
+     *
      * @param context for accessing the SharedPreferences file.
      * @return singleton instance
      */
     public static PreferenceManager getInstance(Context context) {
-        if(instance == null) {
+        if (instance == null) {
             instance = new PreferenceManager(context);
         }
 
@@ -53,6 +58,7 @@ public class PreferenceManager {
 
     /**
      * Saves user infos from "users/view/me" (encrypted)
+     *
      * @param user
      */
     public void setUserInfo(User user) {
@@ -77,6 +83,7 @@ public class PreferenceManager {
     }
 
     /**
+     * Returns the user information if already stored and decrypts it.
      *
      * @return decrypted user info if any, else null
      */
@@ -110,6 +117,7 @@ public class PreferenceManager {
 
     /**
      * Save user org infos from "organisations/view/{orgId}" (encrypted)
+     *
      * @param organisation Object representation of json organisation information
      */
     public void setUserOrgInfo(Organisation organisation) {
@@ -135,12 +143,13 @@ public class PreferenceManager {
     }
 
     /**
+     * Returns the user organisation information if already stored and decrypts it.
      *
      * @return decrypted user org info if any, else null
      */
     public Organisation getUserOrganisation() {
 
-        if(!preferences.contains(USER_ORG_INFOS)) {
+        if (!preferences.contains(USER_ORG_INFOS)) {
             return null;
         }
 
@@ -167,7 +176,8 @@ public class PreferenceManager {
 
 
     /**
-     * Saves the encrypted auth key/automation key
+     * Encrypts the automation key and stores it in preferences.
+     *
      * @param automationKey
      */
     public void setAutomationKey(String automationKey) {
@@ -189,6 +199,11 @@ public class PreferenceManager {
         }
     }
 
+    /**
+     * Decrypts the stored automation key and returns it.
+     *
+     * @return the decr
+     */
     public String getAutomationKey() {
 
         if (!preferences.contains(AUTOMATION_KEY)) {
@@ -215,6 +230,9 @@ public class PreferenceManager {
         return "";
     }
 
+    /**
+     * Delete the key to decrypt this entry and the entry itself.
+     */
     public void clearAutomationKey() {
         // remove the key from KeyStore
         KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.AUTOMATION_ALIAS);
@@ -227,8 +245,9 @@ public class PreferenceManager {
 
 
     /**
-     * Saves the encrypted URL of Misp Server
-     * @param serverUrl
+     * Encrypts the server url and stores it in preferences.
+     *
+     * @param serverUrl url of the corresponding misp instance
      */
     public void setServerUrl(String serverUrl) {
         try {
@@ -251,6 +270,11 @@ public class PreferenceManager {
         }
     }
 
+    /**
+     * Decrypts the stored server url and returns it
+     *
+     * @return decrypted misp instance url
+     */
     public String getServerUrl() {
 
         if (!preferences.contains(SERVER_URL)) {
@@ -278,6 +302,9 @@ public class PreferenceManager {
         return "";
     }
 
+    /**
+     * Delete the key to decrypt this entry and the entry itself.
+     */
     public void clearServerUrl() {
         // remove the key from KeyStore
         KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.SERVER_URL_ALIAS);
@@ -291,7 +318,10 @@ public class PreferenceManager {
 
     /**
      * Set if credentials (authkey & server url) should be saved locally.
+     *
      * @param save enable or disable
+     * @deprecated currently not used because automation key is needed to do requests to your misp instance.
+     * If this should be an option in future: misp automation key would be needed on each sync process.
      */
     public void setSaveCredentials(boolean save) {
         SharedPreferences.Editor editor = preferences.edit();
