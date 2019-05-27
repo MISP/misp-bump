@@ -1,0 +1,198 @@
+package lu.circl.mispbump.security;
+
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
+import android.util.Base64;
+import android.util.Log;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.util.Enumeration;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+
+public class KeyStoreWrapper {
+
+    private static final String TAG = "KeyStoreWrapper";
+
+    public static final String USER_INFO_ALIAS = "ALIAS_USER_INFO";
+    public static final String USER_ORGANISATION_INFO_ALIAS = "ALIAS_USER_ORGANISATION_INFO";
+    public static final String AUTOMATION_ALIAS = "ALIAS_AUTOMATION_KEY";
+    public static final String SERVER_URL_ALIAS = "ALIAS_SERVER_URL";
+
+    private static final String KEYSTORE_PROVIDER = "AndroidKeyStore";
+    private static final String CIPHER_ALGORITHM = "AES/GCM/NoPadding";
+
+    private String KEYSTORE_ALIAS;
+
+    public KeyStoreWrapper(String alias) {
+        KEYSTORE_ALIAS = alias;
+    }
+
+    private boolean isInitialized() {
+        try {
+            KeyStore ks = KeyStore.getInstance(KEYSTORE_PROVIDER);
+            ks.load(null);
+
+            if (ks.containsAlias(KEYSTORE_ALIAS)) {
+                return true;
+            }
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+
+    private SecretKey getStoredKey() {
+        try {
+
+            KeyStore ks = KeyStore.getInstance(KEYSTORE_PROVIDER);
+            ks.load(null);
+            return (SecretKey) ks.getKey(KEYSTORE_ALIAS, null);
+
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private SecretKey generateKey() {
+        try {
+
+            // androids key generator
+            final KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, KEYSTORE_PROVIDER);
+
+            // specs for the generated key
+            final KeyGenParameterSpec keyGenParameterSpec = new KeyGenParameterSpec.Builder(KEYSTORE_ALIAS,
+                    KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                    .setKeySize(256)
+                    .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                    .build();
+
+            // initialize KeyGenerator and generate a secret key
+            keyGenerator.init(keyGenParameterSpec);
+            return keyGenerator.generateKey();
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
+    public void deleteStoredKey() {
+        try {
+            KeyStore ks = KeyStore.getInstance(KEYSTORE_PROVIDER);
+            ks.load(null);
+            ks.deleteEntry(KEYSTORE_ALIAS);
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String encrypt(String data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        SecretKey secretKey;
+
+        if (isInitialized()) {
+            secretKey = getStoredKey();
+        } else {
+            secretKey = generateKey();
+        }
+
+        final Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+        byte[] encryptedData = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
+        String encryptedDataString = Base64.encodeToString(encryptedData, Base64.DEFAULT);
+        String ivString = Base64.encodeToString(cipher.getIV(), Base64.DEFAULT);
+
+        return ivString + ":::" + encryptedDataString;
+    }
+
+    public String decrypt(String input) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+
+        // extract iv from save data
+        String[] parts = input.split(":::");
+
+        byte[] iv = Base64.decode(parts[0], Base64.DEFAULT);
+        byte[] data = Base64.decode(parts[1], Base64.DEFAULT);
+
+        final Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+        final GCMParameterSpec gcmSpec = new GCMParameterSpec(128, iv);
+
+        cipher.init(Cipher.DECRYPT_MODE, getStoredKey(), gcmSpec);
+
+        return new String(cipher.doFinal(data), StandardCharsets.UTF_8);
+    }
+
+
+    public static void deleteAllStoredKeys() {
+        try {
+
+            KeyStore ks = KeyStore.getInstance(KEYSTORE_PROVIDER);
+            ks.load(null);
+
+            Log.i(TAG, "Size: " + ks.size());
+
+            Enumeration<String> aliases = ks.aliases();
+
+            while (aliases.hasMoreElements()) {
+                String alias = aliases.nextElement();
+                ks.deleteEntry(alias);
+            }
+
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
