@@ -1,4 +1,4 @@
-package lu.circl.mispbump;
+package lu.circl.mispbump.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,14 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import lu.circl.mispbump.R;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.restful_client.Organisation;
-import lu.circl.mispbump.restful_client.User;
 import lu.circl.mispbump.security.KeyStoreWrapper;
 
 public class HomeActivity extends AppCompatActivity {
-
-    private static final String TAG = "HomeActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +70,6 @@ public class HomeActivity extends AppCompatActivity {
     private void populateViewsWithInfo() {
         PreferenceManager preferenceManager = PreferenceManager.getInstance(this);
 
-        User user = preferenceManager.getUserInfo();
         Organisation org = preferenceManager.getUserOrganisation();
 
         TextView orgTitle = findViewById(R.id.home_org_name);

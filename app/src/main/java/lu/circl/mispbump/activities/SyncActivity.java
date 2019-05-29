@@ -1,4 +1,4 @@
-package lu.circl.mispbump;
+package lu.circl.mispbump.activities;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -20,11 +20,14 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
+import lu.circl.mispbump.R;
 import lu.circl.mispbump.auxiliary.DialogManager;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.auxiliary.QrCodeGenerator;
 import lu.circl.mispbump.auxiliary.RandomString;
 import lu.circl.mispbump.cam.CameraFragment;
+import lu.circl.mispbump.fragments.SyncOptionsFragment;
+import lu.circl.mispbump.models.SyncInformation;
 import lu.circl.mispbump.restful_client.MispRestClient;
 import lu.circl.mispbump.restful_client.MispServer;
 import lu.circl.mispbump.restful_client.Organisation;
@@ -53,6 +56,14 @@ public class SyncActivity extends AppCompatActivity {
     private FloatingActionButton continueButton;
 
     private SyncState currentSyncState = SyncState.publicKeyExchange;
+    private enum SyncState {
+        publicKeyExchange,
+        dataExchange
+    }
+
+    /**
+     * Callback to any
+     */
     private View.OnClickListener onContinueClicked = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -85,6 +96,7 @@ public class SyncActivity extends AppCompatActivity {
             }
         }
     };
+
     /**
      * Callback for the camera fragment.
      * Delivers the content of a scanned QR code.
@@ -98,6 +110,7 @@ public class SyncActivity extends AppCompatActivity {
                 case publicKeyExchange:
                     try {
                         final PublicKey pk = AESSecurity.publicKeyFromString(qrData);
+
                         DialogManager.publicKeyDialog(pk.toString(), SyncActivity.this,
                                 new DialogManager.IDialogFeedback() {
                                     @Override
@@ -290,11 +303,6 @@ public class SyncActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    private enum SyncState {
-        publicKeyExchange,
-        dataExchange
     }
 
 //    private View.OnClickListener onGetServers = new View.OnClickListener() {

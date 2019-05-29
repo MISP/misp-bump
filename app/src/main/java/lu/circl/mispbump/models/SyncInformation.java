@@ -1,4 +1,4 @@
-package lu.circl.mispbump;
+package lu.circl.mispbump.models;
 
 import lu.circl.mispbump.restful_client.Organisation;
 import lu.circl.mispbump.restful_client.Server;
@@ -14,7 +14,7 @@ public class SyncInformation {
     public Organisation organisation;
     public Server server;
 
-    SyncInformation(User user, Organisation organisation, Server server) {
+    public SyncInformation(User user, Organisation organisation, Server server) {
         this.user = user;
         this.organisation = organisation;
         this.server = server;

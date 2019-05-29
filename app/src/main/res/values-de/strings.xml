@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MispBump</string>
+    <string name="download_misp_infos">MISP Informationen laden</string>
+    <string name="login">Anmelden</string>
+    <string name="logout">Abmelden</string>
+    <string name="menu_login_help_label">Hilfe</string>
+    <string name="misp_automation_hint">MISP Automatisierungs-Schlüssel</string>
+    <string name="no_information">Keine Informationen</string>
+    <string name="save_automation_key_hint">Automatisierungs-Schlüssel speichern</string>
+    <string name="login_help_text">Das ist der Anmelde Informations Text.</string>
+</resources>

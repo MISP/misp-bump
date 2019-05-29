@@ -1,4 +1,4 @@
-package lu.circl.mispbump;
+package lu.circl.mispbump.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -19,6 +19,8 @@ import android.widget.ProgressBar;
 
 import java.util.Objects;
 
+import lu.circl.mispbump.R;
+import lu.circl.mispbump.auxiliary.DialogManager;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.restful_client.MispRestClient;
 import lu.circl.mispbump.restful_client.Organisation;
@@ -32,69 +34,6 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressBar progressBar;
 
     private PreferenceManager preferenceManager;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-
-        // populate Toolbar (Actionbar)
-        Toolbar myToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(myToolbar);
-
-        ActionBar ab = getSupportActionBar();
-        if (ab != null) {
-            ab.setDisplayHomeAsUpEnabled(false);
-        }
-
-        constraintLayout = findViewById(R.id.login_root);
-        progressBar = findViewById(R.id.login_progressbar);
-        serverUrl = findViewById(R.id.login_server_url);
-        serverAutomationKey = findViewById(R.id.login_automation_key);
-        Button downloadInfoButton = findViewById(R.id.login_download_button);
-
-        downloadInfoButton.setOnClickListener(onClickDownload);
-
-        preferenceManager = PreferenceManager.getInstance(this);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_login, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_login_help:
-                showHelpDialog();
-                return true;
-
-            default:
-                // invoke superclass to handle unrecognized item (eg. homeAsUp)
-                return super.onOptionsItemSelected(item);
-
-        }
-    }
-
-    private void showHelpDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        builder.setTitle(R.string.app_name);
-        builder.setMessage("You need to have admin rights in order to create sync users and so on");
-
-        builder.setPositiveButton("Got it", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
     private View.OnClickListener onClickDownload = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -107,12 +46,12 @@ public class LoginActivity extends AppCompatActivity {
             serverUrl.setError(null);
             serverAutomationKey.setError(null);
 
-            if(!isValidUrl(url)) {
+            if (!isValidUrl(url)) {
                 error = true;
                 serverUrl.setError("Invalid Server URL");
             }
 
-            if(!isValidAutomationKey(authkey)) {
+            if (!isValidAutomationKey(authkey)) {
                 error = true;
                 serverAutomationKey.setError("Invalid automation key");
             }
@@ -164,6 +103,55 @@ public class LoginActivity extends AppCompatActivity {
             });
         }
     };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+
+        // populate Toolbar (Actionbar)
+        Toolbar myToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
+
+        ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(false);
+        }
+
+        constraintLayout = findViewById(R.id.login_root);
+        progressBar = findViewById(R.id.login_progressbar);
+        serverUrl = findViewById(R.id.login_server_url);
+        serverAutomationKey = findViewById(R.id.login_automation_key);
+        Button downloadInfoButton = findViewById(R.id.login_download_button);
+
+        downloadInfoButton.setOnClickListener(onClickDownload);
+
+        preferenceManager = PreferenceManager.getInstance(this);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_login, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_login_help:
+                showHelpDialog();
+                return true;
+
+            default:
+                // invoke superclass to handle unrecognized item (eg. homeAsUp)
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
+    private void showHelpDialog() {
+        DialogManager.loginHelpDialog(LoginActivity.this);
+    }
 
     private boolean isValidUrl(String url) {
         return url.startsWith("https://") || url.startsWith("http://");

@@ -1,8 +1,8 @@
-package lu.circl.mispbump;
+package lu.circl.mispbump.activities;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.restful_client.User;
@@ -21,7 +21,7 @@ public class StartUpActivity extends AppCompatActivity {
             startActivity(login);
         }
 
-        // closes the activity thus prevents going back to this (empty) activity
+        // closes the activity to prevent going back to this (empty) activity
         finish();
     }
 

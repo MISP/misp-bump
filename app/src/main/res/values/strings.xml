@@ -2,14 +2,13 @@
     <string name="app_name">MispBump</string>
     <string name="login">Log in</string>
     <string name="logout">Log out</string>
-    <string name="misp_server_url_hint">Misp Server URL</string>
+    <string name="misp_server_url_hint" translatable="false">MISP Server URL</string>
     <string name="misp_automation_hint">MISP Automation Key</string>
     <string name="download_misp_infos">Download MISP Infos</string>
     <string name="no_information">No Information</string>
     <string name="save_automation_key_hint">Save Automation Key</string>
-    <string name="home">Home</string>
+    <string name="home" translatable="false">Home</string>
     <string name="menu_login_help_label">Help</string>
-
-    // Sync options preferences
-    <string name="sync_option_share"><u>Share events</u>\nThis will generate a sync server on your instance</string>
+    <string name="login_help_text">This is the login info text.</string>
+    <string name="ok" translatable="false">Okay</string>
 </resources>

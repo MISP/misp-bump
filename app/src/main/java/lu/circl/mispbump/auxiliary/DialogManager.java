@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
+import lu.circl.mispbump.R;
+
 /**
  * Creates and show dialogs.
  * Automatically takes care of using the UI Thread.
@@ -12,18 +14,11 @@ import android.content.DialogInterface;
 public class DialogManager {
 
     /**
-     * Interface to give feedback about the user choice in dialogs.
-     */
-    public interface IDialogFeedback {
-        void positive();
-        void negative();
-    }
-
-    /**
      * Dialog to display a received public key.
+     *
      * @param publicKey the public key to display
-     * @param context needed to build and show the dialog
-     * @param callback {@link IDialogFeedback}
+     * @param context   needed to build and show the dialog
+     * @param callback  {@link IDialogFeedback}
      */
     public static void publicKeyDialog(String publicKey, Context context, final IDialogFeedback callback) {
         final AlertDialog.Builder adb = new AlertDialog.Builder(context);
@@ -55,7 +50,8 @@ public class DialogManager {
 
     /**
      * Dialog to ask the user if his sync partner already scanned the displayed qr code.
-     * @param context needed to build and show the dialog
+     *
+     * @param context  needed to build and show the dialog
      * @param callback {@link IDialogFeedback}
      */
     public static void confirmProceedDialog(Context context, final IDialogFeedback callback) {
@@ -84,5 +80,40 @@ public class DialogManager {
                 adb.create().show();
             }
         });
+    }
+
+    /**
+     * Dialog to provide login information.
+     *
+     * @param context needed to build and show the dialog
+     */
+    public static void loginHelpDialog(Context context) {
+        final AlertDialog.Builder adb = new AlertDialog.Builder(context);
+        adb.setTitle(R.string.app_name);
+        adb.setMessage(R.string.login_help_text);
+        adb.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        Activity act = (Activity) context;
+
+        act.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adb.create().show();
+            }
+        });
+    }
+
+    /**
+     * Interface to give feedback about the user choice in dialogs.
+     */
+    public interface IDialogFeedback {
+        void positive();
+
+        void negative();
     }
 }
