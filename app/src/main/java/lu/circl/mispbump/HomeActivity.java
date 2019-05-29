@@ -57,12 +57,6 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-
-            case R.id.aes:
-                Intent i = new Intent(getApplicationContext(), AESActivity.class);
-                startActivity(i);
-                return true;
-
             case R.id.main_menu_clear_and_logout:
                 clearDeviceAndLogOut();
                 return true;

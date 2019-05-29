@@ -72,7 +72,6 @@ public class KeyStoreWrapper {
         return false;
     }
 
-
     /**
      *
      * @return SecretKey associated with the given alias.
@@ -155,11 +154,11 @@ public class KeyStoreWrapper {
      * Encrypt data with given algorithm and key associated with alias.
      * @param data data to encrypt.
      * @return encrypted data as String.
-     * @throws NoSuchPaddingException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeyException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
+     * @throws NoSuchPaddingException padding not found
+     * @throws NoSuchAlgorithmException algorithm not found
+     * @throws InvalidKeyException invalid key
+     * @throws BadPaddingException bad padding
+     * @throws IllegalBlockSizeException illegal block size
      */
     public String encrypt(String data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         SecretKey secretKey;
@@ -184,12 +183,12 @@ public class KeyStoreWrapper {
      * Decrypts data with given algorithm and key associated with alias.
      * @param input encrypted data.
      * @return decrypted data as String.
-     * @throws NoSuchPaddingException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidAlgorithmParameterException
-     * @throws InvalidKeyException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
+     * @throws NoSuchPaddingException padding not found
+     * @throws NoSuchAlgorithmException algorithm not found
+     * @throws InvalidAlgorithmParameterException invalid algorithm parameters
+     * @throws InvalidKeyException invalid key
+     * @throws BadPaddingException bad padding
+     * @throws IllegalBlockSizeException illegal block size
      */
     public String decrypt(String input) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
 
@@ -235,5 +234,19 @@ public class KeyStoreWrapper {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Combine IV and encrypted data.
+     * @param iv initialisation vector
+     * @param encryptedData encrypted data
+     * @return combination of iv and encrypted data
+     */
+    private static byte[] getCombinedArray(byte[] iv, byte[] encryptedData) {
+        byte[] combined = new byte[iv.length + encryptedData.length];
+        for (int i = 0; i < combined.length; ++i) {
+            combined[i] = i < iv.length ? iv[i] : encryptedData[i - iv.length];
+        }
+        return combined;
     }
 }

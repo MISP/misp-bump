@@ -9,4 +9,7 @@
     <string name="save_automation_key_hint">Save Automation Key</string>
     <string name="home">Home</string>
     <string name="menu_login_help_label">Help</string>
+
+    // Sync options preferences
+    <string name="sync_option_share"><u>Share events</u>\nThis will generate a sync server on your instance</string>
 </resources>

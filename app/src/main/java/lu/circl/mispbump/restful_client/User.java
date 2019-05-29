@@ -5,6 +5,13 @@ import com.google.gson.annotations.SerializedName;
 
 public class User {
 
+    public static final int ROLE_ADMIN = 1;
+    public static final int ROLE_ORG_ADMIN = 2;
+    public static final int ROLE_USER = 3;
+    public static final int ROLE_PUBLISHER = 4;
+    public static final int ROLE_SYNC_USER = 5;
+    public static final int ROLE_READ_ONLY = 6;
+
     public User(Integer org_id, String email, Integer role_id) {
         this.org_id = org_id;
         this.email = email;

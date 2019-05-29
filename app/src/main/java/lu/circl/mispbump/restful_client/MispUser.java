@@ -9,4 +9,7 @@ public class MispUser {
     @Expose
     public User user;
 
+    public MispUser(User user) {
+        this.user = user;
+    }
 }

@@ -5,6 +5,8 @@ import android.util.Base64;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
@@ -14,7 +16,7 @@ public class AESSecurity {
 
     private static final String TAG = "MISP_LOGGING";
 
-    private static final String ENCRYPT_ALGORITHM = "AES/CBC/PKCS5Padding";
+    private static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
     private static final String KEY_PAIR_ALGORITHM = "EC";
     private static final int KEY_SIZE = 521; // 224 | 256 | 384 | 521
     private static final String KEY_AGREEMENT_ALGORITHM = "ECDH";
@@ -28,8 +30,15 @@ public class AESSecurity {
     private byte[] sharedSecret;
     private IvParameterSpec ivParameterSpec;
 
-    public AESSecurity() {
+    private AESSecurity() {
         initialize();
+    }
+
+    public static AESSecurity getInstance() {
+        if(instance == null) {
+            instance = new AESSecurity();
+        }
+        return instance;
     }
 
     /**
@@ -37,7 +46,6 @@ public class AESSecurity {
      * The private key is fed into the key agreement instance.
      */
     private void initialize() {
-
         try {
             KeyPairGenerator kpg = KeyPairGenerator.getInstance(KEY_PAIR_ALGORITHM);
             kpg.initialize(KEY_SIZE);
@@ -58,7 +66,6 @@ public class AESSecurity {
      * @param publickey public key of the sync partner
      */
     public void setForeignPublicKey(PublicKey publickey) {
-
         try {
             keyAgreement.doPhase(publickey, true);
 
@@ -74,52 +81,42 @@ public class AESSecurity {
     }
 
     /**
-     *
-     * @param data
-     * @return
+     * Encrypts data.
+     * @param data data to encrypt
+     * @return To String converted and encrypted data
      */
     public String encrypt(String data) {
         try {
+            Cipher c = Cipher.getInstance(CIPHER_ALGORITHM);
+            c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(sharedSecret, CIPHER_ALGORITHM), ivParameterSpec);
 
-            Key key = generateKey();
-            Cipher c = Cipher.getInstance(ENCRYPT_ALGORITHM);
-
-            try {
-                c.init(Cipher.ENCRYPT_MODE, key, ivParameterSpec);
-            } catch (InvalidAlgorithmParameterException e) {
-                e.printStackTrace();
-            }
-
-            byte[] encVal = c.doFinal(data.getBytes());
-            return Base64.encodeToString(encVal, 0);
+            byte[] cipherText = c.doFinal(data.getBytes(StandardCharsets.UTF_8));
+            return Base64.encodeToString(cipherText, Base64.NO_WRAP);
 
         } catch (BadPaddingException | InvalidKeyException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
             e.printStackTrace();
         }
         return data;
     }
 
     /**
-     *
-     * @param data
-     * @return
+     * Decrypts data.
+     * @param data data to decrypt
+     * @return To String converted and decrypted data
      */
     public String decrypt(String data) {
         try {
-            Key key = generateKey();
+            Cipher c = Cipher.getInstance(CIPHER_ALGORITHM);
+            c.init(Cipher.DECRYPT_MODE, new SecretKeySpec(sharedSecret, CIPHER_ALGORITHM), ivParameterSpec);
 
-            Cipher c = Cipher.getInstance(ENCRYPT_ALGORITHM);
+            byte[] cipherText = Base64.decode(data, Base64.NO_WRAP);
+            return new String(c.doFinal(cipherText), StandardCharsets.UTF_8);
 
-            try {
-                c.init(Cipher.DECRYPT_MODE, key, ivParameterSpec);
-            } catch (InvalidAlgorithmParameterException e) {
-                e.printStackTrace();
-            }
-
-            byte[] decoded = Base64.decode(data, 0);
-            byte[] decValue = c.doFinal(decoded);
-            return new String(decValue);
         } catch (BadPaddingException | InvalidKeyException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
             e.printStackTrace();
         }
         return data;
@@ -129,31 +126,12 @@ public class AESSecurity {
         return publickey;
     }
 
-    private Key generateKey() {
-        return new SecretKeySpec(sharedSecret, ENCRYPT_ALGORITHM);
-    }
-
     public static String publicKeyToString(PublicKey key) {
         return Base64.encodeToString(key.getEncoded(), Base64.DEFAULT);
     }
 
-    public static PublicKey publicKeyFromString(String key) {
-        try {
-
-            byte[] input = Base64.decode(key, Base64.DEFAULT);
-            return KeyFactory.getInstance(KEY_FACTORY_ALGORITHM).generatePublic(new X509EncodedKeySpec(input));
-
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static AESSecurity getInstance() {
-        if(instance == null) {
-            instance = new AESSecurity();
-        }
-        return instance;
+    public static PublicKey publicKeyFromString(String key) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        byte[] input = Base64.decode(key, Base64.DEFAULT);
+        return KeyFactory.getInstance(KEY_FACTORY_ALGORITHM).generatePublic(new X509EncodedKeySpec(input));
     }
 }

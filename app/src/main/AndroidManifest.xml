@@ -15,6 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
         <activity android:name=".StartUpActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,6 +23,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".HomeActivity"
             android:label="@string/home" />
@@ -30,9 +32,7 @@
             android:label="@string/login" />
         <activity
             android:name=".SyncActivity"
-            android:label="@string/app_name" />
-        <activity
-            android:name=".AESActivity"
+            android:label="@string/app_name"
             android:parentActivityName=".HomeActivity"/>
     </application>
 

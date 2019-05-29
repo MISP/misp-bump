@@ -31,18 +31,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class MispRestClient {
 
-    // callbacks and interfaces
-
-    public enum roleId {
-        ADMIN(1), ORG_ADMIN(2), USER(3), PUBLISHER(4), SYNC_USER(5), READ_ONLY(6);
-
-        private final int id;
-
-        roleId(int id) { this.id = id; }
-
-        public int value() { return id; }
-    }
-
     public interface UserCallback {
         void success(User user);
         void failure(String error);
@@ -59,7 +47,6 @@ public class MispRestClient {
         void failure(String error);
     }
 
-    // fields
 
     private PreferenceManager preferenceManager;
     private MispRestService mispRestService;

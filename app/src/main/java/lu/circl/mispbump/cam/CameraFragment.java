@@ -18,7 +18,6 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -94,7 +93,7 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
                     if (barcodes.size() > 0) {
                         if (qrResultCallback != null) {
 
-                            qrResultCallback.qrDataResult(barcodes.valueAt(0).rawValue);
+                            qrResultCallback.qrScanResult(barcodes.valueAt(0).rawValue);
 
                             try {
                                 sleep(100);
@@ -103,7 +102,7 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
                             }
 
                         } else {
-                            Log.i(TAG, "QrResultCallback not attached");
+                            Log.i(TAG, "QrScanCallback not attached");
                         }
                     }
 
@@ -121,7 +120,7 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
         }
     }
 
-    private QrResultCallback qrResultCallback;
+    private QrScanCallback qrResultCallback;
 
     @Override
     public void onAttach(Context context) {
@@ -783,8 +782,8 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
     }
 
 
-    public interface QrResultCallback {
-        void qrDataResult(String qrData);
+    public interface QrScanCallback {
+        void qrScanResult(String qrData);
     }
 
     private boolean readQrEnabled = true;
@@ -854,7 +853,7 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
         }
     }
 
-    public void setOnQrAvailableListener(QrResultCallback callback) {
+    public void setOnQrAvailableListener(QrScanCallback callback) {
         qrResultCallback = callback;
     }
 }
