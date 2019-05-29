@@ -16,16 +16,17 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
+import lu.circl.mispbump.auxiliary.DialogManager;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.auxiliary.QrCodeGenerator;
 import lu.circl.mispbump.auxiliary.RandomString;
 import lu.circl.mispbump.cam.CameraFragment;
 import lu.circl.mispbump.restful_client.MispRestClient;
 import lu.circl.mispbump.restful_client.MispServer;
-import lu.circl.mispbump.restful_client.MispUser;
 import lu.circl.mispbump.restful_client.Organisation;
 import lu.circl.mispbump.restful_client.Server;
 import lu.circl.mispbump.restful_client.User;
@@ -52,11 +53,85 @@ public class SyncActivity extends AppCompatActivity {
     private FloatingActionButton continueButton;
 
     private SyncState currentSyncState = SyncState.publicKeyExchange;
+    private View.OnClickListener onContinueClicked = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
 
-    private enum SyncState {
-        publicKeyExchange,
-        dataExchange
-    }
+            cameraFragment.setReadQrEnabled(false);
+
+            switch (currentSyncState) {
+                case publicKeyExchange:
+
+                    DialogManager.confirmProceedDialog(SyncActivity.this,
+                            new DialogManager.IDialogFeedback() {
+                                @Override
+                                public void positive() {
+                                    currentSyncState = SyncState.dataExchange;
+                                    continueButton.hide();
+                                    cameraFragment.setReadQrEnabled(true);
+                                    showInformationQr();
+                                }
+
+                                @Override
+                                public void negative() {
+                                    // do nothing, just wait
+                                }
+                            });
+                    break;
+
+                case dataExchange:
+                    // TODO upload
+                    break;
+            }
+        }
+    };
+    /**
+     * Callback for the camera fragment.
+     * Delivers the content of a scanned QR code.
+     */
+    private CameraFragment.QrScanCallback onQrCodeScanned = new CameraFragment.QrScanCallback() {
+        @Override
+        public void qrScanResult(String qrData) {
+            cameraFragment.setReadQrEnabled(false);
+
+            switch (currentSyncState) {
+                case publicKeyExchange:
+                    try {
+                        final PublicKey pk = AESSecurity.publicKeyFromString(qrData);
+                        DialogManager.publicKeyDialog(pk.toString(), SyncActivity.this,
+                                new DialogManager.IDialogFeedback() {
+                                    @Override
+                                    public void positive() {
+                                        aesSecurity.setForeignPublicKey(pk);
+                                        continueButton.show();
+                                    }
+
+                                    @Override
+                                    public void negative() {
+                                        // enable qr read again to scan another pk
+                                        cameraFragment.setReadQrEnabled(true);
+                                    }
+                                });
+                    } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+                        MakeToast("Invalid key");
+                    }
+
+                    break;
+
+                case dataExchange:
+                    // disable qr read
+                    cameraFragment.setReadQrEnabled(false);
+
+                    String data = aesSecurity.decrypt(qrData);
+                    SyncInformation info = new Gson().fromJson(data, SyncInformation.class);
+
+                    Log.i(TAG, info.organisation.toString());
+                    Log.i(TAG, info.user.toString());
+
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,66 +156,6 @@ public class SyncActivity extends AppCompatActivity {
 
         enableSyncOptionsFragment();
     }
-
-    private View.OnClickListener onContinueClicked = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (currentSyncState) {
-                case publicKeyExchange:
-                    currentSyncState = SyncState.dataExchange;
-                    showInformationQr();
-                    continueButton.hide();
-                    cameraFragment.setReadQrEnabled(true);
-                    break;
-
-                case dataExchange:
-                    // TODO upload
-                    break;
-            }
-        }
-    };
-
-    /**
-     * Callback for the camera fragment.
-     * Delivers the content of a scanned QR code.
-     */
-    private CameraFragment.QrScanCallback onQrCodeScanned = new CameraFragment.QrScanCallback() {
-        @Override
-        public void qrScanResult(String qrData) {
-            switch (currentSyncState) {
-                case publicKeyExchange:
-                    try {
-                        aesSecurity.setForeignPublicKey(AESSecurity.publicKeyFromString(qrData));
-                        cameraFragment.setReadQrEnabled(false);
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                continueButton.show();
-                            }
-                        });
-                    } catch (NoSuchAlgorithmException e) {
-                        MakeToast("Something gone wrong while parsing the key (no such algorithm)");
-                    } catch (InvalidKeySpecException e) {
-                        MakeToast("Something gone wrong while parsing the key (invalid key spec)");
-                    }
-
-                    break;
-
-                case dataExchange:
-                    // disable qr read
-                    cameraFragment.setReadQrEnabled(false);
-
-                    String data = aesSecurity.decrypt(qrData);
-                    SyncInformation info = new Gson().fromJson(data, SyncInformation.class);
-
-                    Log.i(TAG, info.organisation.toString());
-                    Log.i(TAG, info.user.toString());
-
-                    break;
-            }
-        }
-    };
 
     /**
      * Creates the camera fragment used to scan the QR codes.
@@ -197,7 +212,6 @@ public class SyncActivity extends AppCompatActivity {
         // my organisation
         Organisation org = preferenceManager.getUserOrganisation();
         User user = preferenceManager.getUserInfo();
-        MispUser mispUser = new MispUser(user);
 
         Server server = new Server(
                 "SyncServer for " + org.name,
@@ -276,6 +290,11 @@ public class SyncActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private enum SyncState {
+        publicKeyExchange,
+        dataExchange
     }
 
 //    private View.OnClickListener onGetServers = new View.OnClickListener() {

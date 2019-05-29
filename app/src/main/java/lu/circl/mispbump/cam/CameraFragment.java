@@ -61,61 +61,49 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
         }
 
         void addToQueue(Bitmap bitmap) {
-
-            if (lastAccessedIndex == 10) {
-                lastAccessedIndex = 0;
-            }
-
             processQueue[lastAccessedIndex] = bitmap;
-            lastAccessedIndex++;
+            // circular array access
+            lastAccessedIndex = (lastAccessedIndex + 1) % processQueue.length;
         }
 
         @Override
         public void run() {
             while (isRunning) {
 
+                // no need to process further images
                 if (!readQrEnabled) {
                     continue;
                 }
 
-                int usedSlots = 0;
-
                 for (int i = 0; i < processQueue.length; i++) {
 
+                    // queue position already processed or not in use
                     if (processQueue[i] == null) {
                         continue;
                     }
 
-                    usedSlots++;
+                    // analyze image for qr codes
+                    SparseArray<Barcode> barcodes = barcodeDetector.detect(
+                            new Frame.Builder().setBitmap(processQueue[i]).build()
+                    );
 
-                    SparseArray<Barcode> barcodes = barcodeDetector.detect(new Frame.Builder().setBitmap(processQueue[i]).build());
-
+                    // does the frame contain any qr code?
                     if (barcodes.size() > 0) {
-                        if (qrResultCallback != null) {
-
+                        if (readQrEnabled) {
                             qrResultCallback.qrScanResult(barcodes.valueAt(0).rawValue);
-
-                            try {
-                                sleep(100);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-
-                        } else {
-                            Log.i(TAG, "QrScanCallback not attached");
                         }
                     }
 
+                    // set buffer entry as processed
                     processQueue[i] = null;
                 }
 
+                // sleep between analysis of buffer (-25% cpu usage)
                 try {
                     sleep(250);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
-                Log.i(TAG, "slots in use: " + usedSlots);
             }
         }
     }
@@ -717,7 +705,6 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
         }
 
     }
-
 
     /**
      * Shows an error message dialog.
