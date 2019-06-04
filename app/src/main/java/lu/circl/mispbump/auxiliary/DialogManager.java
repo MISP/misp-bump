@@ -5,7 +5,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
+import java.security.PublicKey;
+
 import lu.circl.mispbump.R;
+import lu.circl.mispbump.models.SyncInformation;
+import lu.circl.mispbump.security.DiffieHellman;
 
 /**
  * Creates and show dialogs.
@@ -20,21 +24,60 @@ public class DialogManager {
      * @param context   needed to build and show the dialog
      * @param callback  {@link IDialogFeedback}
      */
-    public static void publicKeyDialog(String publicKey, Context context, final IDialogFeedback callback) {
+    public static void publicKeyDialog(PublicKey publicKey, Context context, final IDialogFeedback callback) {
         final AlertDialog.Builder adb = new AlertDialog.Builder(context);
-        adb.setTitle("Public Key Received");
-        adb.setMessage(publicKey);
+        adb.setTitle("Public Key");
+
+        String message = "Algorithm: " + publicKey.getAlgorithm() + "\n" +
+                "Format: " + publicKey.getFormat() + "\n" +
+                "Content: \n" + DiffieHellman.publicKeyToString(publicKey);
+
+        adb.setMessage(message);
+        adb.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (callback != null) {
+                    callback.positive();
+                }
+            }
+        });
+
+        Activity act = (Activity) context;
+
+        act.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adb.create().show();
+            }
+        });
+    }
+
+    /**
+     * Dialog to display a received public key.
+     *
+     * @param syncInformation {@link SyncInformation}
+     * @param context   needed to build and show the dialog
+     * @param callback  {@link IDialogFeedback}
+     */
+    public static void syncInformationDialog(SyncInformation syncInformation, Context context, final IDialogFeedback callback) {
+        final AlertDialog.Builder adb = new AlertDialog.Builder(context);
+        adb.setTitle("Sync information received");
+        adb.setMessage(syncInformation.organisation.name);
         adb.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                callback.positive();
+                if (callback != null) {
+                    callback.positive();
+                }
             }
         });
 
         adb.setNegativeButton("Reject", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                callback.negative();
+                if (callback != null) {
+                    callback.negative();
+                }
             }
         });
 
@@ -56,24 +99,27 @@ public class DialogManager {
      */
     public static void confirmProceedDialog(Context context, final IDialogFeedback callback) {
         final AlertDialog.Builder adb = new AlertDialog.Builder(context);
-        adb.setTitle("Really continue?");
-        adb.setMessage("Was this QR Code already scanned by your partner?");
-        adb.setPositiveButton("Yes, continue", new DialogInterface.OnClickListener() {
+        adb.setTitle("Continue?");
+        adb.setMessage("Only continue if your partner already scanned this QR code");
+        adb.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                callback.positive();
+                if (callback != null) {
+                    callback.positive();
+                }
             }
         });
 
-        adb.setNegativeButton("No, show QR Code", new DialogInterface.OnClickListener() {
+        adb.setNegativeButton("Show QR code again", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                callback.negative();
+                if (callback != null) {
+                    callback.negative();
+                }
             }
         });
 
         Activity act = (Activity) context;
-
         act.runOnUiThread(new Runnable() {
             @Override
             public void run() {

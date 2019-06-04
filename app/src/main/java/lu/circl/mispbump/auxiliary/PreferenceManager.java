@@ -2,10 +2,13 @@ package lu.circl.mispbump.auxiliary;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -13,17 +16,23 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import lu.circl.mispbump.models.UploadInformation;
 import lu.circl.mispbump.restful_client.Organisation;
 import lu.circl.mispbump.restful_client.User;
 import lu.circl.mispbump.security.KeyStoreWrapper;
 
+import static android.support.constraint.Constraints.TAG;
+
 public class PreferenceManager {
 
+    private static final String TAG = "PreferenceManager";
 
     private static final String PREFERENCES_FILE = "user_settings";
 
@@ -33,6 +42,8 @@ public class PreferenceManager {
 
     private static final String USER_INFOS = "user_infos";
     private static final String USER_ORG_INFOS = "user_org_infos";
+
+    private static final String UPLOAD_INFO = "upload_info";
 
     private SharedPreferences preferences;
     private static PreferenceManager instance;
@@ -59,7 +70,7 @@ public class PreferenceManager {
     /**
      * Saves user infos from "users/view/me" (encrypted)
      *
-     * @param user
+     * @param user {@link User}
      */
     public void setUserInfo(User user) {
         try {
@@ -178,7 +189,7 @@ public class PreferenceManager {
     /**
      * Encrypts the automation key and stores it in preferences.
      *
-     * @param automationKey
+     * @param automationKey key entered in {@link lu.circl.mispbump.activities.LoginActivity}
      */
     public void setAutomationKey(String automationKey) {
         try {
@@ -202,7 +213,8 @@ public class PreferenceManager {
     /**
      * Decrypts the stored automation key and returns it.
      *
-     * @return the decr
+     * @return decrypted automation key associated with the current user. If no user exists an empty
+     * String is returned.
      */
     public String getAutomationKey() {
 
@@ -313,6 +325,37 @@ public class PreferenceManager {
         SharedPreferences.Editor editor = preferences.edit();
         editor.remove(SERVER_URL);
         editor.apply();
+    }
+
+
+    public void setUploadInformation(UploadInformation uploadInformation) {
+        String storedUploadInfoString = preferences.getString(UPLOAD_INFO, "");
+
+        Type type = new TypeToken<List<UploadInformation>>() {}.getType();
+        List<UploadInformation> dataList;
+
+        if (storedUploadInfoString.isEmpty()) {
+            dataList = new ArrayList<>();
+        } else {
+            dataList = new Gson().fromJson(storedUploadInfoString, type);
+        }
+
+        dataList.add(uploadInformation);
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(UPLOAD_INFO, new Gson().toJson(dataList));
+        editor.apply();
+    }
+
+    public List<UploadInformation> getUploadInformation() {
+        String storedUploadInfoString = preferences.getString(UPLOAD_INFO, "");
+
+        if (storedUploadInfoString.isEmpty()) {
+            return null;
+        }
+
+        Type type = new TypeToken<List<UploadInformation>>() {}.getType();
+        return new Gson().fromJson(storedUploadInfoString, type);
     }
 
 

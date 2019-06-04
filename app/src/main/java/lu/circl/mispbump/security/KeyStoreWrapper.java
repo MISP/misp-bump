@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Arrays;
 import java.util.Enumeration;
 
 import javax.crypto.BadPaddingException;
@@ -172,11 +173,10 @@ public class KeyStoreWrapper {
         final Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
-        byte[] encryptedData = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
-        String encryptedDataString = Base64.encodeToString(encryptedData, Base64.DEFAULT);
-        String ivString = Base64.encodeToString(cipher.getIV(), Base64.DEFAULT);
-
-        return ivString + ":::" + encryptedDataString;
+        byte[] byteData = data.getBytes(StandardCharsets.UTF_8);
+//        byte[] byteData = Base64.decode(data, Base64.DEFAULT);
+        byte[] combined = getCombinedArray(cipher.getIV(), cipher.doFinal(byteData));
+        return Base64.encodeToString(combined, Base64.NO_WRAP);
     }
 
     /**
@@ -193,17 +193,19 @@ public class KeyStoreWrapper {
     public String decrypt(String input) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
 
         // extract iv from save data
-        String[] parts = input.split(":::");
+//        String[] parts = input.split(":::");
+//        byte[] iv = Base64.decode(parts[0], Base64.DEFAULT);
+//        byte[] data = Base64.decode(parts[1], Base64.DEFAULT);
 
-        byte[] iv = Base64.decode(parts[0], Base64.DEFAULT);
-        byte[] data = Base64.decode(parts[1], Base64.DEFAULT);
+        byte[] in = Base64.decode(input, Base64.NO_WRAP);
+        IvAndData ivAndData = splitCombinedArray(in, 12);
 
         final Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
-        final GCMParameterSpec gcmSpec = new GCMParameterSpec(128, iv);
+        final GCMParameterSpec gcmSpec = new GCMParameterSpec(128, ivAndData.iv);
 
         cipher.init(Cipher.DECRYPT_MODE, getStoredKey(), gcmSpec);
 
-        return new String(cipher.doFinal(data), StandardCharsets.UTF_8);
+        return new String(cipher.doFinal(ivAndData.data), StandardCharsets.UTF_8);
     }
 
     /**
@@ -242,11 +244,33 @@ public class KeyStoreWrapper {
      * @param encryptedData encrypted data
      * @return combination of iv and encrypted data
      */
-    private static byte[] getCombinedArray(byte[] iv, byte[] encryptedData) {
+    private byte[] getCombinedArray(byte[] iv, byte[] encryptedData) {
+
+        Log.i(TAG, "iv length = " + iv.length);
+
         byte[] combined = new byte[iv.length + encryptedData.length];
         for (int i = 0; i < combined.length; ++i) {
             combined[i] = i < iv.length ? iv[i] : encryptedData[i - iv.length];
         }
         return combined;
+    }
+
+    private IvAndData splitCombinedArray(byte[] input, int ivLength) {
+        byte[] iv = Arrays.copyOfRange(input, 0, ivLength);
+        byte[] data = Arrays.copyOfRange(input, ivLength, input.length);
+        return new IvAndData(iv, data);
+    }
+
+    public class IvAndData {
+
+        public IvAndData() {}
+
+        public IvAndData(byte[] iv, byte[] data) {
+            this.iv = iv;
+            this.data = data;
+        }
+
+        public byte[] iv;
+        public byte[] data;
     }
 }

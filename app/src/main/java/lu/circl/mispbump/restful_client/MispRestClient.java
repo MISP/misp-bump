@@ -2,9 +2,18 @@ package lu.circl.mispbump.restful_client;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
@@ -18,6 +27,7 @@ import lu.circl.mispbump.auxiliary.PreferenceManager;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,6 +40,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * In order to conveniently use this api some wrapper interfaces are implemented to return the requested API endpoint as java object.
  */
 public class MispRestClient {
+
+    private static final String TAG = "restClient";
+
+    public interface AvailableCallback {
+        void available();
+        void unavailable();
+    }
 
     public interface UserCallback {
         void success(User user);
@@ -44,6 +61,7 @@ public class MispRestClient {
     public interface ServerCallback {
         void success(List<MispServer> servers);
         void success(MispServer server);
+        void success(Server server);
         void failure(String error);
     }
 
@@ -58,9 +76,13 @@ public class MispRestClient {
     public MispRestClient(Context context) {
         preferenceManager = PreferenceManager.getInstance(context);
 
+        String url = preferenceManager.getServerUrl();
+
+        Log.i(TAG, "URL: " + url);
+
         try {
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(preferenceManager.getServerUrl())
+                    .baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(getUnsafeOkHttpClient())
                     .build();
@@ -137,11 +159,41 @@ public class MispRestClient {
         }
     }
 
+    // status routes
+
+    /**
+     * Check via pyMispRoute if server is available
+     * @param callback {@link AvailableCallback}
+     */
+    public void isAvailable(final AvailableCallback callback) {
+        Call<Version> call = mispRestService.pyMispVersion();
+        call.enqueue(new Callback<Version>() {
+            @Override
+            public void onResponse(Call<Version> call, Response<Version> response) {
+                if (!response.isSuccessful()) {
+                    if (response.code() == 403) {
+                        callback.available();
+                        return;
+                    }
+
+                    callback.unavailable();
+                } else {
+                    callback.available();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Version> call, Throwable t) {
+                callback.unavailable();
+            }
+        });
+    }
+
     // user routes
 
     /**
      * Fetches information about the user that is associated with saved auth key.
-     * @param callback wrapper to return a user directly
+     * @param callback {@link UserCallback} wrapper to return user directly
      */
     public void getMyUser(final UserCallback callback) {
         Call<MispUser> call = mispRestService.getMyUserInformation();
@@ -150,7 +202,7 @@ public class MispRestClient {
             @Override
             public void onResponse(Call<MispUser> call, Response<MispUser> response) {
                 if(!response.isSuccessful()) {
-                    callback.failure("" + response.code());
+                    callback.failure(extractError(response));
                 } else {
                     if (response.body() != null) {
                         callback.success(response.body().user);
@@ -171,7 +223,7 @@ public class MispRestClient {
     /**
      * Get an user with specific ID.
      * @param userId user identifier
-     * @param callback wrapper to return user directly
+     * @param callback {@link UserCallback} wrapper to return user directly
      */
     public void getUser(int userId, final UserCallback callback) {
         Call<MispUser> call = mispRestService.getUser(userId);
@@ -180,7 +232,7 @@ public class MispRestClient {
             @Override
             public void onResponse(Call<MispUser> call, Response<MispUser> response) {
                 if(!response.isSuccessful()) {
-                    callback.failure("" + response.code());
+                    callback.failure(extractError(response));
                 } else {
                     if (response.body() != null) {
                         callback.success(response.body().user);
@@ -201,7 +253,7 @@ public class MispRestClient {
     /**
      * Add a given user to the MISP instance referenced by url in preferences.
      * @param user user to add
-     * @param callback wrapper to return the created user directly
+     * @param callback {@link UserCallback} wrapper to return the created user directly
      */
     public void addUser(User user, final UserCallback callback) {
         Call<MispUser> call = mispRestService.addUser(user);
@@ -209,12 +261,11 @@ public class MispRestClient {
         call.enqueue(new Callback<MispUser>() {
             @Override
             public void onResponse(Call<MispUser> call, Response<MispUser> response) {
-                if (!response.isSuccessful()) {
-                    callback.failure("" + response.code());
-                    return;
+                if(!response.isSuccessful()) {
+                    callback.failure(extractError(response));
+                } else {
+                    callback.success(response.body().user);
                 }
-
-                callback.success(response.body().user);
             }
 
             @Override
@@ -230,7 +281,7 @@ public class MispRestClient {
     /**
      * Get an organisation by a given organisation id.
      * @param orgId organisation identifier
-     * @param callback wrapper to return a organisation directly
+     * @param callback {@link OrganisationCallback} wrapper to return a organisation directly
      */
     public void getOrganisation(int orgId, final OrganisationCallback callback) {
         Call<MispOrganisation> call = mispRestService.getOrganisation(orgId);
@@ -239,7 +290,7 @@ public class MispRestClient {
             @Override
             public void onResponse(Call<MispOrganisation> call, Response<MispOrganisation> response) {
                 if(!response.isSuccessful()) {
-                    callback.failure("" + response.code());
+                    callback.failure(extractError(response));
                 } else {
                     if (response.body() != null) {
                         callback.success(response.body().organisation);
@@ -259,7 +310,7 @@ public class MispRestClient {
     /**
      * Add a given organisation to the MISP instance referenced by url in preferences.
      * @param organisation organisation to add
-     * @param callback wrapper to return the created organisation directly
+     * @param callback {@link OrganisationCallback} wrapper to return the created organisation directly
      */
     public void addOrganisation(Organisation organisation, final OrganisationCallback callback) {
         Call<MispOrganisation> call = mispRestService.addOrganisation(organisation);
@@ -267,12 +318,11 @@ public class MispRestClient {
         call.enqueue(new Callback<MispOrganisation>() {
             @Override
             public void onResponse(Call<MispOrganisation> call, Response<MispOrganisation> response) {
-                if (!response.isSuccessful()) {
-                    callback.failure("" + response.code());
-                    return;
+                if(!response.isSuccessful()) {
+                    callback.failure(extractError(response));
+                } else {
+                    callback.success(response.body().organisation);
                 }
-
-                callback.success(response.body().organisation);
             }
 
             @Override
@@ -286,7 +336,7 @@ public class MispRestClient {
 
     /**
      * Get all servers on MISP instance.
-     * @param callback wrapper to return a list of servers directly
+     * @param callback {@link OrganisationCallback} wrapper to return a list of servers directly
      */
     public void getServers(final ServerCallback callback) {
         Call<List<MispServer>> call = mispRestService.getServers();
@@ -294,12 +344,11 @@ public class MispRestClient {
         call.enqueue(new Callback<List<MispServer>>() {
             @Override
             public void onResponse(Call<List<MispServer>> call, Response<List<MispServer>> response) {
-                if (!response.isSuccessful()) {
-                    callback.failure("" + response.code());
-                    return;
+                if(!response.isSuccessful()) {
+                    callback.failure(extractError(response));
+                } else {
+                    callback.success(response.body());
                 }
-
-                callback.success(response.body());
             }
 
             @Override
@@ -312,26 +361,87 @@ public class MispRestClient {
     /**
      * Add a server to the MISP instance
      * @param server the server to create
-     * @param callback wrapper to return the created server directly
+     * @param callback {@link ServerCallback} wrapper to return the created server directly
      */
-    public void addServer(MispServer server, final ServerCallback callback) {
-        Call<MispServer> call = mispRestService.addServer(server);
+//    public void addServer(MispServer server, final ServerCallback callback) {
+//        Call<MispServer> call = mispRestService.addServer(server);
+//
+//        call.enqueue(new Callback<MispServer>() {
+//            @Override
+//            public void onResponse(Call<MispServer> call, Response<MispServer> response) {
+//                if(!response.isSuccessful()) {
+//                    callback.failure(extractError(response));
+//                } else {
+//                    callback.success(response.body());
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<MispServer> call, Throwable t) {
+//                callback.failure(t.getMessage());
+//            }
+//        });
+//    }
 
-        call.enqueue(new Callback<MispServer>() {
+    public void addServer(Server server, final ServerCallback callback) {
+        Call<Server> call = mispRestService.addServer(server);
+
+        call.enqueue(new Callback<Server>() {
             @Override
-            public void onResponse(Call<MispServer> call, Response<MispServer> response) {
+            public void onResponse(Call<Server> call, Response<Server> response) {
                 if (!response.isSuccessful()) {
-                    callback.failure("" + response.code());
-                    return;
+                    callback.failure(extractError(response));
+                } else {
+                    callback.success(response.body());
                 }
-
-                callback.success(response.body());
             }
 
             @Override
-            public void onFailure(Call<MispServer> call, Throwable t) {
+            public void onFailure(Call<Server> call, Throwable t) {
                 callback.failure(t.getMessage());
             }
         });
+    }
+
+    private <T> String extractError(Response<T> response) {
+        switch (response.code()) {
+            // bad request (malformed)
+            case 400:
+                return "Bad request";
+
+            // unauthorized
+            case 401:
+                return "Unauthorized";
+
+            // forbidden
+            case 403:
+                try {
+                    JSONObject jsonError = new JSONObject(response.errorBody().string());
+
+                    String name = jsonError.getString("name") + "\n";
+                    String reasons = "";
+                    JSONObject errorReasons = jsonError.getJSONObject("errors");
+
+                    Iterator<String> errorKeys = errorReasons.keys();
+
+                    while (errorKeys.hasNext()) {
+                        reasons = reasons.concat(errorReasons.getString(errorKeys.next()) + "\n");
+                    }
+
+                    return name + reasons;
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return "Could not parse (403) error";
+
+                // not found
+            case 404:
+                return "Not found";
+        }
+
+        return "Unknown error";
     }
 }

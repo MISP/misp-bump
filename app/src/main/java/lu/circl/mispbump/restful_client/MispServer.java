@@ -6,6 +6,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class MispServer {
 
+    public MispServer() {}
+
     public MispServer(Server server, Organisation organisation, Organisation remoteOrganisation) {
         this.server = server;
         this.organisation = organisation;

@@ -13,6 +13,11 @@ import retrofit2.http.Path;
  */
 public interface MispRestService {
 
+    // settings routes
+
+    @GET("servers/getPyMISPVersion")
+    Call<Version> pyMispVersion();
+
     // user routes
 
     @GET("users/view/me")
@@ -37,6 +42,9 @@ public interface MispRestService {
     @GET("servers/index")
     Call<List<MispServer>> getServers();
 
+//    @POST("servers/add")
+//    Call<MispServer> addServer(@Body MispServer server);
+
     @POST("servers/add")
-    Call<MispServer> addServer(@Body MispServer server);
+    Call<Server> addServer(@Body Server server);
 }

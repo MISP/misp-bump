@@ -1,8 +1,6 @@
 package lu.circl.mispbump.models;
 
 import lu.circl.mispbump.restful_client.Organisation;
-import lu.circl.mispbump.restful_client.Server;
-import lu.circl.mispbump.restful_client.User;
 
 /**
  * A Class that holds the information needed synchronize two misp instances.
@@ -10,13 +8,10 @@ import lu.circl.mispbump.restful_client.User;
  */
 public class SyncInformation {
 
-    public User user;
     public Organisation organisation;
-    public Server server;
+    public String syncUserPassword;
+    public String syncUserAuthkey;
+    public String baseUrl;
 
-    public SyncInformation(User user, Organisation organisation, Server server) {
-        this.user = user;
-        this.organisation = organisation;
-        this.server = server;
-    }
+    public SyncInformation() {}
 }

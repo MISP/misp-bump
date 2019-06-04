@@ -12,6 +12,9 @@ public class User {
     public static final int ROLE_SYNC_USER = 5;
     public static final int ROLE_READ_ONLY = 6;
 
+    public User() {
+    }
+
     public User(Integer org_id, String email, Integer role_id) {
         this.org_id = org_id;
         this.email = email;

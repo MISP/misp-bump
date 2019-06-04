@@ -1,9 +1,10 @@
 package lu.circl.mispbump.restful_client;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Server {
+
+    public Server() {}
 
     public Server(String name, String url, String authkey, Integer remote_org_id) {
         this.name = name;
@@ -13,91 +14,69 @@ public class Server {
     }
 
     @SerializedName("id")
-    @Expose
     public Integer id;
 
     @SerializedName("name")
-    @Expose
     public String name;
 
     @SerializedName("url")
-    @Expose
     public String url;
 
     @SerializedName("authkey")
-    @Expose
     public String authkey;
 
     @SerializedName("org_id")
-    @Expose
     public Integer org_id;
 
     @SerializedName("push")
-    @Expose
     public Boolean push;
 
     @SerializedName("pull")
-    @Expose
     public Boolean pull;
 
     @SerializedName("lastpulledid")
-    @Expose
     public Object lastpulledid;
 
     @SerializedName("lastpushedid")
-    @Expose
     public Object lastpushedid;
 
     @SerializedName("organization")
-    @Expose
     public Object organization;
 
     @SerializedName("remote_org_id")
-    @Expose
     public Integer remote_org_id;
 
     @SerializedName("publish_without_email")
-    @Expose
-    public Boolean publish_without_email;
+    public Boolean publish_without_email = false;
 
     @SerializedName("unpublish_event")
-    @Expose
     public Boolean unpublish_event;
 
     @SerializedName("self_signed")
-    @Expose
-    public Boolean self_signed;
+    public Boolean self_signed = false;
 
     @SerializedName("pull_rules")
-    @Expose
     public String pull_rules;
 
     @SerializedName("push_rules")
-    @Expose
     public String push_rules;
 
     @SerializedName("cert_file")
-    @Expose
     public Object cert_file;
 
     @SerializedName("client_cert_file")
-    @Expose
     public Object client_cert_file;
 
     @SerializedName("internal")
-    @Expose
     public Boolean internal;
 
     @SerializedName("skip_proxy")
-    @Expose
-    public Boolean skip_proxy;
+    public Boolean skip_proxy = false;
 
     @SerializedName("caching_enabled")
-    @Expose
     public Boolean caching_enabled;
 
     @SerializedName("cache_timestamp")
-    @Expose
     public Boolean cache_timestamp;
 
     @Override

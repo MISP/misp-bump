@@ -12,9 +12,11 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 
-public class AESSecurity {
-
-    private static final String TAG = "MISP_LOGGING";
+/**
+ * This class provides the functionality generate a shared secret key.
+ * Furthermore it contains the encryption/decryption methods.
+ */
+public class DiffieHellman {
 
     private static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
     private static final String KEY_PAIR_ALGORITHM = "EC";
@@ -22,7 +24,7 @@ public class AESSecurity {
     private static final String KEY_AGREEMENT_ALGORITHM = "ECDH";
     private static final String KEY_FACTORY_ALGORITHM = "EC";
 
-    private static AESSecurity instance;
+    private static DiffieHellman instance;
 
     private PublicKey publickey;
     private KeyAgreement keyAgreement;
@@ -30,14 +32,19 @@ public class AESSecurity {
     private byte[] sharedSecret;
     private IvParameterSpec ivParameterSpec;
 
-    private AESSecurity() {
+    private DiffieHellman() {
         initialize();
     }
 
-    public static AESSecurity getInstance() {
+    /**
+     * Singleton pattern
+     * @return {@link DiffieHellman}
+     */
+    public static DiffieHellman getInstance() {
         if(instance == null) {
-            instance = new AESSecurity();
+            instance = new DiffieHellman();
         }
+
         return instance;
     }
 
@@ -102,7 +109,7 @@ public class AESSecurity {
     }
 
     /**
-     * Decrypts data.
+     * Decrypts data with the current shared secret.
      * @param data data to decrypt
      * @return To String converted and decrypted data
      */

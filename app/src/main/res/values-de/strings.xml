@@ -9,4 +9,6 @@
     <string name="no_information">Keine Informationen</string>
     <string name="save_automation_key_hint">Automatisierungs-Schlüssel speichern</string>
     <string name="login_help_text">Das ist der Anmelde Informations Text.</string>
+    <string name="qr_code">QR code</string>
+    <string name="sync">Synchronisation</string>
 </resources>

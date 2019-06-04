@@ -11,4 +11,6 @@
     <string name="menu_login_help_label">Help</string>
     <string name="login_help_text">This is the login info text.</string>
     <string name="ok" translatable="false">Okay</string>
+    <string name="qr_code">QR code</string>
+    <string name="sync">Synchronization</string>
 </resources>
