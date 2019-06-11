@@ -2,6 +2,7 @@ package lu.circl.mispbump.activities;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.design.bottomappbar.BottomAppBar;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -68,22 +69,22 @@ public class SyncActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sync);
+        setContentView(R.layout.activity_sync_2);
 
-        Toolbar myToolbar = findViewById(R.id.appbar);
-        setSupportActionBar(myToolbar);
+//        BottomAppBar myToolbar = findViewById(R.id.bottomNavigation);
+//        setSupportActionBar(myToolbar);
+//
+//        ActionBar ab = getSupportActionBar();
+//        if (ab != null) {
+//            ab.setDisplayHomeAsUpEnabled(true);
+//        }
 
-        ActionBar ab = getSupportActionBar();
-        if (ab != null) {
-            ab.setDisplayHomeAsUpEnabled(true);
-        }
-
-        layout = findViewById(R.id.layout);
+        layout = findViewById(R.id.rootLayout);
 
         qrCodeView = findViewById(R.id.qrcode);
-        continueButton = findViewById(R.id.continue_fab);
-        continueButton.setOnClickListener(onContinueClicked);
-        continueButton.hide();
+//        continueButton = findViewById(R.id.fab);
+//        continueButton.setOnClickListener(onContinueClicked);
+//        continueButton.hide();
 
         diffieHellman = DiffieHellman.getInstance();
         restClient = new MispRestClient(this);
@@ -182,7 +183,7 @@ public class SyncActivity extends AppCompatActivity {
                             new DialogManager.IDialogFeedback() {
                                 @Override
                                 public void positive() {
-                                    uploadInformation.remote = remoteSyncInfo;
+                                    uploadInformation.setRemote(remoteSyncInfo);
                                     continueButton.show();
                                 }
 
@@ -215,7 +216,7 @@ public class SyncActivity extends AppCompatActivity {
             @Override
             public void available() {
 
-                restClient.addOrganisation(uploadInformation.remote.organisation, new MispRestClient.OrganisationCallback() {
+                restClient.addOrganisation(uploadInformation.getRemote().organisation, new MispRestClient.OrganisationCallback() {
                     @Override
                     public void success(final Organisation organisation) {
                         // create syncUser object from syncInfo
@@ -227,8 +228,8 @@ public class SyncActivity extends AppCompatActivity {
                         String emailSaveOrgName = organisation.name.replace(" ", "").toLowerCase();
                         syncUser.email = "syncuser_" + emailSaveOrgName + "@misp.de";
 
-                        syncUser.password = uploadInformation.remote.syncUserPassword;
-                        syncUser.authkey = uploadInformation.remote.syncUserAuthkey;
+                        syncUser.password = uploadInformation.getRemote().syncUserPassword;
+                        syncUser.authkey = uploadInformation.getRemote().syncUserAuthkey;
                         syncUser.termsaccepted = true;
 
                         // add user to local organisation
@@ -237,9 +238,9 @@ public class SyncActivity extends AppCompatActivity {
                             public void success(User user) {
                                 Server server = new Server();
                                 server.name = organisation.name + "'s Sync Server";
-                                server.url = uploadInformation.remote.baseUrl;
+                                server.url = uploadInformation.getRemote().baseUrl;
                                 server.remote_org_id = organisation.id;
-                                server.authkey = uploadInformation.local.syncUserAuthkey;
+                                server.authkey = uploadInformation.getLocal().syncUserAuthkey;
                                 server.self_signed = true;
 
                                 restClient.addServer(server, new MispRestClient.ServerCallback() {
@@ -253,14 +254,14 @@ public class SyncActivity extends AppCompatActivity {
 
                                     @Override
                                     public void success(Server server) {
-                                        uploadInformation.currentSyncStatus = UploadInformation.SyncStatus.COMPLETE;
+                                        uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.COMPLETE);
                                         preferenceManager.setUploadInformation(uploadInformation);
                                         finish();
                                     }
 
                                     @Override
                                     public void failure(String error) {
-                                        uploadInformation.currentSyncStatus = UploadInformation.SyncStatus.FAILURE;
+                                        uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
                                         preferenceManager.setUploadInformation(uploadInformation);
                                         Snackbar.make(layout, error, Snackbar.LENGTH_LONG).show();
                                         Log.e(TAG, error);
@@ -270,7 +271,7 @@ public class SyncActivity extends AppCompatActivity {
 
                             @Override
                             public void failure(String error) {
-                                uploadInformation.currentSyncStatus = UploadInformation.SyncStatus.FAILURE;
+                                uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
                                 preferenceManager.setUploadInformation(uploadInformation);
                                 Snackbar.make(layout, error, Snackbar.LENGTH_LONG).show();
                                 Log.e(TAG, error);
@@ -280,7 +281,7 @@ public class SyncActivity extends AppCompatActivity {
 
                     @Override
                     public void failure(String error) {
-                        uploadInformation.currentSyncStatus = UploadInformation.SyncStatus.FAILURE;
+                        uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
                         preferenceManager.setUploadInformation(uploadInformation);
                         Snackbar.make(layout, error, Snackbar.LENGTH_LONG).show();
                         Log.e(TAG, error);

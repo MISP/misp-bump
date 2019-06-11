@@ -11,4 +11,5 @@
     <string name="login_help_text">Das ist der Anmelde Informations Text.</string>
     <string name="qr_code">QR code</string>
     <string name="sync">Synchronisation</string>
+    <string name="no_syncs_hint">Sie haben noch keine MISP Instanzen verknüpft.</string>
 </resources>

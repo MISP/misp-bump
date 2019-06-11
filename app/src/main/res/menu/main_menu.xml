@@ -3,12 +3,14 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:icon="@drawable/ic_cloud_download_light_24dp"
-        android:id="@+id/update"
-        android:title="Update Organisation"
-        app:showAsAction="never"/>
+        android:id="@+id/menu_profile"
+        android:icon="@drawable/ic_person"
+        android:title="Profile"
+        app:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/main_menu_clear_and_logout"
-        android:title="@string/logout"
+    <item
+        android:id="@+id/menu_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="Settings"
         app:showAsAction="never"/>
 </menu>

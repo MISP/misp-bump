@@ -50,7 +50,7 @@ public class LoginActivity extends AppCompatActivity {
             ab.setDisplayHomeAsUpEnabled(false);
         }
 
-        constraintLayout = findViewById(R.id.layout);
+        constraintLayout = findViewById(R.id.rootLayout);
         progressBar = findViewById(R.id.login_progressbar);
         serverUrl = findViewById(R.id.login_server_url);
         serverAutomationKey = findViewById(R.id.login_automation_key);
