@@ -32,6 +32,7 @@ public class DiffieHellman {
     private byte[] sharedSecret;
     private IvParameterSpec ivParameterSpec;
 
+
     private DiffieHellman() {
         initialize();
     }
@@ -64,25 +65,6 @@ public class DiffieHellman {
             keyAgreement.init(kp.getPrivate());
 
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Generates a shared secret and derives an initialisation vector from it.
-     * @param publickey public key of the sync partner
-     */
-    public void setForeignPublicKey(PublicKey publickey) {
-        try {
-            keyAgreement.doPhase(publickey, true);
-
-            byte[] tmpSharedSecret = keyAgreement.generateSecret();
-            sharedSecret = Arrays.copyOfRange(tmpSharedSecret, 0, 32);
-
-            byte[] inputVector = Arrays.copyOfRange(sharedSecret, 32, 48);
-            ivParameterSpec = new IvParameterSpec(inputVector);
-
-        } catch (InvalidKeyException e) {
             e.printStackTrace();
         }
     }
@@ -129,6 +111,27 @@ public class DiffieHellman {
         return data;
     }
 
+    /**
+     * Generates a shared secret and derives an initialisation vector from it.
+     * @param pk public key of the sync partner
+     */
+    public void setForeignPublicKey(PublicKey pk) {
+        try {
+            keyAgreement.doPhase(pk, true);
+
+            byte[] tmpSharedSecret = keyAgreement.generateSecret();
+            sharedSecret = Arrays.copyOfRange(tmpSharedSecret, 0, 32);
+
+            byte[] inputVector = Arrays.copyOfRange(sharedSecret, 32, 48);
+            ivParameterSpec = new IvParameterSpec(inputVector);
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @return this devices public key
+     */
     public PublicKey getPublicKey() {
         return publickey;
     }

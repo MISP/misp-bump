@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Share events preference -->
-
     <TextView
-        android:id="@+id/share_events_title"
+        android:id="@+id/allow_self_signed"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
         android:fontFamily="sans-serif"
-        android:text="Share events"
+        android:text="Allow self signed certificates"
         android:textColor="@android:color/primary_text_light"
         android:textSize="14sp"
-        app:layout_constraintEnd_toStartOf="@+id/share_events_switch"
+        app:layout_constraintEnd_toStartOf="@+id/self_signed_switch"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -28,20 +25,20 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="16dp"
-        android:text="This will generate a sync server on your instance"
+        android:text="Server certificate must not be from a trusted CA (not recomended)"
         android:textSize="12sp"
-        app:layout_constraintEnd_toStartOf="@+id/share_events_switch"
+        app:layout_constraintEnd_toStartOf="@+id/self_signed_switch"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/share_events_title" />
+        app:layout_constraintTop_toBottomOf="@+id/allow_self_signed" />
 
     <Switch
-        android:id="@+id/share_events_switch"
+        android:id="@+id/self_signed_switch"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginEnd="32dp"
         app:layout_constraintBottom_toBottomOf="@+id/share_events_desc"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/share_events_title" />
+        app:layout_constraintTop_toTopOf="@+id/allow_self_signed" />
 
     <TextView
         android:id="@+id/push_title"
@@ -147,18 +144,4 @@
         app:layout_constraintEnd_toStartOf="@+id/cache_switch"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cache_title" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/sync_options_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_check" />
-
-
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

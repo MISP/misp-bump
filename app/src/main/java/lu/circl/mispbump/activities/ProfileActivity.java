@@ -6,20 +6,17 @@ import android.graphics.Shader;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.widget.ContentLoadingProgressBar;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.Random;
@@ -85,19 +82,15 @@ public class ProfileActivity extends AppCompatActivity {
         MaterialPreferenceText uuid = findViewById(R.id.uuid);
         uuid.setSubText(organisation.uuid);
 
-        uuid.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TextView tv = v.findViewById(R.id.material_preference_subtitle);
-                Snackbar.make(rootLayout, "clicked: " + tv.getText().toString(), Snackbar.LENGTH_LONG).show();
-            }
-        });
-
         MaterialPreferenceText nationality = findViewById(R.id.nationality);
         nationality.setSubText(organisation.nationality);
 
         MaterialPreferenceText sector = findViewById(R.id.sector);
-        sector.setSubText(organisation.sector);
+        if (organisation.sector == null) {
+            sector.setVisibility(View.GONE);
+        } else {
+            sector.setSubText(organisation.sector);
+        }
 
         MaterialPreferenceText description = findViewById(R.id.description);
         description.setSubText(organisation.description);

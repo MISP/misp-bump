@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -9,7 +9,7 @@
         android:id="@+id/material_preference_src"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:tint="@color/colorPrimaryDark"
@@ -22,9 +22,9 @@
         android:id="@+id/material_preference_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="16dp"
         android:text="Language"
         android:textAppearance="@style/Text.Title"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,8 +35,8 @@
         android:id="@+id/material_preference_subtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:text="German"
         android:textAppearance="@style/Text.SubTitle"
@@ -45,4 +45,4 @@
         app:layout_constraintStart_toEndOf="@+id/material_preference_src"
         app:layout_constraintTop_toBottomOf="@+id/material_preference_title" />
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

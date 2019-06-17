@@ -7,17 +7,13 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -27,8 +23,6 @@ import lu.circl.mispbump.models.UploadInformation;
 import lu.circl.mispbump.restful_client.Organisation;
 import lu.circl.mispbump.restful_client.User;
 import lu.circl.mispbump.security.KeyStoreWrapper;
-
-import static android.support.constraint.Constraints.TAG;
 
 public class PreferenceManager {
 
@@ -328,34 +322,126 @@ public class PreferenceManager {
     }
 
 
-    public void setUploadInformation(UploadInformation uploadInformation) {
-        String storedUploadInfoString = preferences.getString(UPLOAD_INFO, "");
+    public void setUploadInformationList(List<UploadInformation> uploadInformationList) {
+        KeyStoreWrapper ksw = new KeyStoreWrapper(KeyStoreWrapper.UPLOAD_INFORMATION_ALIAS);
 
-        Type type = new TypeToken<List<UploadInformation>>() {}.getType();
-        List<UploadInformation> dataList;
-
-        if (storedUploadInfoString.isEmpty()) {
-            dataList = new ArrayList<>();
-        } else {
-            dataList = new Gson().fromJson(storedUploadInfoString, type);
+        try {
+            String cipherText = ksw.encrypt(new Gson().toJson(uploadInformationList));
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString(UPLOAD_INFO, cipherText);
+            editor.apply();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
         }
-
-        dataList.add(uploadInformation);
-
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(UPLOAD_INFO, new Gson().toJson(dataList));
-        editor.apply();
     }
 
     public List<UploadInformation> getUploadInformation() {
-        String storedUploadInfoString = preferences.getString(UPLOAD_INFO, "");
+        KeyStoreWrapper ksw = new KeyStoreWrapper(KeyStoreWrapper.UPLOAD_INFORMATION_ALIAS);
+        String storedUploadInfoString = preferences.getString(UPLOAD_INFO, null);
 
-        if (storedUploadInfoString.isEmpty()) {
+        Type type = new TypeToken<List<UploadInformation>>() {}.getType();
+
+        if (storedUploadInfoString == null) {
             return null;
         }
 
-        Type type = new TypeToken<List<UploadInformation>>() {}.getType();
+        try {
+            storedUploadInfoString = ksw.decrypt(storedUploadInfoString);
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+
         return new Gson().fromJson(storedUploadInfoString, type);
+    }
+
+    public void addUploadInformation(UploadInformation uploadInformation) {
+        List<UploadInformation> uploadInformationList = getUploadInformation();
+
+        if (uploadInformationList == null) {
+            uploadInformationList = new ArrayList<>();
+            uploadInformationList.add(uploadInformation);
+            setUploadInformationList(uploadInformationList);
+        } else {
+
+            // check if upload information already exists
+            for (int i = 0; i < uploadInformationList.size(); i++) {
+                if (uploadInformationList.get(i).getId().compareTo(uploadInformation.getId()) == 0) {
+                    uploadInformationList.set(i, uploadInformation);
+                    setUploadInformationList(uploadInformationList);
+                    return;
+                }
+            }
+
+            uploadInformationList.add(uploadInformation);
+            setUploadInformationList(uploadInformationList);
+        }
+    }
+
+    public boolean containsUploadInformation(UUID uuid) {
+        List<UploadInformation> uploadInformationList = getUploadInformation();
+
+        if (uploadInformationList == null) {
+            return false;
+        }
+
+        for (UploadInformation ui : uploadInformationList) {
+            if (ui.getId().compareTo(uuid) == 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean removeUploadInformation(UUID uuid) {
+        Log.d("PREFS", "uuid to delete: " + uuid.toString());
+
+        List<UploadInformation> uploadInformationList = getUploadInformation();
+
+        for (UploadInformation ui : uploadInformationList) {
+
+            Log.d("PREFS", "checking uuid: " + ui.getId().toString());
+
+            if (ui.getId().compareTo(uuid) == 0) {
+                if (uploadInformationList.size() == 1) {
+                    clearUploadInformation();
+                } else {
+                    uploadInformationList.remove(ui);
+                    setUploadInformationList(uploadInformationList);
+                }
+                return true;
+            }
+        }
+
+
+        return false;
+    }
+
+    public void clearUploadInformation() {
+        KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.UPLOAD_INFORMATION_ALIAS);
+        keyStoreWrapper.deleteStoredKey();
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(UPLOAD_INFO);
+        editor.apply();
     }
 
 

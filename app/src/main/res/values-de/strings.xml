@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MispBump</string>
-    <string name="download_misp_infos">MISP Informationen laden</string>
     <string name="login">Anmelden</string>
     <string name="logout">Abmelden</string>
     <string name="menu_login_help_label">Hilfe</string>
     <string name="misp_automation_hint">MISP Automatisierungs-Schlüssel</string>
     <string name="no_information">Keine Informationen</string>
     <string name="save_automation_key_hint">Automatisierungs-Schlüssel speichern</string>
-    <string name="login_help_text">Das ist der Anmelde Informations Text.</string>
+    <string name="login_help_text"><b>MISP Server URL</b>\nDie URL unter der Ihre MISP Instanz erreichbar ist.\n\n<b>MISP Automatisierungs Schlüssel</b>\nZu finden unter ...</string>
     <string name="qr_code">QR code</string>
     <string name="sync">Synchronisation</string>
     <string name="no_syncs_hint">Sie haben noch keine MISP Instanzen verknüpft.</string>

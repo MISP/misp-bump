@@ -2,27 +2,30 @@ package lu.circl.mispbump.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.adapters.SyncAdapter;
+import lu.circl.mispbump.auxiliary.DialogManager;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
+import lu.circl.mispbump.interfaces.IOnItemClickListener;
 import lu.circl.mispbump.models.UploadInformation;
-import lu.circl.mispbump.restful_client.MispRestClient;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -54,7 +57,8 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        populateRecyclerView();
+        initializeRecyclerView();
+        refreshSyncInformation();
     }
 
     @Override
@@ -66,12 +70,12 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_settings) {
+            startActivity(new Intent(HomeActivity.this, PreferenceActivity.class));
             return true;
         }
 
         if (item.getItemId() == R.id.menu_profile) {
-            Intent profile = new Intent(HomeActivity.this, ProfileActivity.class);
-            startActivity(profile);
+            startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
             return true;
         }
 
@@ -98,21 +102,59 @@ public class HomeActivity extends AppCompatActivity {
         sync_fab.setOnClickListener(onFabClicked);
     }
 
-    private void populateRecyclerView() {
+    private void refreshSyncInformation () {
         List<UploadInformation> uploadInformationList = preferenceManager.getUploadInformation();
-
         TextView empty = findViewById(R.id.emtpy);
 
+        // no sync information available
         if (uploadInformationList == null) {
             empty.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
             return;
         }
 
+        // sync information available
         empty.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
 
-        SyncAdapter syncAdapter = new SyncAdapter(uploadInformationList, HomeActivity.this);
+        SyncAdapter adapter = (SyncAdapter) recyclerView.getAdapter();
+        assert adapter != null;
+        adapter.setUploadInformationList(uploadInformationList);
+    }
+
+    private void initializeRecyclerView() {
+        SyncAdapter syncAdapter = new SyncAdapter(HomeActivity.this);
+        syncAdapter.setOnDeleteClickListener(new IOnItemClickListener<UploadInformation>() {
+            @Override
+            public void onItemClick(final UploadInformation clickedObject) {
+                DialogManager.deleteSyncInformationDialog(HomeActivity.this, new DialogManager.IDialogFeedback() {
+                    @Override
+                    public void positive() {
+                        boolean status = preferenceManager.removeUploadInformation(clickedObject.getId());
+
+                        if (status) {
+                            Snackbar.make(layout, "Successfully deleted sync information", Snackbar.LENGTH_LONG).show();
+                            refreshSyncInformation();
+                        } else {
+                            Snackbar.make(layout, "Failed to delete sync information", Snackbar.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void negative() { }
+                });
+            }
+        });
+
+        syncAdapter.setOnRetryClickListener(new IOnItemClickListener<UploadInformation>() {
+            @Override
+            public void onItemClick(UploadInformation clickedObject) {
+                Intent upload = new Intent(HomeActivity.this, UploadActivity.class);
+                upload.putExtra(UploadActivity.EXTRA_UPLOAD_INFO, new Gson().toJson(clickedObject));
+                startActivity(upload);
+            }
+        });
+
         recyclerView.setAdapter(syncAdapter);
     }
 }

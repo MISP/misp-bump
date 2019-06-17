@@ -1,6 +1,8 @@
 package lu.circl.mispbump.cam;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -8,7 +10,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.ImageFormat;
+import android.graphics.Matrix;
+import android.graphics.Point;
+import android.graphics.RectF;
+import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -21,18 +28,27 @@ import android.media.ImageReader;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.renderscript.*;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicYuvToRGB;
+import android.renderscript.Type;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Surface;
+import android.view.TextureView;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -108,6 +124,10 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
         }
     }
 
+    private static final String TAG = "CAMERA";
+
+    private View hideCamView;
+
     private QrScanCallback qrResultCallback;
 
     @Override
@@ -125,8 +145,6 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
         ORIENTATIONS.append(Surface.ROTATION_180, 270);
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
-
-    private static final String TAG = "CameraFragment";
 
     /**
      * Max preview width that is guaranteed by Camera2 API
@@ -163,7 +181,8 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
         }
 
         @Override
-        public void onSurfaceTextureUpdated(SurfaceTexture texture) { }
+        public void onSurfaceTextureUpdated(SurfaceTexture texture) {
+        }
     };
 
     private ImageProcessingThread imageProcessingThread;
@@ -338,6 +357,10 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_camera, container, false);
+
+        hideCamView = v.findViewById(R.id.hideCam);
+        hideCamView.setVisibility(View.GONE);
+
         initRenderScript();
         setUpBarcodeDetector();
         return v;
@@ -356,20 +379,21 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
     @Override
     public void onResume() {
         super.onResume();
-        startBackgroundThread();
-
-        imageProcessingThread = new ImageProcessingThread();
-        imageProcessingThread.start();
-
-        // When the screen is turned off and turned back on, the SurfaceTexture is already
-        // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
-        // a camera and start preview from here (otherwise, we wait until the surface is ready in
-        // the SurfaceTextureListener).
-        if (autoFitTextureView.isAvailable()) {
-            openCamera(autoFitTextureView.getWidth(), autoFitTextureView.getHeight());
-        } else {
-            autoFitTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
-        }
+        enablePreview();
+//        startBackgroundThread();
+//
+//        imageProcessingThread = new ImageProcessingThread();
+//        imageProcessingThread.start();
+//
+//        // When the screen is turned off and turned back on, the SurfaceTexture is already
+//        // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
+//        // a camera and start preview from here (otherwise, we wait until the surface is ready in
+//        // the SurfaceTextureListener).
+//        if (autoFitTextureView.isAvailable()) {
+//            openCamera(autoFitTextureView.getWidth(), autoFitTextureView.getHeight());
+//        } else {
+//            autoFitTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+//        }
     }
 
     @Override
@@ -590,8 +614,13 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
      * Stops the background thread and its {@link Handler}.
      */
     private void stopBackgroundThread() {
-        mBackgroundThread.quitSafely();
+
+        if (mBackgroundThread == null) {
+            return;
+        }
+
         try {
+            mBackgroundThread.quitSafely();
             mBackgroundThread.join();
             mBackgroundThread = null;
             mBackgroundHandler = null;
@@ -773,6 +802,11 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
         void qrScanResult(String qrData);
     }
 
+    public interface CameraReadyCallback {
+        void ready();
+    }
+
+    private CameraReadyCallback cameraReadyCallback;
     private boolean readQrEnabled = true;
     private BarcodeDetector barcodeDetector;
     private RenderScript renderScript;
@@ -826,8 +860,56 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
     }
 
     public void setReadQrEnabled(boolean enabled) {
-        Log.d(TAG, "setReadQrEnabled() called with: enabled = [" + enabled + "]");
         readQrEnabled = enabled;
+    }
+
+    public void disablePreview() {
+        hideCamView.setAlpha(0f);
+        hideCamView.setVisibility(View.VISIBLE);
+        hideCamView.animate()
+                .alpha(1f)
+                .setDuration(250)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        closeCamera();
+                        stopBackgroundThread();
+
+                        if (imageProcessingThread.isAlive()) {
+                            imageProcessingThread.isRunning = false;
+                        }
+                    }
+                });
+    }
+
+    public void enablePreview() {
+
+        startBackgroundThread();
+
+        imageProcessingThread = new ImageProcessingThread();
+        imageProcessingThread.start();
+
+        if (autoFitTextureView.isAvailable()) {
+            openCamera(autoFitTextureView.getWidth(), autoFitTextureView.getHeight());
+        } else {
+            autoFitTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+        }
+
+        hideCamView.setAlpha(1f);
+        hideCamView.setVisibility(View.VISIBLE);
+        hideCamView.animate()
+                .alpha(0f)
+                .setStartDelay(100)
+                .setDuration(1000)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        hideCamView.setVisibility(View.GONE);
+                        if (cameraReadyCallback != null) {
+                            cameraReadyCallback.ready();
+                        }
+                    }
+                });
     }
 
     private void setUpBarcodeDetector() {
@@ -842,6 +924,10 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
 
     public void setOnQrAvailableListener(QrScanCallback callback) {
         qrResultCallback = callback;
+    }
+
+    public void setCameraReadyCallback(CameraReadyCallback callback) {
+        this.cameraReadyCallback = callback;
     }
 }
 

@@ -9,9 +9,21 @@ import lu.circl.mispbump.restful_client.Organisation;
 public class SyncInformation {
 
     public Organisation organisation;
+    public String syncUserEmail;
     public String syncUserPassword;
     public String syncUserAuthkey;
     public String baseUrl;
 
     public SyncInformation() {}
+
+    @Override
+    public String toString() {
+        return "SyncInformation{" +
+                "organisation=" + organisation +
+                ", syncUserEmail='" + syncUserEmail + '\'' +
+                ", syncUserPassword='" + syncUserPassword + '\'' +
+                ", syncUserAuthkey='" + syncUserAuthkey + '\'' +
+                ", baseUrl='" + baseUrl + '\'' +
+                '}';
+    }
 }

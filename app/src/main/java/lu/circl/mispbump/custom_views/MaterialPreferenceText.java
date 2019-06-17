@@ -2,7 +2,7 @@ package lu.circl.mispbump.custom_views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.constraint.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,9 +39,4 @@ public class MaterialPreferenceText extends ConstraintLayout {
     public void setSubText(String subText) {
         subtitle.setText(subText);
     }
-
-//    @Override
-//    public void onClick(View v) {
-//
-//    }
 }

@@ -35,6 +35,7 @@ public class KeyStoreWrapper {
     public static final String USER_ORGANISATION_INFO_ALIAS = "ALIAS_USER_ORGANISATION_INFO";
     public static final String AUTOMATION_ALIAS = "ALIAS_AUTOMATION_KEY";
     public static final String SERVER_URL_ALIAS = "ALIAS_SERVER_URL";
+    public static final String UPLOAD_INFORMATION_ALIAS = "ALIAS_UPLOAD_INFORMATION";
 
     private static final String KEYSTORE_PROVIDER = "AndroidKeyStore";
     private static final String CIPHER_ALGORITHM = "AES/GCM/NoPadding";
@@ -174,7 +175,6 @@ public class KeyStoreWrapper {
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
         byte[] byteData = data.getBytes(StandardCharsets.UTF_8);
-//        byte[] byteData = Base64.decode(data, Base64.DEFAULT);
         byte[] combined = getCombinedArray(cipher.getIV(), cipher.doFinal(byteData));
         return Base64.encodeToString(combined, Base64.NO_WRAP);
     }
@@ -262,15 +262,12 @@ public class KeyStoreWrapper {
     }
 
     public class IvAndData {
-
-        public IvAndData() {}
-
-        public IvAndData(byte[] iv, byte[] data) {
+        IvAndData(byte[] iv, byte[] data) {
             this.iv = iv;
             this.data = data;
         }
 
-        public byte[] iv;
-        public byte[] data;
+        byte[] iv;
+        byte[] data;
     }
 }

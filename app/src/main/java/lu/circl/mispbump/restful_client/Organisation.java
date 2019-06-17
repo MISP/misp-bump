@@ -5,18 +5,6 @@ package lu.circl.mispbump.restful_client;
  */
 public class Organisation {
 
-    public Organisation() {
-    }
-
-    public Organisation(String name) {
-        this.name = name;
-    }
-
-    public Organisation(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
     public Integer id;
     public String name;
     public String date_created;
@@ -32,7 +20,19 @@ public class Organisation {
     public String created_by;
     public Integer user_count;
 
-    public Organisation syncOrganisation() {
+    public Organisation() {
+    }
+
+    public Organisation(String name) {
+        this.name = name;
+    }
+
+    public Organisation(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public Organisation toSyncOrganisation() {
         Organisation organisation = new Organisation();
         organisation.local = true;
         organisation.name = name;

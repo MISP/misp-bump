@@ -1,41 +1,38 @@
 package lu.circl.mispbump.activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.design.bottomappbar.BottomAppBar;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.util.List;
 
 import lu.circl.mispbump.R;
-import lu.circl.mispbump.auxiliary.DialogManager;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.auxiliary.QrCodeGenerator;
 import lu.circl.mispbump.auxiliary.RandomString;
 import lu.circl.mispbump.cam.CameraFragment;
+import lu.circl.mispbump.custom_views.ExtendedBottomSheetBehavior;
 import lu.circl.mispbump.fragments.SyncOptionsFragment;
 import lu.circl.mispbump.models.SyncInformation;
 import lu.circl.mispbump.models.UploadInformation;
-import lu.circl.mispbump.restful_client.MispRestClient;
-import lu.circl.mispbump.restful_client.MispServer;
-import lu.circl.mispbump.restful_client.Organisation;
-import lu.circl.mispbump.restful_client.Server;
-import lu.circl.mispbump.restful_client.User;
 import lu.circl.mispbump.security.DiffieHellman;
 
 /**
@@ -45,365 +42,382 @@ import lu.circl.mispbump.security.DiffieHellman;
  */
 public class SyncActivity extends AppCompatActivity {
 
-    private static final String TAG = "SyncActivity";
-
+    // layout
     private CoordinatorLayout layout;
-    private ImageView qrCodeView;
-    private FloatingActionButton continueButton;
+    private ImageView qrCodeView, bottomSheetIcon;
+    private TextView bottomSheetText;
+    private ImageButton prevButton, nextButton;
+    private ExtendedBottomSheetBehavior bottomSheetBehavior;
 
-    private CameraFragment cameraFragment;
+    // dependencies
+    private PreferenceManager preferenceManager;
     private DiffieHellman diffieHellman;
-    private MispRestClient restClient;
 
     private UploadInformation uploadInformation;
 
-    private SyncState currentSyncState = SyncState.publicKeyExchange;
+    // fragments
+    private CameraFragment cameraFragment;
+    private SyncOptionsFragment syncOptionsFragment;
 
-    private PreferenceManager preferenceManager;
+    // qr codes
+    private QrCodeGenerator qrCodeGenerator;
+    private Bitmap publicKeyQr, syncInfoQr;
+
+    private SyncState currentSyncState = SyncState.settings;
 
     private enum SyncState {
-        publicKeyExchange,
-        dataExchange
+        settings(0),
+        publicKeyExchange(1),
+        dataExchange(2);
+
+
+        private final int value;
+
+        SyncState(final int value) {
+            this.value = value;
+        }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sync_2);
+        setContentView(R.layout.activity_sync);
+        initializeViews();
+    }
 
-//        BottomAppBar myToolbar = findViewById(R.id.bottomNavigation);
-//        setSupportActionBar(myToolbar);
-//
-//        ActionBar ab = getSupportActionBar();
-//        if (ab != null) {
-//            ab.setDisplayHomeAsUpEnabled(true);
-//        }
-
+    private void initializeViews() {
+        // Root Layout
         layout = findViewById(R.id.rootLayout);
 
+        // prev button
+        prevButton = findViewById(R.id.prevButton);
+        prevButton.setOnClickListener(onPrevClicked);
+
+        // next button
+        nextButton = findViewById(R.id.nextButton);
+        nextButton.setOnClickListener(onNextClicked);
+
+        // QR Code View
         qrCodeView = findViewById(R.id.qrcode);
-//        continueButton = findViewById(R.id.fab);
-//        continueButton.setOnClickListener(onContinueClicked);
-//        continueButton.hide();
+        qrCodeGenerator = new QrCodeGenerator(SyncActivity.this);
+
+        bottomSheetIcon = findViewById(R.id.bottomSheetIcon);
+        bottomSheetText = findViewById(R.id.bottomSheetText);
 
         diffieHellman = DiffieHellman.getInstance();
-        restClient = new MispRestClient(this);
-
         preferenceManager = PreferenceManager.getInstance(this);
 
-        enableSyncOptionsFragment();
+        View bottomSheet = findViewById(R.id.bottomSheet);
+        bottomSheetBehavior = (ExtendedBottomSheetBehavior) BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bottomSheetBehavior.setSwipeable(false);
+        bottomSheetBehavior.setHideable(false);
+
+        publicKeyQr = generatePublicKeyQr();
+
+        switchState(SyncState.settings);
     }
 
     /**
-     * This callback is called at the end of each sync step.
+     * Called when "next button" is pressed
      */
-    private View.OnClickListener onContinueClicked = new View.OnClickListener() {
+    private View.OnClickListener onNextClicked = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
-            cameraFragment.setReadQrEnabled(false);
-
             switch (currentSyncState) {
-                case publicKeyExchange:
-                    DialogManager.confirmProceedDialog(SyncActivity.this,
-                            new DialogManager.IDialogFeedback() {
-                                @Override
-                                public void positive() {
-                                    currentSyncState = SyncState.dataExchange;
-                                    continueButton.hide();
-                                    cameraFragment.setReadQrEnabled(true);
-                                    showInformationQr();
-                                }
+                case settings:
+                    uploadInformation.setCached(syncOptionsFragment.cache.isChecked());
+                    uploadInformation.setPush(syncOptionsFragment.push.isChecked());
+                    uploadInformation.setPull(syncOptionsFragment.pull.isChecked());
+                    uploadInformation.setAllowSelfSigned(syncOptionsFragment.allowSelfSigned.isChecked());
 
-                                @Override
-                                public void negative() {
-                                }
-                            });
+                    switchState(SyncState.publicKeyExchange);
+                    break;
+
+                case publicKeyExchange:
+                    switchState(SyncState.dataExchange);
                     break;
 
                 case dataExchange:
-                    DialogManager.confirmProceedDialog(SyncActivity.this, new DialogManager.IDialogFeedback() {
-                        @Override
-                        public void positive() {
-                            startUpload();
-                        }
-
-                        @Override
-                        public void negative() {
-                        }
-                    });
+                    Intent upload = new Intent(SyncActivity.this, UploadActivity.class);
+                    upload.putExtra(UploadActivity.EXTRA_UPLOAD_INFO, new Gson().toJson(uploadInformation));
+                    startActivity(upload);
+                    overridePendingTransition(R.anim.slide_in_right, android.R.anim.slide_out_right);
+                    finish();
                     break;
             }
         }
     };
 
     /**
-     * Callback for the camera fragment.
-     * Delivers the content of a scanned QR code.
+     * Called when "prev button" is clicked
+     */
+    private View.OnClickListener onPrevClicked = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (currentSyncState) {
+                case settings:
+                    finish();
+                    break;
+
+                case publicKeyExchange:
+                    switchState(SyncState.settings);
+                    break;
+
+                case dataExchange:
+                    switchState(SyncState.publicKeyExchange);
+                    break;
+            }
+        }
+    };
+
+    /**
+     * Called when the camera fragment detects a qr code
      */
     private CameraFragment.QrScanCallback onQrCodeScanned = new CameraFragment.QrScanCallback() {
         @Override
         public void qrScanResult(String qrData) {
             cameraFragment.setReadQrEnabled(false);
-
             switch (currentSyncState) {
                 case publicKeyExchange:
                     try {
                         final PublicKey pk = DiffieHellman.publicKeyFromString(qrData);
                         diffieHellman.setForeignPublicKey(pk);
 
+                        syncInfoQr = generateSyncInfoQr();
+
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-
-                                continueButton.show();
-
-                                Snackbar sb = Snackbar.make(continueButton, "Public key received", Snackbar.LENGTH_LONG);
-                                sb.setAction("Details", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        DialogManager.publicKeyDialog(pk, SyncActivity.this, null);
-                                    }
-                                });
-                                sb.show();
+                                nextButton.setVisibility(View.VISIBLE);
+                                cameraFragment.disablePreview();
+                                qrReceivedFeedback();
                             }
                         });
                     } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
                         Snackbar.make(layout, "Invalid key", Snackbar.LENGTH_SHORT).show();
+                        cameraFragment.setReadQrEnabled(true);
                     }
                     break;
 
                 case dataExchange:
                     cameraFragment.setReadQrEnabled(false);
 
-                    final SyncInformation remoteSyncInfo = new Gson().fromJson(diffieHellman.decrypt(qrData), SyncInformation.class);
+                    try {
+                        final SyncInformation remoteSyncInfo = new Gson().fromJson(diffieHellman.decrypt(qrData), SyncInformation.class);
+                        uploadInformation.setRemote(remoteSyncInfo);
 
-                    DialogManager.syncInformationDialog(remoteSyncInfo,
-                            SyncActivity.this,
-                            new DialogManager.IDialogFeedback() {
-                                @Override
-                                public void positive() {
-                                    uploadInformation.setRemote(remoteSyncInfo);
-                                    continueButton.show();
-                                }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                cameraFragment.disablePreview();
+                                nextButton.setVisibility(View.VISIBLE);
+                                qrReceivedFeedback();
+                            }
+                        });
 
-                                @Override
-                                public void negative() {
-                                    cameraFragment.setReadQrEnabled(true);
-                                }
-                            });
-
+                    } catch (JsonSyntaxException e) {
+                        Snackbar.make(layout, "Sync information unreadable", Snackbar.LENGTH_SHORT).show();
+                        cameraFragment.setReadQrEnabled(true);
+                    }
                     break;
             }
         }
     };
 
-    private void startUpload() {
-        // check if misp instance is available
-        restClient.isAvailable(new MispRestClient.AvailableCallback() {
-            @Override
-            public void unavailable() {
-                Snackbar sb = Snackbar.make(layout, "MISP instance not available", Snackbar.LENGTH_LONG);
-                sb.setAction("Retry", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startUpload();  // TODO check if this works
-                    }
-                });
-                sb.show();
-            }
 
-            @Override
-            public void available() {
+    private void switchUiState(SyncState state) {
 
-                restClient.addOrganisation(uploadInformation.getRemote().organisation, new MispRestClient.OrganisationCallback() {
-                    @Override
-                    public void success(final Organisation organisation) {
-                        // create syncUser object from syncInfo
-                        User syncUser = new User();
-                        syncUser.org_id = organisation.id;
-                        syncUser.role_id = User.ROLE_SYNC_USER;
+        bottomSheetIcon.setVisibility(View.INVISIBLE);
+        bottomSheetBehavior.setSwipeable(false);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-                        // syncuser_ORG@REMOTE_ORG_EMAIL_DOMAIN
-                        String emailSaveOrgName = organisation.name.replace(" ", "").toLowerCase();
-                        syncUser.email = "syncuser_" + emailSaveOrgName + "@misp.de";
+        switch (state) {
+            case settings:
+                prevButton.setImageDrawable(getDrawable(R.drawable.ic_close));
+                prevButton.setVisibility(View.VISIBLE);
+                nextButton.setVisibility(View.VISIBLE);
+                hideQrCode();
+                break;
+            case publicKeyExchange:
+                prevButton.setImageDrawable(getDrawable(R.drawable.ic_arrow_back));
+                prevButton.setVisibility(View.VISIBLE);
 
-                        syncUser.password = uploadInformation.getRemote().syncUserPassword;
-                        syncUser.authkey = uploadInformation.getRemote().syncUserAuthkey;
-                        syncUser.termsaccepted = true;
+                nextButton.setImageDrawable(getDrawable(R.drawable.ic_arrow_forward));
+                nextButton.setVisibility(View.GONE);
+                showQrCode(publicKeyQr);
+                break;
+            case dataExchange:
+                prevButton.setImageDrawable(getDrawable(R.drawable.ic_arrow_back));
+                prevButton.setVisibility(View.VISIBLE);
 
-                        // add user to local organisation
-                        restClient.addUser(syncUser, new MispRestClient.UserCallback() {
-                            @Override
-                            public void success(User user) {
-                                Server server = new Server();
-                                server.name = organisation.name + "'s Sync Server";
-                                server.url = uploadInformation.getRemote().baseUrl;
-                                server.remote_org_id = organisation.id;
-                                server.authkey = uploadInformation.getLocal().syncUserAuthkey;
-                                server.self_signed = true;
+                nextButton.setImageDrawable(getDrawable(R.drawable.ic_cloud_upload));
+                nextButton.setVisibility(View.GONE);
 
-                                restClient.addServer(server, new MispRestClient.ServerCallback() {
-                                    @Override
-                                    public void success(List<MispServer> servers) {
-                                    }
-
-                                    @Override
-                                    public void success(MispServer server) {
-                                    }
-
-                                    @Override
-                                    public void success(Server server) {
-                                        uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.COMPLETE);
-                                        preferenceManager.setUploadInformation(uploadInformation);
-                                        finish();
-                                    }
-
-                                    @Override
-                                    public void failure(String error) {
-                                        uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-                                        preferenceManager.setUploadInformation(uploadInformation);
-                                        Snackbar.make(layout, error, Snackbar.LENGTH_LONG).show();
-                                        Log.e(TAG, error);
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void failure(String error) {
-                                uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-                                preferenceManager.setUploadInformation(uploadInformation);
-                                Snackbar.make(layout, error, Snackbar.LENGTH_LONG).show();
-                                Log.e(TAG, error);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void failure(String error) {
-                        uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-                        preferenceManager.setUploadInformation(uploadInformation);
-                        Snackbar.make(layout, error, Snackbar.LENGTH_LONG).show();
-                        Log.e(TAG, error);
-                    }
-                });
-            }
-        });
+                cameraFragment.enablePreview();
+                cameraFragment.setReadQrEnabled(true);
+                showQrCode(syncInfoQr);
+                break;
+        }
     }
 
-    /**
-     * Creates the camera fragment used to scan the QR codes.
-     * Automatically starts processing images (search QR codes).
-     */
-    private void enableCameraFragment() {
-        cameraFragment = new CameraFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.sync_fragment_container, cameraFragment, cameraFragment.getClass().getSimpleName());
-        transaction.commit();
-
-        cameraFragment.setReadQrEnabled(true);
-        cameraFragment.setOnQrAvailableListener(onQrCodeScanned);
-    }
-
-    /**
-     * Creates fragment to tweak sync options.
-     */
-    private void enableSyncOptionsFragment() {
-        SyncOptionsFragment syncOptionsFragment = new SyncOptionsFragment();
-
-        syncOptionsFragment.setOnOptionsReadyCallback(new SyncOptionsFragment.OptionsReadyCallback() {
-            @Override
-            public void ready(boolean share_events, boolean push, boolean pull, boolean caching) {
-                showPublicKeyQr();
-                enableCameraFragment();
-            }
-        });
+    private void switchState(SyncState state) {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.sync_fragment_container, syncOptionsFragment, syncOptionsFragment.getClass().getSimpleName());
-        transaction.commit();
+
+        if (currentSyncState != state) {
+            if (state.value < currentSyncState.value) {
+                transaction.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+            } else {
+                transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+            }
+        }
+
+        currentSyncState = state;
+
+        switchUiState(currentSyncState);
+
+        switch (currentSyncState) {
+            case settings:
+                String fragTag = SyncOptionsFragment.class.getSimpleName();
+
+                syncOptionsFragment = (SyncOptionsFragment) fragmentManager.findFragmentByTag(fragTag);
+
+                if (syncOptionsFragment == null) {
+                    syncOptionsFragment = new SyncOptionsFragment();
+                }
+
+                transaction.replace(R.id.sync_fragment_container, syncOptionsFragment, fragTag);
+                transaction.commit();
+                break;
+
+            case publicKeyExchange:
+                fragTag = CameraFragment.class.getSimpleName();
+                cameraFragment = (CameraFragment) fragmentManager.findFragmentByTag(fragTag);
+
+                if (cameraFragment == null) {
+                    cameraFragment = new CameraFragment();
+                    cameraFragment.setOnQrAvailableListener(onQrCodeScanned);
+                }
+
+                transaction.replace(R.id.sync_fragment_container, cameraFragment, fragTag);
+                transaction.commit();
+                break;
+
+            case dataExchange:
+                fragTag = CameraFragment.class.getSimpleName();
+                cameraFragment = (CameraFragment) fragmentManager.findFragmentByTag(fragTag);
+
+                if (cameraFragment == null) {
+                    cameraFragment = new CameraFragment();
+                    cameraFragment.setOnQrAvailableListener(onQrCodeScanned);
+                }
+
+                transaction.replace(R.id.sync_fragment_container, cameraFragment, fragTag);
+                transaction.commit();
+                break;
+        }
     }
 
-    /**
-     * Display QR code that contains the public key .
-     */
-    private void showPublicKeyQr() {
-        QrCodeGenerator qrCodeGenerator = new QrCodeGenerator(this);
-        Bitmap bm = qrCodeGenerator.generateQrCode(DiffieHellman.publicKeyToString(diffieHellman.getPublicKey()));
-        qrCodeView.setImageBitmap(bm);
-        qrCodeView.setVisibility(View.VISIBLE);
+
+    private Bitmap generatePublicKeyQr() {
+        return qrCodeGenerator.generateQrCode(DiffieHellman.publicKeyToString(diffieHellman.getPublicKey()));
     }
 
-    /**
-     * Display QR code that contains mandatory information for a sync.
-     */
-    private void showInformationQr() {
-        PreferenceManager preferenceManager = PreferenceManager.getInstance(this);
-
+    private Bitmap generateSyncInfoQr() {
         SyncInformation syncInformation = new SyncInformation();
-
-        syncInformation.organisation = preferenceManager.getUserOrganisation().syncOrganisation();
+        syncInformation.organisation = preferenceManager.getUserOrganisation().toSyncOrganisation();
         syncInformation.syncUserAuthkey = new RandomString(40).nextString();
         syncInformation.baseUrl = preferenceManager.getServerUrl();
-        syncInformation.syncUserPassword = "abcdefghijklmnop";
+        syncInformation.syncUserPassword = new RandomString(16).nextString();
+
+        String myEmailDomain = preferenceManager.getUserInfo().email.split("@")[1];
+        syncInformation.syncUserEmail = "syncuser_[ORG]@" + myEmailDomain;
 
         uploadInformation = new UploadInformation(syncInformation);
 
         // encrypt serialized content
         String encrypted = diffieHellman.encrypt(new Gson().toJson(syncInformation));
 
-        // Generate QR code
-        QrCodeGenerator qrCodeGenerator = new QrCodeGenerator(this);
-        final Bitmap bm = qrCodeGenerator.generateQrCode(encrypted);
+        // generate QR code
+        return qrCodeGenerator.generateQrCode(encrypted);
+    }
 
+
+    private void showQrCode(final Bitmap bitmap) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                qrCodeView.setImageBitmap(bm);
+
+                qrCodeView.setImageBitmap(bitmap);
+                qrCodeView.setAlpha(0f);
                 qrCodeView.setVisibility(View.VISIBLE);
+                qrCodeView.setScaleX(0.9f);
+                qrCodeView.setScaleY(0.6f);
+                qrCodeView.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .alpha(1f)
+                        .setDuration(250)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                qrCodeView.setVisibility(View.VISIBLE);
+                            }
+                        });
             }
         });
     }
 
-//    /**
-//     * Display toast on UI thread.
-//     *
-//     * @param message message to display
-//     */
-//    private void MakeToast(final String message) {
-//        this.runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-//            }
-//        });
-//    }
+    private void hideQrCode() {
 
-//    private View.OnClickListener onGetServers = new View.OnClickListener() {
-//        @Override
-//        public void onClick(View v) {
-//            restClient.getServers(new MispRestClient.ServerCallback() {
-//                @Override
-//                public void success(List<MispServer> servers) {
-//                    for (MispServer server : servers) {
-//                        resultView.append(server.server.toString() + "\n\n");
-//                        resultView.append(server.organisation.toString() + "\n\n");
-//                        resultView.append(server.remoteOrg.toString());
-//                    }
-//                }
-//
-//                @Override
-//                public void success(MispServer server) {
-//
-//                }
-//
-//                @Override
-//                public void failure(String error) {
-//                    resultView.setText(error);
-//                }
-//            });
-//        }
-//    };
+        if (qrCodeView.getVisibility() == View.GONE) {
+            return;
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                qrCodeView.setAlpha(1f);
+                qrCodeView.setVisibility(View.VISIBLE);
+                qrCodeView.setScaleX(1f);
+                qrCodeView.setScaleY(1f);
+                qrCodeView.animate()
+                        .scaleX(0f)
+                        .scaleY(0f)
+                        .alpha(0f)
+                        .setDuration(250)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                qrCodeView.setVisibility(View.GONE);
+                            }
+                        });
+            }
+        });
+    }
+
+    private void qrReceivedFeedback() {
+        bottomSheetIcon.setScaleX(0f);
+        bottomSheetIcon.setScaleY(0f);
+        bottomSheetIcon.setVisibility(View.VISIBLE);
+        bottomSheetIcon.animate()
+                .scaleY(1f)
+                .scaleX(1f)
+                .setDuration(250);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        bottomSheetBehavior.setSwipeable(true);
+
+        switch (currentSyncState) {
+            case publicKeyExchange:
+                bottomSheetText.setText("Received public key from partner");
+                break;
+
+            case dataExchange:
+                bottomSheetText.setText("Received sync information from partner");
+                break;
+        }
+    }
+
 }

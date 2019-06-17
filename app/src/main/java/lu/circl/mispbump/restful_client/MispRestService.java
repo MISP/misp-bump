@@ -34,6 +34,9 @@ public interface MispRestService {
     @GET("organisations/view/{value}")
     Call<MispOrganisation> getOrganisation(@Path("value") int orgId);
 
+    @GET("organisations")
+    Call<List<MispOrganisation>> getAllOrganisations();
+
     @POST("admin/organisations/add")
     Call<MispOrganisation> addOrganisation(@Body Organisation organisation);
 

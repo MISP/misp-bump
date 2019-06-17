@@ -1,17 +1,23 @@
 package lu.circl.mispbump.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
@@ -40,25 +46,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        // populate Toolbar (Actionbar)
-        Toolbar myToolbar = findViewById(R.id.appbar);
-        setSupportActionBar(myToolbar);
-
-        ActionBar ab = getSupportActionBar();
-        if (ab != null) {
-            ab.setDisplayHomeAsUpEnabled(false);
-        }
-
-        constraintLayout = findViewById(R.id.rootLayout);
-        progressBar = findViewById(R.id.login_progressbar);
-        serverUrl = findViewById(R.id.login_server_url);
-        serverAutomationKey = findViewById(R.id.login_automation_key);
-        Button downloadInfoButton = findViewById(R.id.login_download_button);
-
-        downloadInfoButton.setOnClickListener(onClickDownload);
-
-        preferenceManager = PreferenceManager.getInstance(this);
+        initializeViews();
     }
 
     @Override
@@ -69,16 +57,35 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_login_help:
-                DialogManager.loginHelpDialog(LoginActivity.this);
-                return true;
-
-            default:
-                // invoke superclass to handle unrecognized item (eg. homeAsUp)
-                return super.onOptionsItemSelected(item);
-
+        if (item.getItemId() == R.id.menu_login_help) {
+            DialogManager.loginHelpDialog(LoginActivity.this);
+            return true;
         }
+
+        // invoke superclass to handle unrecognized item (eg. homeAsUp)
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void initializeViews() {
+        // populate Toolbar (Actionbar)
+        Toolbar myToolbar = findViewById(R.id.appbar);
+        setSupportActionBar(myToolbar);
+
+        ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(false);
+        }
+
+        constraintLayout = findViewById(R.id.rootLayout);
+
+        serverUrl = findViewById(R.id.login_server_url);
+        serverAutomationKey = findViewById(R.id.login_automation_key);
+        Button downloadInfoButton = findViewById(R.id.login_download_button);
+        downloadInfoButton.setOnClickListener(onClickDownload);
+
+        progressBar = findViewById(R.id.login_progressbar);
+
+        preferenceManager = PreferenceManager.getInstance(this);
     }
 
     /**
@@ -112,6 +119,7 @@ public class LoginActivity extends AppCompatActivity {
 
             // save authkey
             preferenceManager.setAutomationKey(authkey);
+
             // save url
             preferenceManager.setServerUrl(url);
 
@@ -122,20 +130,29 @@ public class LoginActivity extends AppCompatActivity {
             progressBar.setVisibility(View.VISIBLE);
 
             // get my user information and the organisation associated with my user
-            mispRestClient.getMyUser(new MispRestClient.UserCallback() {
+            mispRestClient.isAvailable(new MispRestClient.AvailableCallback() {
                 @Override
-                public void success(final User user) {
-
-                    preferenceManager.setUserInfo(user);
-
-                    mispRestClient.getOrganisation(user.org_id, new MispRestClient.OrganisationCallback() {
+                public void available() {
+                    mispRestClient.getMyUser(new MispRestClient.UserCallback() {
                         @Override
-                        public void success(Organisation organisation) {
-                            preferenceManager.setUserOrgInfo(organisation);
-                            progressBar.setVisibility(View.GONE);
-                            Intent home = new Intent(getApplicationContext(), HomeActivity.class);
-                            startActivity(home);
-                            finish();
+                        public void success(final User user) {
+                            preferenceManager.setUserInfo(user);
+                            mispRestClient.getOrganisation(user.org_id, new MispRestClient.OrganisationCallback() {
+                                @Override
+                                public void success(Organisation organisation) {
+                                    preferenceManager.setUserOrgInfo(organisation);
+                                    progressBar.setVisibility(View.GONE);
+                                    Intent home = new Intent(getApplicationContext(), HomeActivity.class);
+                                    startActivity(home);
+                                    finish();
+                                }
+
+                                @Override
+                                public void failure(String error) {
+                                    progressBar.setVisibility(View.GONE);
+                                    Snackbar.make(constraintLayout, error, Snackbar.LENGTH_LONG).show();
+                                }
+                            });
                         }
 
                         @Override
@@ -147,9 +164,10 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void failure(String error) {
+                public void unavailable(String error) {
                     progressBar.setVisibility(View.GONE);
-                    Snackbar.make(constraintLayout, error, Snackbar.LENGTH_LONG).show();
+                    Snackbar sb = Snackbar.make(constraintLayout, error, Snackbar.LENGTH_LONG);
+                    sb.show();
                 }
             });
         }
@@ -162,7 +180,13 @@ public class LoginActivity extends AppCompatActivity {
      * @return true or false
      */
     private boolean isValidUrl(String url) {
-        return url.startsWith("https://") || url.startsWith("http://");
+        Uri uri = Uri.parse(url);
+
+        if (uri == null) {
+            return false;
+        }
+
+        return uri.getScheme() != null;
     }
 
     /**

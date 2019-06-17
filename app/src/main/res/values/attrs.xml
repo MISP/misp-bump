@@ -5,4 +5,8 @@
         <attr name="text"/>
         <attr name="subText"/>
     </declare-styleable>
+
+    <declare-styleable name="UploadAction">
+        <attr name="title" format="string"/>
+    </declare-styleable>
 </resources>

@@ -15,6 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".activities.UploadActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="Upload"/>
+        <activity android:name=".activities.PreferenceActivity" />
         <activity android:name=".activities.StartUpActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,14 +34,14 @@
             android:label="@string/login" />
         <activity
             android:name=".activities.SyncActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/sync"
             android:parentActivityName=".activities.HomeActivity" />
-
         <activity
             android:name=".activities.ProfileActivity"
             android:label="Profile"
-            android:theme="@style/AppTheme.Translucent"
-            android:parentActivityName=".activities.HomeActivity"/>
+            android:parentActivityName=".activities.HomeActivity"
+            android:theme="@style/AppTheme.Translucent" />
     </application>
 
 </manifest>
