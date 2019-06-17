@@ -14,7 +14,7 @@ import lu.circl.mispbump.R;
 
 public class SyncOptionsFragment extends Fragment {
 
-    public Switch allowSelfSigned, push, pull, cache;
+    private Switch allowSelfSigned, push, pull, cache;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -26,5 +26,33 @@ public class SyncOptionsFragment extends Fragment {
         cache = v.findViewById(R.id.cache_switch);
 
         return v;
+    }
+
+    public boolean getAllowSelfSigned() {
+        return allowSelfSigned.isChecked();
+    }
+    public void setAllowSelfSigned(boolean allowSelfSigned) {
+        this.allowSelfSigned.setChecked(allowSelfSigned);
+    }
+
+    public boolean getPush() {
+        return push.isChecked();
+    }
+    public void setPush(boolean push) {
+        this.push.setChecked(push);
+    }
+
+    public boolean getPull() {
+        return pull.isChecked();
+    }
+    public void setPull(boolean pull) {
+        this.pull.setChecked(pull);
+    }
+
+    public boolean getCache() {
+        return cache.isChecked();
+    }
+    public void setCache(boolean cache) {
+        this.cache.setChecked(cache);
     }
 }

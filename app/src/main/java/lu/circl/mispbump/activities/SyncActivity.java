@@ -126,10 +126,11 @@ public class SyncActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch (currentSyncState) {
                 case settings:
-                    uploadInformation.setCached(syncOptionsFragment.cache.isChecked());
-                    uploadInformation.setPush(syncOptionsFragment.push.isChecked());
-                    uploadInformation.setPull(syncOptionsFragment.pull.isChecked());
-                    uploadInformation.setAllowSelfSigned(syncOptionsFragment.allowSelfSigned.isChecked());
+                    uploadInformation = new UploadInformation();
+                    uploadInformation.setAllowSelfSigned(syncOptionsFragment.getAllowSelfSigned());
+                    uploadInformation.setPush(syncOptionsFragment.getPush());
+                    uploadInformation.setPull(syncOptionsFragment.getPull());
+                    uploadInformation.setCached(syncOptionsFragment.getCache());
 
                     switchState(SyncState.publicKeyExchange);
                     break;
@@ -281,7 +282,6 @@ public class SyncActivity extends AppCompatActivity {
         switch (currentSyncState) {
             case settings:
                 String fragTag = SyncOptionsFragment.class.getSimpleName();
-
                 syncOptionsFragment = (SyncOptionsFragment) fragmentManager.findFragmentByTag(fragTag);
 
                 if (syncOptionsFragment == null) {
@@ -331,11 +331,9 @@ public class SyncActivity extends AppCompatActivity {
         syncInformation.syncUserAuthkey = new RandomString(40).nextString();
         syncInformation.baseUrl = preferenceManager.getServerUrl();
         syncInformation.syncUserPassword = new RandomString(16).nextString();
+        syncInformation.syncUserEmail = preferenceManager.getUserInfo().email;
 
-        String myEmailDomain = preferenceManager.getUserInfo().email.split("@")[1];
-        syncInformation.syncUserEmail = "syncuser_[ORG]@" + myEmailDomain;
-
-        uploadInformation = new UploadInformation(syncInformation);
+        uploadInformation.setLocal(syncInformation);
 
         // encrypt serialized content
         String encrypted = diffieHellman.encrypt(new Gson().toJson(syncInformation));

@@ -84,7 +84,7 @@ public class UploadInformation implements Serializable {
         return date;
     }
     public String getDateString() {
-        SimpleDateFormat df = new SimpleDateFormat("dd.mm.yyyy", Locale.getDefault());
+        SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         return df.format(date);
     }
 

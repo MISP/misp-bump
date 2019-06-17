@@ -29,7 +29,7 @@ public class SyncAdapter extends RecyclerView.Adapter<SyncAdapter.SyncViewHolder
     private IOnItemClickListener<UploadInformation> deleteListener, retryListener;
 
     static class SyncViewHolder extends RecyclerView.ViewHolder {
-        MaterialPreferenceText email, password;
+        MaterialPreferenceText baseUrl, email, password, authkey;
         TextView orgName, date;
         ImageView syncStatus;
         ImageButton retry, delete;
@@ -57,8 +57,10 @@ public class SyncAdapter extends RecyclerView.Adapter<SyncAdapter.SyncViewHolder
             orgName = v.findViewById(R.id.orgName);
             date = v.findViewById(R.id.date);
 
+            baseUrl = v.findViewById(R.id.baseUrl);
             email = v.findViewById(R.id.email);
             password = v.findViewById(R.id.password);
+            authkey = v.findViewById(R.id.authkey);
 
             syncStatus = v.findViewById(R.id.syncStatus);
 
@@ -112,10 +114,14 @@ public class SyncAdapter extends RecyclerView.Adapter<SyncAdapter.SyncViewHolder
     @Override
     public void onBindViewHolder(@NonNull SyncViewHolder syncViewHolder, int i) {
 
-        syncViewHolder.orgName.setText(uploadInformationList.get(i).getRemote().organisation.name);
         syncViewHolder.date.setText(uploadInformationList.get(i).getDateString());
-        syncViewHolder.email.setSubText(uploadInformationList.get(i).getRemote().syncUserEmail);
-        syncViewHolder.password.setSubText(uploadInformationList.get(i).getRemote().syncUserPassword);
+        syncViewHolder.orgName.setText(uploadInformationList.get(i).getRemote().organisation.name);
+
+        syncViewHolder.baseUrl.setSubText(uploadInformationList.get(i).getRemote().baseUrl);
+        syncViewHolder.email.setSubText(uploadInformationList.get(i).getLocal().syncUserEmail);
+        syncViewHolder.password.setSubText(uploadInformationList.get(i).getLocal().syncUserPassword);
+        syncViewHolder.authkey.setSubText(uploadInformationList.get(i).getLocal().syncUserAuthkey);
+
 
         switch (uploadInformationList.get(i).getCurrentSyncStatus()) {
             case COMPLETE:
@@ -130,7 +136,7 @@ public class SyncAdapter extends RecyclerView.Adapter<SyncAdapter.SyncViewHolder
                 break;
             case PENDING:
                 ImageViewCompat.setImageTintList(syncViewHolder.syncStatus, ColorStateList.valueOf(context.getColor(R.color.status_amber)));
-                syncViewHolder.syncStatus.setImageResource(R.drawable.ic_error_outline);
+                syncViewHolder.syncStatus.setImageResource(R.drawable.ic_info_outline);
                 syncViewHolder.retry.setVisibility(View.VISIBLE);
                 break;
         }

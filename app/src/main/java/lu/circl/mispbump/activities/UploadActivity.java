@@ -108,11 +108,12 @@ public class UploadActivity extends AppCompatActivity {
         User syncUser = new User();
         syncUser.org_id = organisation.id;
         syncUser.role_id = User.ROLE_SYNC_USER;
+        syncUser.email = uploadInformation.getRemote().syncUserEmail;
 
-        String emailSaveOrgName = organisation.name.replace(" ", "").toLowerCase();
-        String syncUserEmailFormat = uploadInformation.getRemote().syncUserEmail;
-        syncUser.email = syncUserEmailFormat.replace("[ORG]", emailSaveOrgName);
-        uploadInformation.getRemote().syncUserEmail = syncUser.email;
+//        String emailSaveOrgName = organisation.name.replace(" ", "").toLowerCase();
+//        String syncUserEmailFormat = uploadInformation.getRemote().syncUserEmail;
+//        syncUser.email = syncUserEmailFormat.replace("[ORG]", emailSaveOrgName);
+//        uploadInformation.getLocal().syncUserEmail = syncUser.email;
 
         syncUser.password = uploadInformation.getRemote().syncUserPassword;
         syncUser.authkey = uploadInformation.getRemote().syncUserAuthkey;
@@ -126,28 +127,7 @@ public class UploadActivity extends AppCompatActivity {
         public void available() {
             availableAction.setCurrentUploadState(UploadAction.UploadState.DONE);
             orgAction.setCurrentUploadState(UploadAction.UploadState.LOADING);
-
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        int orgId = organisationExists();
-                        if (orgId != -1) {
-                            Snackbar.make(rootLayout, "exists", Snackbar.LENGTH_INDEFINITE).show();
-                            uploadInformation.getRemote().organisation.id = orgId;
-                            // TODO if exists: add User
-                        } else {
-                            restClient.addOrganisation(uploadInformation.getRemote().organisation, organisationCallback);
-                            Snackbar.make(rootLayout, "does not exist", Snackbar.LENGTH_INDEFINITE).show();
-                        }
-                    } catch (IOException e) {
-                        Snackbar.make(rootLayout, "Some error", Snackbar.LENGTH_INDEFINITE).show();
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            t.start();
+            restClient.addOrganisation(uploadInformation.getRemote().organisation, organisationCallback);
         }
 
         @Override
@@ -183,15 +163,11 @@ public class UploadActivity extends AppCompatActivity {
 
         @Override
         public void failure(String error) {
-
-
-            // IF error = org already exists:
-            // resClient.addUser()
-
             orgAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
+            orgAction.setError(error);
+
             uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
             preferenceManager.addUploadInformation(uploadInformation);
-            Snackbar.make(rootLayout, error, Snackbar.LENGTH_LONG).show();
         }
     };
 
@@ -205,6 +181,7 @@ public class UploadActivity extends AppCompatActivity {
             server.url = uploadInformation.getRemote().baseUrl;
             server.remote_org_id = uploadInformation.getRemote().organisation.id;
             server.authkey = uploadInformation.getLocal().syncUserAuthkey;
+
             server.pull = uploadInformation.isPull();
             server.push = uploadInformation.isPush();
             server.caching_enabled = uploadInformation.isCached();
@@ -216,9 +193,10 @@ public class UploadActivity extends AppCompatActivity {
         @Override
         public void failure(String error) {
             userAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
+            userAction.setError(error);
+
             uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
             preferenceManager.addUploadInformation(uploadInformation);
-            Snackbar.make(rootLayout, error, Snackbar.LENGTH_LONG).show();
         }
     };
 
@@ -244,9 +222,10 @@ public class UploadActivity extends AppCompatActivity {
         @Override
         public void failure(String error) {
             serverAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
+            serverAction.setError(error);
+
             uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
             preferenceManager.addUploadInformation(uploadInformation);
-            Snackbar.make(rootLayout, error, Snackbar.LENGTH_LONG).show();
         }
     };
 
