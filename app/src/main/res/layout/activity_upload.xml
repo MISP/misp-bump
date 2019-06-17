@@ -1,74 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.UploadActivity">
 
-<android.support.design.widget.CoordinatorLayout
-		xmlns:android="http://schemas.android.com/apk/res/android"
-		xmlns:tools="http://schemas.android.com/tools"
-		xmlns:app="http://schemas.android.com/apk/res-auto"
-		tools:context=".MainActivity"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent">
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-	<android.support.design.widget.AppBarLayout
-			android:id="@+id/appbar"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:theme="@style/AppTheme.AppBarOverlay">
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            android:background="@color/colorPrimary" />
+    </com.google.android.material.appbar.AppBarLayout>
 
-		<android.support.v7.widget.Toolbar
-				android:id="@+id/toolbar"
-				android:layout_width="match_parent"
-				android:layout_height="?android:attr/actionBarSize"
-				app:popupTheme="@style/AppTheme.PopupOverlay"/>
+    <androidx.appcompat.widget.LinearLayoutCompat
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-	</android.support.design.widget.AppBarLayout>
+        <lu.circl.mispbump.custom_views.UploadAction
+            android:id="@+id/availableAction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="Check if instance is available" />
 
-	<android.support.constraint.ConstraintLayout
-			app:layout_behavior="@string/appbar_scrolling_view_behavior"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent" android:id="@+id/constraintLayout">
+        <lu.circl.mispbump.custom_views.UploadAction
+            android:id="@+id/orgAction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="Add organisation" />
 
-		<android.support.v7.widget.RecyclerView
-				android:id="@+id/recyclerView"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent" app:layout_constraintStart_toStartOf="parent"
-				app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"
-				app:layout_constraintBottom_toBottomOf="parent"/>
-	</android.support.constraint.ConstraintLayout>
+        <lu.circl.mispbump.custom_views.UploadAction
+            android:id="@+id/userAction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="Add sync user" />
 
-	<LinearLayout
-			android:orientation="horizontal"
-			android:layout_width="match_parent" android:layout_height="wrap_content"
-			android:layout_gravity="bottom">
+        <lu.circl.mispbump.custom_views.UploadAction
+            android:id="@+id/serverAction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="Add sync server" />
 
-		<View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
-		<android.support.design.widget.FloatingActionButton
-				android:id="@+id/fab_finish"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				app:fabSize="normal"
-				android:tint="@color/colorWhite"
-				android:src="@drawable/icon_check"
-				android:layout_margin="16dp"/>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        app:backgroundTint="@color/colorAccent"
+        android:tint="@color/white"
+        android:src="@drawable/ic_cloud_upload"/>
 
-		<android.support.design.widget.FloatingActionButton
-				android:id="@+id/fab_retry"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				app:fabSize="normal"
-				android:tint="@color/colorWhite"
-				android:src="@drawable/icon_retry"
-				android:layout_margin="16dp"/>
-
-		<android.support.design.widget.FloatingActionButton
-				android:id="@+id/fab_start"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				app:fabSize="normal"
-				android:tint="@color/colorWhite"
-				android:src="@drawable/icon_cloud_upload"
-				android:layout_margin="16dp"/>
-
-	</LinearLayout>
-
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

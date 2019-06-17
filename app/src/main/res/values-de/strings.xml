@@ -1,52 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">MISPBump</string>
-
-	<string name="exit">Verlassen</string>
-	<string name="previous">Zurück</string>
-	<string name="empty_sync_list">Sie haben bisher keine Instanzen verknüpft</string>
-	<string name="empty_my_org">Keine lokalen Informationen vorhanden</string>
-	<string name="save_authkey">Autorisierungschlüssel speichern (potentielles Sicherheitsrisiko)</string>
-	<string name="unsaved_changes">Ungesicherte Änderungen</string>
-	<string name="save_changes">Wollen Sie die Änderungen sichern?</string>
-	<string name="save">Speichern</string>
-	<string name="discard">Verwerfen</string>
-	<string name="missing_local_information_title">Lokale Informationen fehlen</string>
-	<string name="missing_local_information_message">Bitte laden Sie erst die fehlenden Informationen von Ihrer Instanz</string>
-	<string name="enter_credentials">Informationen Laden</string>
-	<string name="upload">Hochladen</string>
-	<string name="accept">Akzeptieren</string>
-	<string name="reject">Ablehnen</string>
-	<string name="public_key">Öffentlicher Schlüssel</string>
-	<string name="qr_code">QR Code</string>
-	<string name="str_continue">weiter</string>
-	<string name="delete">Löschen</string>
-	<string name="delete_local_data">Lokale Daten löschen</string>
-	<string name="delete_local_data_msg">Die URL, der Autorisierungsschlüssel und ihre lokalen Daten werden gelöscht. \n\nHinweis: diese Informationen sind für eine Synchronissierung notwendig</string>
-
-	<string name="override">Überschreiben</string>
-	<string name="override_local_data">Lokale Daten überschreiben</string>
-	<string name="override_local_data_msg">Wollen Sie wirklich die lokalen Daten auf diesem Gerät überschreiben?</string>
-
-	<string name="credentials_activity">Synchronisierungs Profil</string>
-
-	<string name="server_url">Server URL</string>
-	<string name="authkey">Autorisierungsschlüssel</string>
-
-	<string name="credential_settings">Autentifizierungseinstellungen</string>
-
-	<string name="sync_information">Sync Informationen</string>
-
-	<string name="error_url_required">MISP Url benötigt</string>
-	<string name="error_automation_key">MISP Automatisierungsschlüssel benötigt</string>
-	<string name="copied_to_clipboard">In Zwischenablage kopiert</string>
-	<string name="dialog_open_in_browser_msg">%1$s im Browser öffnen?</string>
-	<string name="dialog_open_browser_title">Im Browser öffnen</string>
-	<string name="open">öffnen</string>
-	<string name="settings">Einstellungen</string>
-	<string name="request_scanned_pk">Wurde Ihr Öffentlicher Schlüssel bereits von Ihrem Partner gescannt?</string>
-	<string name="request_scanned_si">Wurden Ihre Synchronisations Informationen bereits von Ihrem Partner gescannt?</string>
-	<string name="yes">Ja</string>
-	<string name="no">Nein</string>
-	<string name="proceed">Fortfahren</string>
+    <string name="app_name">MispBump</string>
+    <string name="login">Anmelden</string>
+    <string name="logout">Abmelden</string>
+    <string name="menu_login_help_label">Hilfe</string>
+    <string name="misp_automation_hint">MISP Automatisierungs-Schlüssel</string>
+    <string name="no_information">Keine Informationen</string>
+    <string name="save_automation_key_hint">Automatisierungs-Schlüssel speichern</string>
+    <string name="login_help_text"><b>MISP Server URL</b>\nDie URL unter der Ihre MISP Instanz erreichbar ist.\n\n<b>MISP Automatisierungs Schlüssel</b>\nZu finden unter ...</string>
+    <string name="qr_code">QR code</string>
+    <string name="sync">Synchronisation</string>
+    <string name="no_syncs_hint">Sie haben noch keine MISP Instanzen verknüpft.</string>
 </resources>
