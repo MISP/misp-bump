@@ -2,7 +2,7 @@ package lu.circl.mispbump.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
@@ -21,28 +21,18 @@ import android.widget.TextView;
 import java.util.List;
 
 import lu.circl.mispbump.R;
-import lu.circl.mispbump.adapters.SyncAdapter;
-import lu.circl.mispbump.auxiliary.DialogManager;
+import lu.circl.mispbump.adapters.UploadInfoAdapter;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
-import lu.circl.mispbump.interfaces.IOnItemClickListener;
+import lu.circl.mispbump.interfaces.OnRecyclerItemClickListener;
 import lu.circl.mispbump.models.UploadInformation;
 
 public class HomeActivity extends AppCompatActivity {
 
-    public static final String TAG = "Home";
-
-    private CoordinatorLayout layout;
-    private RecyclerView recyclerView;
-
+    private View rootView;
     private PreferenceManager preferenceManager;
 
-    private View.OnClickListener onFabClicked = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Intent sync = new Intent(HomeActivity.this, SyncActivity.class);
-            startActivity(sync);
-        }
-    };
+    private RecyclerView recyclerView;
+    private UploadInfoAdapter uploadInfoAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,14 +41,72 @@ public class HomeActivity extends AppCompatActivity {
 
         preferenceManager = PreferenceManager.getInstance(this);
 
-        initializeViews();
+        init();
+        initRecyclerView();
     }
+
+
+    private void init() {
+        rootView = findViewById(R.id.rootLayout);
+
+        // populate Toolbar (Actionbar)
+        Toolbar myToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
+
+        ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(false);
+        }
+
+        FloatingActionButton sync_fab = findViewById(R.id.home_fab);
+        sync_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this, SyncActivity.class));
+            }
+        });
+    }
+
+    private void initRecyclerView() {
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
+
+        uploadInfoAdapter = new UploadInfoAdapter(HomeActivity.this);
+
+        uploadInfoAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener<UploadInformation>() {
+            @Override
+            public void onClick(UploadInformation item) {
+                Intent i = new Intent(HomeActivity.this, UploadInformationActivity.class);
+                i.putExtra(UploadInformationActivity.EXTRA_UPLOAD_INFO_KEY, new Gson().toJson(item));
+                startActivity(i);
+            }
+        });
+
+        recyclerView.setAdapter(uploadInfoAdapter);
+    }
+
+    private void refreshRecyclerView() {
+        List<UploadInformation> uploadInformationList = preferenceManager.getUploadInformation();
+        TextView empty = findViewById(R.id.empty);
+
+        // no sync information available
+        if (uploadInformationList == null) {
+            empty.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+            return;
+        }
+
+        // sync information available
+        empty.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.VISIBLE);
+        uploadInfoAdapter.setItems(uploadInformationList);
+    }
+
 
     @Override
     protected void onResume() {
         super.onResume();
-        initializeRecyclerView();
-        refreshSyncInformation();
+        refreshRecyclerView();
     }
 
     @Override
@@ -81,80 +129,5 @@ public class HomeActivity extends AppCompatActivity {
 
         // invoke superclass to handle unrecognized item (eg. homeAsUp)
         return super.onOptionsItemSelected(item);
-    }
-
-    private void initializeViews() {
-        layout = findViewById(R.id.rootLayout);
-
-        // populate Toolbar (Actionbar)
-        Toolbar myToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(myToolbar);
-
-        ActionBar ab = getSupportActionBar();
-        if (ab != null) {
-            ab.setDisplayHomeAsUpEnabled(false);
-        }
-
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        FloatingActionButton sync_fab = findViewById(R.id.home_fab);
-        sync_fab.setOnClickListener(onFabClicked);
-    }
-
-    private void refreshSyncInformation () {
-        List<UploadInformation> uploadInformationList = preferenceManager.getUploadInformation();
-        TextView empty = findViewById(R.id.emtpy);
-
-        // no sync information available
-        if (uploadInformationList == null) {
-            empty.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-            return;
-        }
-
-        // sync information available
-        empty.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.VISIBLE);
-
-        SyncAdapter adapter = (SyncAdapter) recyclerView.getAdapter();
-        assert adapter != null;
-        adapter.setUploadInformationList(uploadInformationList);
-    }
-
-    private void initializeRecyclerView() {
-        SyncAdapter syncAdapter = new SyncAdapter(HomeActivity.this);
-        syncAdapter.setOnDeleteClickListener(new IOnItemClickListener<UploadInformation>() {
-            @Override
-            public void onItemClick(final UploadInformation clickedObject) {
-                DialogManager.deleteSyncInformationDialog(HomeActivity.this, new DialogManager.IDialogFeedback() {
-                    @Override
-                    public void positive() {
-                        boolean status = preferenceManager.removeUploadInformation(clickedObject.getId());
-
-                        if (status) {
-                            Snackbar.make(layout, "Successfully deleted sync information", Snackbar.LENGTH_LONG).show();
-                            refreshSyncInformation();
-                        } else {
-                            Snackbar.make(layout, "Failed to delete sync information", Snackbar.LENGTH_LONG).show();
-                        }
-                    }
-
-                    @Override
-                    public void negative() { }
-                });
-            }
-        });
-
-        syncAdapter.setOnRetryClickListener(new IOnItemClickListener<UploadInformation>() {
-            @Override
-            public void onItemClick(UploadInformation clickedObject) {
-                Intent upload = new Intent(HomeActivity.this, UploadActivity.class);
-                upload.putExtra(UploadActivity.EXTRA_UPLOAD_INFO, new Gson().toJson(clickedObject));
-                startActivity(upload);
-            }
-        });
-
-        recyclerView.setAdapter(syncAdapter);
     }
 }

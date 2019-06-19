@@ -44,7 +44,7 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        mispRestClient = new MispRestClient(this);
+        mispRestClient = MispRestClient.getInstance(this);
         preferenceManager = PreferenceManager.getInstance(this);
 
         initializeViews();

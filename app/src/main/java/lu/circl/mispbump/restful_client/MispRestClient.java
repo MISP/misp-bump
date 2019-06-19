@@ -39,8 +39,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class MispRestClient {
 
-    private static final String TAG = "restClient";
-
     public interface AvailableCallback {
         void available();
 
@@ -59,11 +57,6 @@ public class MispRestClient {
         void failure(String error);
     }
 
-    public interface OrganisationsCallback {
-        void success(Organisation[] organisations);
-        void failure(String error);
-    }
-
     public interface ServerCallback {
         void success(List<MispServer> servers);
 
@@ -75,20 +68,28 @@ public class MispRestClient {
     }
 
 
+    private static MispRestClient instance;
     private PreferenceManager preferenceManager;
     private MispRestService mispRestService;
+
+
+    public static MispRestClient getInstance(Context context) {
+        if (instance == null) {
+            instance = new MispRestClient(context);
+        }
+
+        return instance;
+    }
 
     /**
      * Initializes the rest client to communicate with a MISP instance.
      *
      * @param context needed to access the preferences for loading credentials
      */
-    public MispRestClient(Context context) {
+    private MispRestClient(Context context) {
         preferenceManager = PreferenceManager.getInstance(context);
 
         String url = preferenceManager.getServerUrl();
-
-        Log.i(TAG, "URL: " + url);
 
         try {
             Retrofit retrofit = new Retrofit.Builder()

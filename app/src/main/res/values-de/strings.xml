@@ -10,5 +10,5 @@
     <string name="login_help_text"><b>MISP Server URL</b>\nDie URL unter der Ihre MISP Instanz erreichbar ist.\n\n<b>MISP Automatisierungs Schlüssel</b>\nZu finden unter ...</string>
     <string name="qr_code">QR code</string>
     <string name="sync">Synchronisation</string>
-    <string name="no_syncs_hint">Sie haben noch keine MISP Instanzen verknüpft.</string>
+    <string name="no_syncs_hint">Sie haben noch keine MISP Instanzen verknüpft</string>
 </resources>

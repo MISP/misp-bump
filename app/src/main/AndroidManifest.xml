@@ -15,9 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activities.UploadActivity"
+        <activity android:name=".activities.UploadInformationActivity"></activity>
+        <activity
+            android:name=".activities.UploadActivity"
             android:configChanges="orientation|screenSize"
-            android:label="Upload"/>
+            android:label="Upload" />
         <activity android:name=".activities.PreferenceActivity" />
         <activity android:name=".activities.StartUpActivity">
             <intent-filter>

@@ -31,8 +31,8 @@ import lu.circl.mispbump.restful_client.Organisation;
 import lu.circl.mispbump.restful_client.User;
 
 /**
- * This activity is shown when the current device has no misp user associated with it.
- * Takes care of downloading all information necessary for a sync with other misp instances.
+ * This activity is shown when the current device has no misp user and organisation associated with it.
+ * It takes care of downloading all information necessary for a sync with other misp instances.
  */
 public class LoginActivity extends AppCompatActivity {
 
@@ -78,11 +78,11 @@ public class LoginActivity extends AppCompatActivity {
 
         constraintLayout = findViewById(R.id.rootLayout);
 
-        serverUrl = findViewById(R.id.login_server_url);
-        serverAutomationKey = findViewById(R.id.login_automation_key);
         Button downloadInfoButton = findViewById(R.id.login_download_button);
         downloadInfoButton.setOnClickListener(onClickDownload);
 
+        serverUrl = findViewById(R.id.login_server_url);
+        serverAutomationKey = findViewById(R.id.login_automation_key);
         progressBar = findViewById(R.id.login_progressbar);
 
         preferenceManager = PreferenceManager.getInstance(this);
@@ -124,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
             preferenceManager.setServerUrl(url);
 
             // instance of MispRestClient with given URL
-            final MispRestClient mispRestClient = new MispRestClient(getApplicationContext());
+            final MispRestClient mispRestClient = MispRestClient.getInstance(getApplicationContext());
 
             // display progress bar
             progressBar.setVisibility(View.VISIBLE);

@@ -55,8 +55,9 @@ public class UploadActivity extends AppCompatActivity {
     }
 
     private void init() {
+        restClient = MispRestClient.getInstance(this);
         preferenceManager = PreferenceManager.getInstance(this);
-        restClient = new MispRestClient(this);
+
         rootLayout = findViewById(R.id.rootLayout);
 
         // toolbar

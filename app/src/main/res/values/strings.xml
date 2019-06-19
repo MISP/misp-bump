@@ -12,5 +12,5 @@
     <string name="ok" translatable="false">Okay</string>
     <string name="qr_code">QR code</string>
     <string name="sync">Synchronization</string>
-    <string name="no_syncs_hint">You have not synced any MISP instances yet.</string>
+    <string name="no_syncs_hint">You have not synced any MISP instances yet</string>
 </resources>
