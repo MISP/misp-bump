@@ -1,4 +1,4 @@
-package lu.circl.mispbump.restful_client;
+package lu.circl.mispbump.models.restModels;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;

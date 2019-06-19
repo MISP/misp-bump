@@ -1,7 +1,14 @@
-package lu.circl.mispbump.restful_client;
+package lu.circl.mispbump.interfaces;
 
 import java.util.List;
 
+import lu.circl.mispbump.models.restModels.MispOrganisation;
+import lu.circl.mispbump.models.restModels.MispServer;
+import lu.circl.mispbump.models.restModels.MispUser;
+import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.Server;
+import lu.circl.mispbump.models.restModels.User;
+import lu.circl.mispbump.models.restModels.Version;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -11,7 +18,7 @@ import retrofit2.http.Path;
 /**
  * RetroFit2 interface for communication with misp instances
  */
-public interface MispRestService {
+public interface MispRestInterface {
 
     // settings routes
 
@@ -44,9 +51,6 @@ public interface MispRestService {
 
     @GET("servers/index")
     Call<List<MispServer>> getServers();
-
-//    @POST("servers/add")
-//    Call<MispServer> addServer(@Body MispServer server);
 
     @POST("servers/add")
     Call<Server> addServer(@Body Server server);

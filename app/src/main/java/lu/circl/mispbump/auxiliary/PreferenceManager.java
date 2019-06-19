@@ -20,8 +20,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import lu.circl.mispbump.models.UploadInformation;
-import lu.circl.mispbump.restful_client.Organisation;
-import lu.circl.mispbump.restful_client.User;
+import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.User;
 import lu.circl.mispbump.security.KeyStoreWrapper;
 
 public class PreferenceManager {

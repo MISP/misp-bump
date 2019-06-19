@@ -1,4 +1,4 @@
-package lu.circl.mispbump.restful_client;
+package lu.circl.mispbump.models.restModels;
 
 /**
  * Information gathered from Misp API about a organisation.

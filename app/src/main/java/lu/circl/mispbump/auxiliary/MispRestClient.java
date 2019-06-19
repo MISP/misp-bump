@@ -1,15 +1,13 @@
-package lu.circl.mispbump.restful_client;
+package lu.circl.mispbump.auxiliary;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.NoRouteToHostException;
-import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateException;
 import java.util.Iterator;
 import java.util.List;
@@ -22,7 +20,14 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import lu.circl.mispbump.auxiliary.PreferenceManager;
+import lu.circl.mispbump.interfaces.MispRestInterface;
+import lu.circl.mispbump.models.restModels.MispOrganisation;
+import lu.circl.mispbump.models.restModels.MispServer;
+import lu.circl.mispbump.models.restModels.MispUser;
+import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.Server;
+import lu.circl.mispbump.models.restModels.User;
+import lu.circl.mispbump.models.restModels.Version;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -38,6 +43,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * In order to conveniently use this api some wrapper interfaces are implemented to return the requested API endpoint as java object.
  */
 public class MispRestClient {
+
 
     public interface AvailableCallback {
         void available();
@@ -60,8 +66,6 @@ public class MispRestClient {
     public interface ServerCallback {
         void success(List<MispServer> servers);
 
-        void success(MispServer server);
-
         void success(Server server);
 
         void failure(String error);
@@ -69,8 +73,9 @@ public class MispRestClient {
 
 
     private static MispRestClient instance;
+
     private PreferenceManager preferenceManager;
-    private MispRestService mispRestService;
+    private MispRestInterface mispRestInterface;
 
 
     public static MispRestClient getInstance(Context context) {
@@ -95,64 +100,68 @@ public class MispRestClient {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create())
-                    .client(getUnsafeOkHttpClient())
+                    .client(getCustomClient(true, false))
                     .build();
 
-            mispRestService = retrofit.create(MispRestService.class);
+            mispRestInterface = retrofit.create(MispRestInterface.class);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * NOTE: for development only!
-     * <p>
-     * Accepts all certificates including self signed.
      *
-     * @return {@link OkHttpClient} which accepts all certificates
+     * @param unsafe whether to accept all certificates or only trusted ones
+     * @param logging whether to log Retrofit calls (for debugging)
+     * @return {@link OkHttpClient}
      */
-    private OkHttpClient getUnsafeOkHttpClient() {
+    private OkHttpClient getCustomClient(boolean unsafe, boolean logging) {
         try {
-            // Create a trust manager that does not validate certificate chains
-            final TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        @SuppressLint("TrustAllX509TrustManager")
-                        @Override
-                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-                        }
-
-                        @SuppressLint("TrustAllX509TrustManager")
-                        @Override
-                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-                        }
-
-                        @Override
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                            return new java.security.cert.X509Certificate[]{};
-                        }
-                    }
-            };
-
-            // Install the all-trusting trust manager
-            final SSLContext sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-
-            // Create an ssl socket factory with our all-trusting manager
-            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
-            builder.hostnameVerifier(new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            });
 
-            // create logging interceptor
-            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-            builder.addInterceptor(interceptor);
+            if (unsafe) {
+                // Create a trust manager that does not validate certificate chains
+                final TrustManager[] trustAllCerts = new TrustManager[]{
+                        new X509TrustManager() {
+                            @SuppressLint("TrustAllX509TrustManager")
+                            @Override
+                            public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                            }
+
+                            @SuppressLint("TrustAllX509TrustManager")
+                            @Override
+                            public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                            }
+
+                            @Override
+                            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                                return new java.security.cert.X509Certificate[]{};
+                            }
+                        }
+                };
+
+                // Install the all-trusting trust manager
+                final SSLContext sslContext = SSLContext.getInstance("SSL");
+                sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+
+                // Create an ssl socket factory with our all-trusting manager
+                final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+                builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
+                builder.hostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        return true;
+                    }
+                });
+            }
+
+            if (logging) {
+                HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+                interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+                builder.addInterceptor(interceptor);
+            }
 
             // create authorization interceptor
             builder.addInterceptor(new Interceptor() {
@@ -167,12 +176,12 @@ public class MispRestClient {
             });
 
             return builder.build();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    // status routes
 
     /**
      * Check via pyMispRoute if server is available
@@ -180,7 +189,7 @@ public class MispRestClient {
      * @param callback {@link AvailableCallback}
      */
     public void isAvailable(final AvailableCallback callback) {
-        Call<Version> call = mispRestService.pyMispVersion();
+        Call<Version> call = mispRestInterface.pyMispVersion();
         call.enqueue(new Callback<Version>() {
             @Override
             public void onResponse(Call<Version> call, Response<Version> response) {
@@ -203,7 +212,7 @@ public class MispRestClient {
         });
     }
 
-    // user routes
+
 
     /**
      * Fetches information about the user that is associated with saved auth key.
@@ -211,7 +220,7 @@ public class MispRestClient {
      * @param callback {@link UserCallback} wrapper to return user directly
      */
     public void getMyUser(final UserCallback callback) {
-        Call<MispUser> call = mispRestService.getMyUserInformation();
+        Call<MispUser> call = mispRestInterface.getMyUserInformation();
 
         call.enqueue(new Callback<MispUser>() {
             @Override
@@ -242,7 +251,7 @@ public class MispRestClient {
      * @param callback {@link UserCallback} wrapper to return user directly
      */
     public void getUser(int userId, final UserCallback callback) {
-        Call<MispUser> call = mispRestService.getUser(userId);
+        Call<MispUser> call = mispRestInterface.getUser(userId);
 
         call.enqueue(new Callback<MispUser>() {
             @Override
@@ -273,7 +282,7 @@ public class MispRestClient {
      * @param callback {@link UserCallback} wrapper to return the created user directly
      */
     public void addUser(User user, final UserCallback callback) {
-        Call<MispUser> call = mispRestService.addUser(user);
+        Call<MispUser> call = mispRestInterface.addUser(user);
 
         call.enqueue(new Callback<MispUser>() {
             @Override
@@ -294,7 +303,7 @@ public class MispRestClient {
     }
 
 
-    // organisation routes
+    // --- organisation routes ---
 
     /**
      * Get an organisation by a given organisation id.
@@ -303,7 +312,7 @@ public class MispRestClient {
      * @param callback {@link OrganisationCallback} wrapper to return a organisation directly
      */
     public void getOrganisation(int orgId, final OrganisationCallback callback) {
-        Call<MispOrganisation> call = mispRestService.getOrganisation(orgId);
+        Call<MispOrganisation> call = mispRestInterface.getOrganisation(orgId);
 
         call.enqueue(new Callback<MispOrganisation>() {
             @Override
@@ -327,7 +336,7 @@ public class MispRestClient {
     }
 
     public Organisation[] getAllOrganisations() throws IOException {
-        Call<List<MispOrganisation>> call = mispRestService.getAllOrganisations();
+        Call<List<MispOrganisation>> call = mispRestInterface.getAllOrganisations();
         Response<List<MispOrganisation>> response = call.execute();
 
         List<MispOrganisation> mispOrganisations = response.body();
@@ -374,7 +383,7 @@ public class MispRestClient {
      * @param callback     {@link OrganisationCallback} wrapper to return the created organisation directly
      */
     public void addOrganisation(Organisation organisation, final OrganisationCallback callback) {
-        Call<MispOrganisation> call = mispRestService.addOrganisation(organisation);
+        Call<MispOrganisation> call = mispRestInterface.addOrganisation(organisation);
 
         call.enqueue(new Callback<MispOrganisation>() {
             @Override
@@ -394,7 +403,7 @@ public class MispRestClient {
         });
     }
 
-    // server routes
+    // --- server routes ---
 
     /**
      * Get all servers on MISP instance.
@@ -402,7 +411,7 @@ public class MispRestClient {
      * @param callback {@link OrganisationCallback} wrapper to return a list of servers directly
      */
     public void getServers(final ServerCallback callback) {
-        Call<List<MispServer>> call = mispRestService.getServers();
+        Call<List<MispServer>> call = mispRestInterface.getServers();
 
         call.enqueue(new Callback<List<MispServer>>() {
             @Override
@@ -428,7 +437,7 @@ public class MispRestClient {
      * @param callback {@link ServerCallback} wrapper to return the created server directly
      */
     public void addServer(Server server, final ServerCallback callback) {
-        Call<Server> call = mispRestService.addServer(server);
+        Call<Server> call = mispRestInterface.addServer(server);
 
         call.enqueue(new Callback<Server>() {
             @Override
@@ -447,7 +456,7 @@ public class MispRestClient {
         });
     }
 
-    // error parsing
+    // --- error parsing ---
 
     /**
      * Converts error {@link Response}s to human readable info.

@@ -1,4 +1,4 @@
-package lu.circl.mispbump.restful_client;
+package lu.circl.mispbump.models.restModels;
 
 import com.google.gson.annotations.SerializedName;
 

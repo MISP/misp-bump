@@ -1,4 +1,4 @@
-package lu.circl.mispbump.custom_views;
+package lu.circl.mispbump.customViews;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -39,11 +39,10 @@ public class UploadAction extends LinearLayoutCompat {
 
     public UploadAction(Context context, AttributeSet attrs) {
         super(context, attrs);
-
         this.context = context;
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.UploadAction);
-        String title = a.getString(R.styleable.UploadAction_title);
+        String title = a.getString(R.styleable.UploadAction_description);
         a.recycle();
 
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -72,7 +71,6 @@ public class UploadAction extends LinearLayoutCompat {
     }
 
     public void setCurrentUploadState(UploadState state) {
-
         currentUploadState = state;
         progressBar.setVisibility(GONE);
 

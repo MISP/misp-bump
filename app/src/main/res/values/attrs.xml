@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="MaterialPreferenceText">
-        <attr name="pref_icon" format="reference"/>
-        <attr name="text"/>
-        <attr name="subText"/>
+        <attr name="pref_icon" format="integer"/>
+        <attr name="title" format="string"/>
+        <attr name="subtitle" format="string"/>
     </declare-styleable>
 
     <declare-styleable name="UploadAction">
-        <attr name="title" format="string"/>
+        <attr name="description" format="string"/>
     </declare-styleable>
 </resources>

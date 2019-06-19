@@ -1,4 +1,4 @@
-package lu.circl.mispbump.cam;
+package lu.circl.mispbump.customViews;
 
 /*
  * Copyright 2014 The Android Open Source Project

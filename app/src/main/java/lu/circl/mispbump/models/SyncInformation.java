@@ -1,6 +1,6 @@
 package lu.circl.mispbump.models;
 
-import lu.circl.mispbump.restful_client.Organisation;
+import lu.circl.mispbump.models.restModels.Organisation;
 
 /**
  * A Class that holds the information needed synchronize two misp instances.

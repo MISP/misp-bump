@@ -5,7 +5,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import lu.circl.mispbump.auxiliary.PreferenceManager;
-import lu.circl.mispbump.restful_client.User;
+import lu.circl.mispbump.models.restModels.User;
 
 public class StartUpActivity extends AppCompatActivity {
 

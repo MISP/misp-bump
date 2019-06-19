@@ -1,4 +1,4 @@
-package lu.circl.mispbump.cam;
+package lu.circl.mispbump.fragments;
 
 import android.Manifest;
 import android.animation.Animator;
@@ -63,6 +63,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import lu.circl.mispbump.R;
+import lu.circl.mispbump.customViews.AutoFitTextureView;
 
 public class CameraFragment extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback {
 

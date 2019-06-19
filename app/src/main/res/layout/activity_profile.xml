@@ -6,6 +6,8 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
+    android:descendantFocusability="blocksDescendants"
     tools:context=".activities.ProfileActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -76,33 +78,20 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <lu.circl.mispbump.custom_views.MaterialPreferenceText
-            android:id="@+id/description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sector"
-            app:pref_icon="@drawable/ic_description"
-            app:subText=""
-            app:text="Description">
-
-        </lu.circl.mispbump.custom_views.MaterialPreferenceText>
-
-        <lu.circl.mispbump.custom_views.MaterialPreferenceText
+        <lu.circl.mispbump.customViews.MaterialPreferenceText
             android:id="@+id/uuid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:pref_icon="@drawable/ic_code_black_24dp"
-            app:subText=""
-            app:text="UUID" />
+            app:title="UUID"/>
 
-        <lu.circl.mispbump.custom_views.MaterialPreferenceText
+        <lu.circl.mispbump.customViews.MaterialPreferenceText
             android:id="@+id/nationality"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -111,12 +100,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/uuid"
             app:pref_icon="@drawable/ic_language"
-            app:subText="German"
-            app:text="Nationality">
+            app:title="Nationality"/>
 
-        </lu.circl.mispbump.custom_views.MaterialPreferenceText>
-
-        <lu.circl.mispbump.custom_views.MaterialPreferenceText
+        <lu.circl.mispbump.customViews.MaterialPreferenceText
             android:id="@+id/sector"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -125,10 +111,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/nationality"
             app:pref_icon="@drawable/ic_sector"
-            app:subText="Industrial"
-            app:text="Sector">
+            app:title="Sector"/>
 
-        </lu.circl.mispbump.custom_views.MaterialPreferenceText>
+        <lu.circl.mispbump.customViews.MaterialPreferenceText
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sector"
+            app:pref_icon="@drawable/ic_description"
+            app:title="Description"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

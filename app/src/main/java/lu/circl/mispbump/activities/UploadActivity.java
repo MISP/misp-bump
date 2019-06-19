@@ -18,15 +18,14 @@ import java.util.List;
 import java.util.UUID;
 
 import lu.circl.mispbump.R;
-import lu.circl.mispbump.auxiliary.DialogManager;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
-import lu.circl.mispbump.custom_views.UploadAction;
+import lu.circl.mispbump.customViews.UploadAction;
 import lu.circl.mispbump.models.UploadInformation;
-import lu.circl.mispbump.restful_client.MispRestClient;
-import lu.circl.mispbump.restful_client.MispServer;
-import lu.circl.mispbump.restful_client.Organisation;
-import lu.circl.mispbump.restful_client.Server;
-import lu.circl.mispbump.restful_client.User;
+import lu.circl.mispbump.auxiliary.MispRestClient;
+import lu.circl.mispbump.models.restModels.MispServer;
+import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.Server;
+import lu.circl.mispbump.models.restModels.User;
 
 public class UploadActivity extends AppCompatActivity {
 
@@ -204,11 +203,6 @@ public class UploadActivity extends AppCompatActivity {
     private MispRestClient.ServerCallback serverCallback = new MispRestClient.ServerCallback() {
         @Override
         public void success(List<MispServer> servers) {
-
-        }
-
-        @Override
-        public void success(MispServer server) {
 
         }
 

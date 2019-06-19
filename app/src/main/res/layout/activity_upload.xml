@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <lu.circl.mispbump.custom_views.UploadAction
+        <lu.circl.mispbump.customViews.UploadAction
             android:id="@+id/availableAction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:title="Check if instance is available" />
 
-        <lu.circl.mispbump.custom_views.UploadAction
+        <lu.circl.mispbump.customViews.UploadAction
             android:id="@+id/orgAction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:title="Add organisation" />
 
-        <lu.circl.mispbump.custom_views.UploadAction
+        <lu.circl.mispbump.customViews.UploadAction
             android:id="@+id/userAction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:title="Add sync user" />
 
-        <lu.circl.mispbump.custom_views.UploadAction
+        <lu.circl.mispbump.customViews.UploadAction
             android:id="@+id/serverAction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

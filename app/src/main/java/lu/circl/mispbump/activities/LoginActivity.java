@@ -10,14 +10,10 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
@@ -26,9 +22,9 @@ import java.util.Objects;
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.auxiliary.DialogManager;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
-import lu.circl.mispbump.restful_client.MispRestClient;
-import lu.circl.mispbump.restful_client.Organisation;
-import lu.circl.mispbump.restful_client.User;
+import lu.circl.mispbump.auxiliary.MispRestClient;
+import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.User;
 
 /**
  * This activity is shown when the current device has no misp user and organisation associated with it.

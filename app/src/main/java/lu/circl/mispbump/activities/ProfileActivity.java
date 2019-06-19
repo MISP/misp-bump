@@ -13,6 +13,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,10 +26,10 @@ import java.util.Random;
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.auxiliary.TileDrawable;
-import lu.circl.mispbump.custom_views.MaterialPreferenceText;
-import lu.circl.mispbump.restful_client.MispRestClient;
-import lu.circl.mispbump.restful_client.Organisation;
-import lu.circl.mispbump.restful_client.User;
+import lu.circl.mispbump.customViews.MaterialPreferenceText;
+import lu.circl.mispbump.auxiliary.MispRestClient;
+import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.User;
 import lu.circl.mispbump.security.KeyStoreWrapper;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -47,11 +49,11 @@ public class ProfileActivity extends AppCompatActivity {
         mispRestClient = MispRestClient.getInstance(this);
         preferenceManager = PreferenceManager.getInstance(this);
 
-        initializeViews();
+        init();
         populateInformationViews();
     }
 
-    private void initializeViews() {
+    private void init() {
         rootLayout = findViewById(R.id.rootLayout);
 
         ImageView headerBg = findViewById(R.id.headerBg);
@@ -79,21 +81,27 @@ public class ProfileActivity extends AppCompatActivity {
         TextView name = findViewById(R.id.orgName);
         name.setText(organisation.name);
 
-        MaterialPreferenceText uuid = findViewById(R.id.uuid);
-        uuid.setSubText(organisation.uuid);
+        final MaterialPreferenceText uuid = findViewById(R.id.uuid);
+        uuid.setSubtitle(organisation.uuid);
+//        uuid.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Snackbar.make(rootLayout, "Copied to clipboard", Snackbar.LENGTH_LONG).show();
+//            }
+//        });
 
         MaterialPreferenceText nationality = findViewById(R.id.nationality);
-        nationality.setSubText(organisation.nationality);
+        nationality.setSubtitle(organisation.nationality);
 
         MaterialPreferenceText sector = findViewById(R.id.sector);
         if (organisation.sector == null) {
             sector.setVisibility(View.GONE);
         } else {
-            sector.setSubText(organisation.sector);
+            sector.setSubtitle(organisation.sector);
         }
 
         MaterialPreferenceText description = findViewById(R.id.description);
-        description.setSubText(organisation.description);
+        description.setSubtitle(organisation.description);
     }
 
     @Override
