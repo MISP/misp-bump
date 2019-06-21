@@ -2,21 +2,20 @@ package lu.circl.mispbump.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.gson.Gson;
-
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -75,10 +74,12 @@ public class HomeActivity extends AppCompatActivity {
 
         uploadInfoAdapter.setOnRecyclerItemClickListener(new OnRecyclerItemClickListener<UploadInformation>() {
             @Override
-            public void onClick(UploadInformation item) {
+            public void onClick(final View v, UploadInformation item) {
                 Intent i = new Intent(HomeActivity.this, UploadInformationActivity.class);
                 i.putExtra(UploadInformationActivity.EXTRA_UPLOAD_INFO_KEY, new Gson().toJson(item));
-                startActivity(i);
+
+                ActivityOptionsCompat options = ActivityOptionsCompat.makeClipRevealAnimation(v.findViewById(R.id.rootLayout), (int) v.getX(), (int) v.getY(), v.getWidth(), v.getHeight());
+                startActivity(i, options.toBundle());
             }
         });
 

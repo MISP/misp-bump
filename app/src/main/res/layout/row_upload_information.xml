@@ -4,15 +4,20 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/header"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
     android:foreground="?attr/selectableItemBackground"
-    android:layout_marginBottom="1dp">
+    android:layout_marginBottom="1dp"
+    android:padding="8dp"
+    android:transitionName="root">
 
     <ImageView
         android:id="@+id/syncStatus"
+        android:transitionName="icon"
+        android:transformPivotX="12dp"
+        android:transformPivotY="12dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -26,6 +31,7 @@
 
     <TextView
         android:id="@+id/orgName"
+        android:transitionName="title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

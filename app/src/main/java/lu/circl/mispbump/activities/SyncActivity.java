@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.BounceInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -42,8 +44,8 @@ import lu.circl.mispbump.security.DiffieHellman;
  */
 public class SyncActivity extends AppCompatActivity {
 
-    // layout
-    private CoordinatorLayout layout;
+    // rootLayout
+    private CoordinatorLayout rootLayout;
     private ImageView qrCodeView, bottomSheetIcon;
     private TextView bottomSheetText;
     private ImageButton prevButton, nextButton;
@@ -86,8 +88,8 @@ public class SyncActivity extends AppCompatActivity {
     }
 
     private void initializeViews() {
-        // Root Layout
-        layout = findViewById(R.id.rootLayout);
+
+        rootLayout = findViewById(R.id.rootLayout);
 
         // prev button
         prevButton = findViewById(R.id.prevButton);
@@ -196,7 +198,7 @@ public class SyncActivity extends AppCompatActivity {
                             }
                         });
                     } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-                        Snackbar.make(layout, "Invalid key", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(rootLayout, "Invalid key", Snackbar.LENGTH_SHORT).show();
                         cameraFragment.setReadQrEnabled(true);
                     }
                     break;
@@ -218,7 +220,7 @@ public class SyncActivity extends AppCompatActivity {
                         });
 
                     } catch (JsonSyntaxException e) {
-                        Snackbar.make(layout, "Sync information unreadable", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(rootLayout, "Sync information unreadable", Snackbar.LENGTH_SHORT).show();
                         cameraFragment.setReadQrEnabled(true);
                     }
                     break;
@@ -403,7 +405,7 @@ public class SyncActivity extends AppCompatActivity {
         bottomSheetIcon.animate()
                 .scaleY(1f)
                 .scaleX(1f)
-                .setDuration(250);
+                .setDuration(500);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         bottomSheetBehavior.setSwipeable(true);
 

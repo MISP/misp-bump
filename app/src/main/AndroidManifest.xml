@@ -15,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activities.UploadInformationActivity"></activity>
+        <activity android:name=".activities.UploadInformationActivity"
+            android:label="Sync details"/>
         <activity
             android:name=".activities.UploadActivity"
             android:configChanges="orientation|screenSize"

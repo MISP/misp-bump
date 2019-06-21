@@ -52,7 +52,7 @@ public class UploadInfoAdapter extends RecyclerView.Adapter<UploadInfoListViewHo
         switch (item.getCurrentSyncStatus()) {
             case COMPLETE:
                 ImageViewCompat.setImageTintList(holder.syncStatus, ColorStateList.valueOf(context.getColor(R.color.status_green)));
-                holder.syncStatus.setImageResource(R.drawable.ic_check);
+                holder.syncStatus.setImageResource(R.drawable.ic_check_outline);
                 break;
             case FAILURE:
                 ImageViewCompat.setImageTintList(holder.syncStatus, ColorStateList.valueOf(context.getColor(R.color.status_red)));
@@ -67,7 +67,7 @@ public class UploadInfoAdapter extends RecyclerView.Adapter<UploadInfoListViewHo
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onRecyclerItemClickListener.onClick(item);
+                onRecyclerItemClickListener.onClick(view, item);
             }
         });
     }

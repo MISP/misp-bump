@@ -11,6 +11,9 @@
     <!-- colors -->
     <color name="white">#FFFFFF</color>
     <color name="white_50">#80FFFFFF</color>
+
+    <color name="grey">#BDBDBD</color>
+
     <color name="status_green">#4CAF50</color>
     <color name="status_amber">#FB8C00</color>
     <color name="status_red">#E53935</color>
