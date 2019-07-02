@@ -73,10 +73,6 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
         private int lastAccessedIndex = 0;
         private Bitmap[] processQueue = new Bitmap[10];
 
-        ImageProcessingThread() {
-            Log.i(TAG, "Image worker thread created");
-        }
-
         void addToQueue(Bitmap bitmap) {
             processQueue[lastAccessedIndex] = bitmap;
             // circular array access
@@ -167,7 +163,6 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
 
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture texture, int width, int height) {
-            Log.i(TAG, "Width: " + width + "; height: " + height);
             openCamera(width, height);
         }
 
@@ -350,7 +345,6 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
         } else if (notBigEnough.size() > 0) {
             return Collections.max(notBigEnough, new CompareSizesByArea());
         } else {
-            Log.e(TAG, "Couldn't find any suitable preview size");
             return choices[0];
         }
     }
@@ -359,8 +353,7 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_camera, container, false);
 
-        hideCamView = v.findViewById(R.id.hideCam);
-        hideCamView.setVisibility(View.GONE);
+//        hideCamView = v.findViewById(R.id.hideCam);
 
         initRenderScript();
         setUpBarcodeDetector();
@@ -370,6 +363,7 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         autoFitTextureView = view.findViewById(R.id.texture);
+        hideCamView = view.findViewById(R.id.hideCam);
     }
 
     @Override
@@ -381,20 +375,6 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
     public void onResume() {
         super.onResume();
         enablePreview();
-//        startBackgroundThread();
-//
-//        imageProcessingThread = new ImageProcessingThread();
-//        imageProcessingThread.start();
-//
-//        // When the screen is turned off and turned back on, the SurfaceTexture is already
-//        // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
-//        // a camera and start preview from here (otherwise, we wait until the surface is ready in
-//        // the SurfaceTextureListener).
-//        if (autoFitTextureView.isAvailable()) {
-//            openCamera(autoFitTextureView.getWidth(), autoFitTextureView.getHeight());
-//        } else {
-//            autoFitTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
-//        }
     }
 
     @Override
@@ -510,10 +490,6 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
                 }
 
                 Size[] sizes = map.getOutputSizes(SurfaceTexture.class);
-
-                for (Size size : sizes) {
-                    Log.i(TAG, size.toString());
-                }
 
                 // Danger, W.R.! Attempting to use too large a preview size could  exceed the camera
                 // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
@@ -802,12 +778,6 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
     public interface QrScanCallback {
         void qrScanResult(String qrData);
     }
-
-    public interface CameraReadyCallback {
-        void ready();
-    }
-
-    private CameraReadyCallback cameraReadyCallback;
     private boolean readQrEnabled = true;
     private BarcodeDetector barcodeDetector;
     private RenderScript renderScript;
@@ -865,6 +835,18 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
     }
 
     public void disablePreview() {
+
+        if (hideCamView.getAlpha() == 1 && hideCamView.getVisibility() == View.VISIBLE) {
+            closeCamera();
+            stopBackgroundThread();
+
+            if (imageProcessingThread.isAlive()) {
+                imageProcessingThread.isRunning = false;
+            }
+
+            return;
+        }
+
         hideCamView.setAlpha(0f);
         hideCamView.setVisibility(View.VISIBLE);
         hideCamView.animate()
@@ -896,19 +878,15 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
             autoFitTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
         }
 
-        hideCamView.setAlpha(1f);
         hideCamView.setVisibility(View.VISIBLE);
+        hideCamView.setAlpha(1f);
         hideCamView.animate()
                 .alpha(0f)
-                .setStartDelay(100)
                 .setDuration(1000)
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         hideCamView.setVisibility(View.GONE);
-                        if (cameraReadyCallback != null) {
-                            cameraReadyCallback.ready();
-                        }
                     }
                 });
     }
@@ -925,10 +903,6 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
 
     public void setOnQrAvailableListener(QrScanCallback callback) {
         qrResultCallback = callback;
-    }
-
-    public void setCameraReadyCallback(CameraReadyCallback callback) {
-        this.cameraReadyCallback = callback;
     }
 }
 

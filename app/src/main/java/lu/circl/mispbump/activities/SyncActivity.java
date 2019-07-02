@@ -1,13 +1,11 @@
 package lu.circl.mispbump.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.BounceInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,7 +15,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -25,315 +22,320 @@ import com.google.gson.JsonSyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.util.List;
 
 import lu.circl.mispbump.R;
+import lu.circl.mispbump.auxiliary.DialogManager;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.auxiliary.QrCodeGenerator;
 import lu.circl.mispbump.auxiliary.RandomString;
 import lu.circl.mispbump.fragments.CameraFragment;
-import lu.circl.mispbump.customViews.ExtendedBottomSheetBehavior;
-import lu.circl.mispbump.fragments.SyncOptionsFragment;
+import lu.circl.mispbump.fragments.UploadSettingsFragment;
 import lu.circl.mispbump.models.SyncInformation;
 import lu.circl.mispbump.models.UploadInformation;
 import lu.circl.mispbump.security.DiffieHellman;
 
-/**
- * This class provides the sync functionality.
- * It collects the necessary information, guides through the process and finally completes with
- * the upload to the misp instance.
- */
 public class SyncActivity extends AppCompatActivity {
 
-    // rootLayout
-    private CoordinatorLayout rootLayout;
-    private ImageView qrCodeView, bottomSheetIcon;
-    private TextView bottomSheetText;
-    private ImageButton prevButton, nextButton;
-    private ExtendedBottomSheetBehavior bottomSheetBehavior;
+    enum SyncState {
+        PUBLIC_KEY,
+        DATA
+    }
 
-    // dependencies
+    enum UiState {
+        PUBLIC_KEY_SHOW,
+        PUBLIC_KEY_SHOW_AND_RECEIVED,
+        SYNC_INFO_SHOW,
+        SYNC_INFO_SHOW_AND_RECEIVED
+    }
+
+    private SyncState currentSyncState;
+
     private PreferenceManager preferenceManager;
+    private UploadInformation uploadInformation;
+    private QrCodeGenerator qrCodeGenerator;
     private DiffieHellman diffieHellman;
 
-    private UploadInformation uploadInformation;
+    private boolean foreignPublicKeyReceived, foreignSyncInfoReceived;
 
-    // fragments
+    // Fragments
     private CameraFragment cameraFragment;
-    private SyncOptionsFragment syncOptionsFragment;
 
-    // qr codes
-    private QrCodeGenerator qrCodeGenerator;
-    private Bitmap publicKeyQr, syncInfoQr;
+    // Views
+    private CoordinatorLayout rootLayout;
+    private FrameLayout qrFrame;
+    private ImageView qrCode;
+    private TextView qrHint;
+    private ImageButton prevButton, nextButton;
 
-    private SyncState currentSyncState = SyncState.settings;
+    private Bitmap publicKeyQrCode, syncInfoQrCode;
 
-    private enum SyncState {
-        settings(0),
-        publicKeyExchange(1),
-        dataExchange(2);
-
-
-        private final int value;
-
-        SyncState(final int value) {
-            this.value = value;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sync);
-        initializeViews();
+
+        init();
+        initViews();
+
+        switchState(SyncState.PUBLIC_KEY);
     }
 
-    private void initializeViews() {
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
 
+        switch (currentSyncState) {
+            case PUBLIC_KEY:
+                // TODO warn that sync is maybe not complete ... ?
+                break;
+            case DATA:
+                switchState(SyncState.PUBLIC_KEY);
+                break;
+        }
+    }
+
+    private void init() {
+        preferenceManager = PreferenceManager.getInstance(SyncActivity.this);
+        diffieHellman = DiffieHellman.getInstance();
+
+        qrCodeGenerator = new QrCodeGenerator(SyncActivity.this);
+        publicKeyQrCode = qrCodeGenerator.generateQrCode(DiffieHellman.publicKeyToString(diffieHellman.getPublicKey()));
+
+        uploadInformation = new UploadInformation();
+    }
+
+    private void initViews() {
         rootLayout = findViewById(R.id.rootLayout);
 
-        // prev button
+        qrFrame = findViewById(R.id.qrFrame);
+        qrCode = findViewById(R.id.qrCode);
+        qrHint = findViewById(R.id.qrHint);
+
         prevButton = findViewById(R.id.prevButton);
         prevButton.setOnClickListener(onPrevClicked);
 
-        // next button
         nextButton = findViewById(R.id.nextButton);
         nextButton.setOnClickListener(onNextClicked);
-
-        // QR Code View
-        qrCodeView = findViewById(R.id.qrcode);
-        qrCodeGenerator = new QrCodeGenerator(SyncActivity.this);
-
-        bottomSheetIcon = findViewById(R.id.bottomSheetIcon);
-        bottomSheetText = findViewById(R.id.bottomSheetText);
-
-        diffieHellman = DiffieHellman.getInstance();
-        preferenceManager = PreferenceManager.getInstance(this);
-
-        View bottomSheet = findViewById(R.id.bottomSheet);
-        bottomSheetBehavior = (ExtendedBottomSheetBehavior) BottomSheetBehavior.from(bottomSheet);
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        bottomSheetBehavior.setSwipeable(false);
-        bottomSheetBehavior.setHideable(false);
-
-        publicKeyQr = generatePublicKeyQr();
-
-        switchState(SyncState.settings);
     }
 
-    /**
-     * Called when "next button" is pressed
-     */
-    private View.OnClickListener onNextClicked = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (currentSyncState) {
-                case settings:
-                    uploadInformation = new UploadInformation();
-                    uploadInformation.setAllowSelfSigned(syncOptionsFragment.getAllowSelfSigned());
-                    uploadInformation.setPush(syncOptionsFragment.getPush());
-                    uploadInformation.setPull(syncOptionsFragment.getPull());
-                    uploadInformation.setCached(syncOptionsFragment.getCache());
+    private void switchState(SyncState state) {
+        switchFragment(state);
+        displayQr(state);
 
-                    switchState(SyncState.publicKeyExchange);
-                    break;
-
-                case publicKeyExchange:
-                    switchState(SyncState.dataExchange);
-                    break;
-
-                case dataExchange:
-                    Intent upload = new Intent(SyncActivity.this, UploadActivity.class);
-                    upload.putExtra(UploadActivity.EXTRA_UPLOAD_INFO, new Gson().toJson(uploadInformation));
-                    startActivity(upload);
-                    overridePendingTransition(R.anim.slide_in_right, android.R.anim.slide_out_right);
-                    finish();
-                    break;
-            }
+        switch (state) {
+            case PUBLIC_KEY:
+                if (foreignPublicKeyReceived) {
+                    switchUiState(UiState.PUBLIC_KEY_SHOW_AND_RECEIVED);
+                    cameraFragment.setReadQrEnabled(false);
+                } else {
+                    switchUiState(UiState.PUBLIC_KEY_SHOW);
+                    cameraFragment.setReadQrEnabled(true);
+                }
+                break;
+            case DATA:
+                if (foreignSyncInfoReceived) {
+                    switchUiState(UiState.SYNC_INFO_SHOW_AND_RECEIVED);
+                    cameraFragment.setReadQrEnabled(false);
+                } else {
+                    switchUiState(UiState.SYNC_INFO_SHOW);
+                    cameraFragment.setReadQrEnabled(true);
+                }
+                break;
         }
-    };
 
-    /**
-     * Called when "prev button" is clicked
-     */
+        currentSyncState = state;
+    }
+
+    private void switchFragment(SyncState state) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        String camTag = CameraFragment.class.getSimpleName();
+        String settingsTag = UploadSettingsFragment.class.getSimpleName();
+
+        switch (state) {
+            case PUBLIC_KEY:
+            case DATA:
+                cameraFragment = (CameraFragment) fragmentManager.findFragmentByTag(camTag);
+                if (cameraFragment != null) {
+                    fragmentTransaction.show(cameraFragment);
+                } else {
+                    cameraFragment = new CameraFragment();
+                    cameraFragment.setOnQrAvailableListener(onReadQrCode);
+                    fragmentTransaction.add(R.id.fragmentContainer, cameraFragment, camTag);
+                }
+
+                UploadSettingsFragment uploadSettingsFragment = (UploadSettingsFragment) fragmentManager.findFragmentByTag(settingsTag);
+                if (uploadSettingsFragment != null) {
+                    fragmentTransaction.hide(uploadSettingsFragment);
+                }
+
+                fragmentTransaction.commit();
+                break;
+        }
+    }
+
+    private void displayQr(SyncState state) {
+        switch (state) {
+            case PUBLIC_KEY:
+                qrCode.setImageBitmap(publicKeyQrCode);
+                qrFrame.setVisibility(View.VISIBLE);
+                break;
+            case DATA:
+                qrCode.setImageBitmap(syncInfoQrCode);
+                qrFrame.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    private void switchUiState(final UiState state) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                switch (state) {
+                    case PUBLIC_KEY_SHOW:
+                        prevButton.setImageDrawable(getDrawable(R.drawable.ic_close));
+                        prevButton.setVisibility(View.VISIBLE);
+                        nextButton.setVisibility(View.INVISIBLE);
+                        qrReceivedFeedback(false);
+                        break;
+                    case PUBLIC_KEY_SHOW_AND_RECEIVED:
+                        prevButton.setImageDrawable(getDrawable(R.drawable.ic_close));
+                        nextButton.setImageDrawable(getDrawable(R.drawable.ic_arrow_forward));
+                        prevButton.setVisibility(View.VISIBLE);
+                        nextButton.setVisibility(View.VISIBLE);
+                        cameraFragment.disablePreview();
+                        qrReceivedFeedback(true);
+                        break;
+                    case SYNC_INFO_SHOW:
+                        prevButton.setImageDrawable(getDrawable(R.drawable.ic_arrow_back));
+                        nextButton.setImageDrawable(getDrawable(R.drawable.ic_arrow_forward));
+                        nextButton.setVisibility(View.INVISIBLE);
+                        prevButton.setVisibility(View.VISIBLE);
+                        cameraFragment.enablePreview();
+                        qrReceivedFeedback(false);
+                        break;
+                    case SYNC_INFO_SHOW_AND_RECEIVED:
+                        prevButton.setImageDrawable(getDrawable(R.drawable.ic_arrow_back));
+                        nextButton.setImageDrawable(getDrawable(R.drawable.ic_check));
+                        nextButton.setVisibility(View.VISIBLE);
+                        prevButton.setVisibility(View.VISIBLE);
+                        cameraFragment.disablePreview();
+                        qrReceivedFeedback(true);
+                        break;
+                }
+            }
+        });
+    }
+
+    // listener
+
     private View.OnClickListener onPrevClicked = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch (currentSyncState) {
-                case settings:
+                case PUBLIC_KEY:
                     finish();
                     break;
-
-                case publicKeyExchange:
-                    switchState(SyncState.settings);
-                    break;
-
-                case dataExchange:
-                    switchState(SyncState.publicKeyExchange);
+                case DATA:
+                    switchState(SyncState.PUBLIC_KEY);
                     break;
             }
         }
     };
 
-    /**
-     * Called when the camera fragment detects a qr code
-     */
-    private CameraFragment.QrScanCallback onQrCodeScanned = new CameraFragment.QrScanCallback() {
+    private View.OnClickListener onNextClicked = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (currentSyncState) {
+                case PUBLIC_KEY:
+                    switchState(SyncState.DATA);
+                    break;
+
+                case DATA:
+                    uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.PENDING);
+                    preferenceManager.addUploadInformation(uploadInformation);
+
+                    Intent i = new Intent(SyncActivity.this, UploadInfoActivity.class);
+                    i.putExtra(UploadInfoActivity.EXTRA_UPLOAD_INFO_UUID, uploadInformation.getUuid());
+                    startActivity(i);
+                    finish();
+                    break;
+            }
+        }
+    };
+
+    private CameraFragment.QrScanCallback onReadQrCode = new CameraFragment.QrScanCallback() {
         @Override
         public void qrScanResult(String qrData) {
             cameraFragment.setReadQrEnabled(false);
             switch (currentSyncState) {
-                case publicKeyExchange:
+                case PUBLIC_KEY:
                     try {
                         final PublicKey pk = DiffieHellman.publicKeyFromString(qrData);
                         diffieHellman.setForeignPublicKey(pk);
-
-                        syncInfoQr = generateSyncInfoQr();
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                nextButton.setVisibility(View.VISIBLE);
-                                cameraFragment.disablePreview();
-                                qrReceivedFeedback();
-                            }
-                        });
+                        syncInfoQrCode = generateSyncInfoQr();
+                        switchUiState(UiState.PUBLIC_KEY_SHOW_AND_RECEIVED);
+                        foreignPublicKeyReceived = true;
                     } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
                         Snackbar.make(rootLayout, "Invalid key", Snackbar.LENGTH_SHORT).show();
-                        cameraFragment.setReadQrEnabled(true);
+                        switchUiState(UiState.PUBLIC_KEY_SHOW);
                     }
                     break;
 
-                case dataExchange:
-                    cameraFragment.setReadQrEnabled(false);
-
+                case DATA:
                     try {
                         final SyncInformation remoteSyncInfo = new Gson().fromJson(diffieHellman.decrypt(qrData), SyncInformation.class);
-                        uploadInformation.setRemote(remoteSyncInfo);
 
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                cameraFragment.disablePreview();
-                                nextButton.setVisibility(View.VISIBLE);
-                                qrReceivedFeedback();
+                        List<UploadInformation> uploadInformationList = preferenceManager.getUploadInformationList();
+
+                        if (uploadInformationList != null) {
+                            for (final UploadInformation ui : uploadInformationList) {
+                                if (ui.getRemote().organisation.uuid.equals(remoteSyncInfo.organisation.uuid)) {
+                                    DialogManager.syncAlreadyExistsDialog(SyncActivity.this, new DialogManager.IDialogFeedback() {
+                                        @Override
+                                        public void positive() {
+                                            uploadInformation.setUuid(ui.getUuid());
+                                        }
+
+                                        @Override
+                                        public void negative() {
+                                            finish();
+                                        }
+                                    });
+                                }
                             }
-                        });
+                        }
 
+                        uploadInformation.setRemote(remoteSyncInfo);
+                        switchUiState(UiState.SYNC_INFO_SHOW_AND_RECEIVED);
+                        foreignSyncInfoReceived = true;
                     } catch (JsonSyntaxException e) {
                         Snackbar.make(rootLayout, "Sync information unreadable", Snackbar.LENGTH_SHORT).show();
-                        cameraFragment.setReadQrEnabled(true);
+                        switchUiState(UiState.SYNC_INFO_SHOW);
                     }
                     break;
             }
         }
     };
 
+    // aux
 
-    private void switchUiState(SyncState state) {
-
-        bottomSheetIcon.setVisibility(View.INVISIBLE);
-        bottomSheetBehavior.setSwipeable(false);
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-
-        switch (state) {
-            case settings:
-                prevButton.setImageDrawable(getDrawable(R.drawable.ic_close));
-                prevButton.setVisibility(View.VISIBLE);
-                nextButton.setVisibility(View.VISIBLE);
-                hideQrCode();
-                break;
-            case publicKeyExchange:
-                prevButton.setImageDrawable(getDrawable(R.drawable.ic_arrow_back));
-                prevButton.setVisibility(View.VISIBLE);
-
-                nextButton.setImageDrawable(getDrawable(R.drawable.ic_arrow_forward));
-                nextButton.setVisibility(View.GONE);
-                showQrCode(publicKeyQr);
-                break;
-            case dataExchange:
-                prevButton.setImageDrawable(getDrawable(R.drawable.ic_arrow_back));
-                prevButton.setVisibility(View.VISIBLE);
-
-                nextButton.setImageDrawable(getDrawable(R.drawable.ic_cloud_upload));
-                nextButton.setVisibility(View.GONE);
-
-                cameraFragment.enablePreview();
-                cameraFragment.setReadQrEnabled(true);
-                showQrCode(syncInfoQr);
-                break;
-        }
-    }
-
-    private void switchState(SyncState state) {
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-        if (currentSyncState != state) {
-            if (state.value < currentSyncState.value) {
-                transaction.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-            } else {
-                transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
-            }
-        }
-
-        currentSyncState = state;
-
-        switchUiState(currentSyncState);
-
-        switch (currentSyncState) {
-            case settings:
-                String fragTag = SyncOptionsFragment.class.getSimpleName();
-                syncOptionsFragment = (SyncOptionsFragment) fragmentManager.findFragmentByTag(fragTag);
-
-                if (syncOptionsFragment == null) {
-                    syncOptionsFragment = new SyncOptionsFragment();
-                }
-
-                transaction.replace(R.id.sync_fragment_container, syncOptionsFragment, fragTag);
-                transaction.commit();
-                break;
-
-            case publicKeyExchange:
-                fragTag = CameraFragment.class.getSimpleName();
-                cameraFragment = (CameraFragment) fragmentManager.findFragmentByTag(fragTag);
-
-                if (cameraFragment == null) {
-                    cameraFragment = new CameraFragment();
-                    cameraFragment.setOnQrAvailableListener(onQrCodeScanned);
-                }
-
-                transaction.replace(R.id.sync_fragment_container, cameraFragment, fragTag);
-                transaction.commit();
-                break;
-
-            case dataExchange:
-                fragTag = CameraFragment.class.getSimpleName();
-                cameraFragment = (CameraFragment) fragmentManager.findFragmentByTag(fragTag);
-
-                if (cameraFragment == null) {
-                    cameraFragment = new CameraFragment();
-                    cameraFragment.setOnQrAvailableListener(onQrCodeScanned);
-                }
-
-                transaction.replace(R.id.sync_fragment_container, cameraFragment, fragTag);
-                transaction.commit();
-                break;
-        }
-    }
-
-
-    private Bitmap generatePublicKeyQr() {
-        return qrCodeGenerator.generateQrCode(DiffieHellman.publicKeyToString(diffieHellman.getPublicKey()));
-    }
-
-    private Bitmap generateSyncInfoQr() {
+    private SyncInformation generateLocalSyncInfo() {
         SyncInformation syncInformation = new SyncInformation();
         syncInformation.organisation = preferenceManager.getUserOrganisation().toSyncOrganisation();
         syncInformation.syncUserAuthkey = new RandomString(40).nextString();
         syncInformation.baseUrl = preferenceManager.getServerUrl();
         syncInformation.syncUserPassword = new RandomString(16).nextString();
         syncInformation.syncUserEmail = preferenceManager.getUserInfo().email;
+
+        return syncInformation;
+    }
+
+    private Bitmap generateSyncInfoQr() {
+        SyncInformation syncInformation = generateLocalSyncInfo();
 
         uploadInformation.setLocal(syncInformation);
 
@@ -344,80 +346,18 @@ public class SyncActivity extends AppCompatActivity {
         return qrCodeGenerator.generateQrCode(encrypted);
     }
 
-
-    private void showQrCode(final Bitmap bitmap) {
+    private void qrReceivedFeedback(final boolean done) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
-                qrCodeView.setImageBitmap(bitmap);
-                qrCodeView.setAlpha(0f);
-                qrCodeView.setVisibility(View.VISIBLE);
-                qrCodeView.setScaleX(0.9f);
-                qrCodeView.setScaleY(0.6f);
-                qrCodeView.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .alpha(1f)
-                        .setDuration(250)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                qrCodeView.setVisibility(View.VISIBLE);
-                            }
-                        });
+                if (done) {
+                    qrHint.setCompoundDrawablesWithIntrinsicBounds(getDrawable(R.drawable.ic_check_outline), null, null, null);
+                    qrHint.setCompoundDrawableTintList(ColorStateList.valueOf(getColor(R.color.status_green)));
+                } else {
+                    qrHint.setCompoundDrawablesWithIntrinsicBounds(getDrawable(R.drawable.ic_info_outline), null, null, null);
+                    qrHint.setCompoundDrawableTintList(ColorStateList.valueOf(getColor(R.color.status_amber)));
+                }
             }
         });
     }
-
-    private void hideQrCode() {
-
-        if (qrCodeView.getVisibility() == View.GONE) {
-            return;
-        }
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                qrCodeView.setAlpha(1f);
-                qrCodeView.setVisibility(View.VISIBLE);
-                qrCodeView.setScaleX(1f);
-                qrCodeView.setScaleY(1f);
-                qrCodeView.animate()
-                        .scaleX(0f)
-                        .scaleY(0f)
-                        .alpha(0f)
-                        .setDuration(250)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                qrCodeView.setVisibility(View.GONE);
-                            }
-                        });
-            }
-        });
-    }
-
-    private void qrReceivedFeedback() {
-        bottomSheetIcon.setScaleX(0f);
-        bottomSheetIcon.setScaleY(0f);
-        bottomSheetIcon.setVisibility(View.VISIBLE);
-        bottomSheetIcon.animate()
-                .scaleY(1f)
-                .scaleX(1f)
-                .setDuration(500);
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        bottomSheetBehavior.setSwipeable(true);
-
-        switch (currentSyncState) {
-            case publicKeyExchange:
-                bottomSheetText.setText("Received public key from partner");
-                break;
-
-            case dataExchange:
-                bottomSheetText.setText("Received sync information from partner");
-                break;
-        }
-    }
-
 }

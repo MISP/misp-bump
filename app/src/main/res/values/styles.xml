@@ -1,21 +1,8 @@
 <resources>
-    <!-- Theme.MaterialComponents.Light.NoActionBar || Theme.AppCompat.Light.NoActionBar -->
-
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-
-        <item name="android:windowContentTransitions">true</item>
-
-        <!-- specify enter and exit transitions -->
-        <!-- options are: explode, slide, fade -->
-        <!--<item name="android:windowEnterTransition">@transition/simple</item>-->
-        <!--<item name="android:windowExitTransition">@transition/simple</item>-->
-
-         <!--specify shared element transitions -->
-        <item name="android:windowSharedElementEnterTransition">@transition/simple</item>
-        <item name="android:windowSharedElementExitTransition">@transition/simple</item>
     </style>
 
     <style name="AppTheme.Translucent">
@@ -23,13 +10,14 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="AppTheme.FullScreenDialog" parent="Theme.MaterialComponents.Light.DialogWhenLarge">
-        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
-    </style>
+    <style name="PopupTheme" parent="ThemeOverlay.MaterialComponents.Light"/>
 
-    <style name="DialogAnimation">
-        <item name="android:windowEnterAnimation">@anim/fade_in</item>
-        <item name="android:windowExitAnimation">@anim/fade_out</item>
+    <style name="ToolbarTheme" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
+
+    <style name="ToolbarTheme.Light" parent="@style/ThemeOverlay.MaterialComponents.ActionBar">
+        <item name="android:background">@color/white</item>
+        <item name="colorControlNormal">#000</item>
+        <item name="android:tint">#000</item>
     </style>
 
     <style name="Text"/>

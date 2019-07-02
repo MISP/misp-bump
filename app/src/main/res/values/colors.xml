@@ -2,17 +2,17 @@
 <resources>
     <color name="colorPrimary">#047EB4</color>
     <color name="colorPrimaryDark">#023850</color>
-    <!--<color name="colorPrimaryDark">#047EB4</color>-->
     <color name="colorAccent">#12B3FA</color>
-    <color name="colorAccent_50">#8012B3FA</color>
 
     <color name="dividerColor">#33000000</color>
 
-    <!-- colors -->
     <color name="white">#FFFFFF</color>
     <color name="white_50">#80FFFFFF</color>
 
     <color name="grey">#BDBDBD</color>
+    <color name="grey_light">#F0F0F0</color>
+
+    <color name="black">#000</color>
 
     <color name="status_green">#4CAF50</color>
     <color name="status_amber">#FB8C00</color>

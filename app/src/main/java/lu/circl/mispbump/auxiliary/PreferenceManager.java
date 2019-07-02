@@ -322,120 +322,104 @@ public class PreferenceManager {
     }
 
 
-    public void setUploadInformationList(List<UploadInformation> uploadInformationList) {
-        KeyStoreWrapper ksw = new KeyStoreWrapper(KeyStoreWrapper.UPLOAD_INFORMATION_ALIAS);
+    private List<UploadInformation> cachedUploadInformationList;
 
-        try {
-            String cipherText = ksw.encrypt(new Gson().toJson(uploadInformationList));
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(UPLOAD_INFO, cipherText);
-            editor.apply();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public List<UploadInformation> getUploadInformation() {
+    private void loadUploadInformationList() {
         KeyStoreWrapper ksw = new KeyStoreWrapper(KeyStoreWrapper.UPLOAD_INFORMATION_ALIAS);
         String storedUploadInfoString = preferences.getString(UPLOAD_INFO, null);
 
         Type type = new TypeToken<List<UploadInformation>>() {}.getType();
 
-        if (storedUploadInfoString == null) {
-            return null;
+        if (storedUploadInfoString == null || storedUploadInfoString.isEmpty()) {
+            cachedUploadInformationList = new ArrayList<>();
+        } else {
+            try {
+                storedUploadInfoString = ksw.decrypt(storedUploadInfoString);
+                cachedUploadInformationList = new Gson().fromJson(storedUploadInfoString, type);
+            } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchPaddingException | NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
         }
+    }
 
+    private void saveUploadInformationList() {
         try {
-            storedUploadInfoString = ksw.decrypt(storedUploadInfoString);
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
+            KeyStoreWrapper ksw = new KeyStoreWrapper(KeyStoreWrapper.UPLOAD_INFORMATION_ALIAS);
+            String cipherText = ksw.encrypt(new Gson().toJson(cachedUploadInformationList));
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString(UPLOAD_INFO, cipherText);
+            editor.apply();
+        } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
             e.printStackTrace();
         }
+    }
 
-        return new Gson().fromJson(storedUploadInfoString, type);
+    public List<UploadInformation> getUploadInformationList() {
+        if (cachedUploadInformationList == null) {
+            loadUploadInformationList();
+        }
+
+        return cachedUploadInformationList;
+    }
+
+    public void setUploadInformationList(List<UploadInformation> uploadInformationList) {
+        cachedUploadInformationList = uploadInformationList;
+        saveUploadInformationList();
+    }
+
+    public UploadInformation getUploadInformation(UUID uuid) {
+        if (cachedUploadInformationList == null) {
+            loadUploadInformationList();
+        }
+
+        for (UploadInformation ui : cachedUploadInformationList) {
+            if (ui.getUuid().compareTo(uuid) == 0) {
+                return ui;
+            }
+        }
+
+        return null;
     }
 
     public void addUploadInformation(UploadInformation uploadInformation) {
-        List<UploadInformation> uploadInformationList = getUploadInformation();
-
-        if (uploadInformationList == null) {
-            uploadInformationList = new ArrayList<>();
-            uploadInformationList.add(uploadInformation);
-            setUploadInformationList(uploadInformationList);
-        } else {
-
-            // check if upload information already exists
-            for (int i = 0; i < uploadInformationList.size(); i++) {
-                if (uploadInformationList.get(i).getId().compareTo(uploadInformation.getId()) == 0) {
-                    uploadInformationList.set(i, uploadInformation);
-                    setUploadInformationList(uploadInformationList);
-                    return;
-                }
-            }
-
-            uploadInformationList.add(uploadInformation);
-            setUploadInformationList(uploadInformationList);
-        }
-    }
-
-    public boolean containsUploadInformation(UUID uuid) {
-        List<UploadInformation> uploadInformationList = getUploadInformation();
-
-        if (uploadInformationList == null) {
-            return false;
+        if (cachedUploadInformationList == null) {
+            loadUploadInformationList();
         }
 
-        for (UploadInformation ui : uploadInformationList) {
-            if (ui.getId().compareTo(uuid) == 0) {
-                return true;
+        // update if exists
+        for (int i = 0; i < cachedUploadInformationList.size(); i++) {
+            if (cachedUploadInformationList.get(i).getUuid().compareTo(uploadInformation.getUuid()) == 0) {
+                cachedUploadInformationList.set(i, uploadInformation);
+                saveUploadInformationList();
+                return;
             }
         }
 
-        return false;
+        // else: add
+        cachedUploadInformationList.add(uploadInformation);
+        saveUploadInformationList();
     }
 
-    public boolean removeUploadInformation(UUID uuid) {
-        Log.d("PREFS", "uuid to delete: " + uuid.toString());
+    public void removeUploadInformation(UUID uuid) {
+        if (cachedUploadInformationList == null) {
+            loadUploadInformationList();
+        }
 
-        List<UploadInformation> uploadInformationList = getUploadInformation();
-
-        for (UploadInformation ui : uploadInformationList) {
-
-            Log.d("PREFS", "checking uuid: " + ui.getId().toString());
-
-            if (ui.getId().compareTo(uuid) == 0) {
-                if (uploadInformationList.size() == 1) {
+        for (UploadInformation ui : cachedUploadInformationList) {
+            if (ui.getUuid().compareTo(uuid) == 0) {
+                if (cachedUploadInformationList.size() == 1) {
                     clearUploadInformation();
                 } else {
-                    uploadInformationList.remove(ui);
-                    setUploadInformationList(uploadInformationList);
+                    cachedUploadInformationList.remove(ui);
+                    saveUploadInformationList();
                 }
-                return true;
             }
         }
-
-
-        return false;
     }
 
     public void clearUploadInformation() {
+        cachedUploadInformationList.clear();
+
         KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.UPLOAD_INFORMATION_ALIAS);
         keyStoreWrapper.deleteStoredKey();
 

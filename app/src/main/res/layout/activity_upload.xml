@@ -34,10 +34,10 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:title="Check if instance is available" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:description="Check if instance is available" />
 
         <lu.circl.mispbump.customViews.UploadAction
             android:id="@+id/orgAction"
@@ -46,10 +46,10 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:title="Add organisation" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:description="Add organisation" />
 
         <lu.circl.mispbump.customViews.UploadAction
             android:id="@+id/userAction"
@@ -61,7 +61,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:title="Add sync user" />
+            app:description="Add sync user" />
 
         <lu.circl.mispbump.customViews.UploadAction
             android:id="@+id/serverAction"
@@ -73,18 +73,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:title="Add sync server" />
+            app:description="Add sync server" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        app:backgroundTint="@color/colorAccent"
-        android:tint="@color/white"
-        android:src="@drawable/ic_cloud_upload"/>
+    <!--<com.google.android.material.floatingactionbutton.FloatingActionButton-->
+        <!--android:id="@+id/fab"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="bottom|end"-->
+        <!--android:layout_margin="16dp"-->
+        <!--app:backgroundTint="@color/colorAccent"-->
+        <!--android:tint="@color/white"-->
+        <!--android:src="@drawable/ic_cloud_upload"/>-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

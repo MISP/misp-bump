@@ -11,11 +11,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.widget.ImageViewCompat;
 
 import lu.circl.mispbump.R;
 
-public class UploadAction extends LinearLayoutCompat {
+public class UploadAction extends ConstraintLayout {
 
     private Context context;
 
@@ -26,7 +27,7 @@ public class UploadAction extends LinearLayoutCompat {
         ERROR
     }
 
-    private TextView errorView;
+    private TextView titleView, errorView;
     private UploadState currentUploadState;
     private ImageView stateView;
     private ProgressBar progressBar;
@@ -41,20 +42,23 @@ public class UploadAction extends LinearLayoutCompat {
         super(context, attrs);
         this.context = context;
 
+        View baseView = LayoutInflater.from(context).inflate(R.layout.view_upload_action_2, this);
+
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.UploadAction);
-        String title = a.getString(R.styleable.UploadAction_description);
+
+        titleView = baseView.findViewById(R.id.title);
+        titleView.setText(a.getString(R.styleable.UploadAction_description));
+
         a.recycle();
 
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View baseView = inflater.inflate(R.layout.view_upload_action, this);
+        errorView = baseView.findViewById(R.id.error);
+        stateView = baseView.findViewById(R.id.stateView);
+        progressBar = baseView.findViewById(R.id.progressBar);
+    }
 
-        errorView = findViewById(R.id.error);
 
-        TextView titleView = baseView.findViewById(R.id.title);
+    public void setTitle(String title) {
         titleView.setText(title);
-
-        stateView = findViewById(R.id.stateView);
-        progressBar = findViewById(R.id.progressBar);
     }
 
     /**
@@ -75,12 +79,6 @@ public class UploadAction extends LinearLayoutCompat {
         progressBar.setVisibility(GONE);
 
         switch (state) {
-            case PENDING:
-                stateView.setVisibility(VISIBLE);
-                stateView.setImageResource(R.drawable.ic_info_outline);
-                ImageViewCompat.setImageTintList(stateView, ColorStateList.valueOf(context.getColor(R.color.status_amber)));
-                break;
-
             case LOADING:
                 stateView.setVisibility(GONE);
                 progressBar.setVisibility(VISIBLE);
@@ -96,6 +94,12 @@ public class UploadAction extends LinearLayoutCompat {
                 stateView.setVisibility(VISIBLE);
                 stateView.setImageResource(R.drawable.ic_error_outline);
                 ImageViewCompat.setImageTintList(stateView, ColorStateList.valueOf(context.getColor(R.color.status_red)));
+                break;
+
+            case PENDING:
+                stateView.setVisibility(VISIBLE);
+                stateView.setImageResource(R.drawable.ic_info_outline);
+                ImageViewCompat.setImageTintList(stateView, ColorStateList.valueOf(context.getColor(R.color.status_amber)));
                 break;
         }
     }

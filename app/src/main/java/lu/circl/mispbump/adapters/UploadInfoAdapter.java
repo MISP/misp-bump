@@ -5,6 +5,8 @@ import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.widget.ImageViewCompat;
@@ -15,34 +17,30 @@ import java.util.List;
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.interfaces.OnRecyclerItemClickListener;
 import lu.circl.mispbump.models.UploadInformation;
-import lu.circl.mispbump.viewholders.UploadInfoListViewHolder;
 
-public class UploadInfoAdapter extends RecyclerView.Adapter<UploadInfoListViewHolder> {
+public class UploadInfoAdapter extends RecyclerView.Adapter<UploadInfoAdapter.ViewHolder> {
 
     private Context context;
     private List<UploadInformation> items;
 
     private OnRecyclerItemClickListener<UploadInformation> onRecyclerItemClickListener;
+    private OnRecyclerItemClickListener<Integer> onRecyclerPositionClickListener;
 
 
     public UploadInfoAdapter(Context context) {
         this.context = context;
     }
 
-    public UploadInfoAdapter(Context context, List<UploadInformation> items) {
-        this.context = context;
-        this.items = items;
-    }
 
     @NonNull
     @Override
-    public UploadInfoListViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public UploadInfoAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.row_upload_information, viewGroup, false);
-        return new UploadInfoListViewHolder(v);
+        return new UploadInfoAdapter.ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final UploadInfoListViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final UploadInfoAdapter.ViewHolder holder, final int position) {
 
         final UploadInformation item = items.get(position);
 
@@ -60,7 +58,7 @@ public class UploadInfoAdapter extends RecyclerView.Adapter<UploadInfoListViewHo
                 break;
             case PENDING:
                 ImageViewCompat.setImageTintList(holder.syncStatus, ColorStateList.valueOf(context.getColor(R.color.status_amber)));
-                holder.syncStatus.setImageResource(R.drawable.ic_info_outline);
+                holder.syncStatus.setImageResource(R.drawable.ic_pending);
                 break;
         }
 
@@ -70,6 +68,13 @@ public class UploadInfoAdapter extends RecyclerView.Adapter<UploadInfoListViewHo
                 onRecyclerItemClickListener.onClick(view, item);
             }
         });
+
+        holder.rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onRecyclerPositionClickListener.onClick(view, position);
+            }
+        });
     }
 
     @Override
@@ -77,12 +82,37 @@ public class UploadInfoAdapter extends RecyclerView.Adapter<UploadInfoListViewHo
         return items.size();
     }
 
+
     public void setItems(List<UploadInformation> items) {
         this.items = items;
+        notifyDataSetChanged();
     }
+
+
+    // callbacks
 
     public void setOnRecyclerItemClickListener(OnRecyclerItemClickListener<UploadInformation> onRecyclerItemClickListener) {
         this.onRecyclerItemClickListener = onRecyclerItemClickListener;
+    }
+
+    public void setOnRecyclerPositionClickListener(OnRecyclerItemClickListener<Integer> onRecyclerPositionClickListener) {
+        this.onRecyclerPositionClickListener = onRecyclerPositionClickListener;
+    }
+
+    // viewHolder
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        View rootView;
+        ImageView syncStatus;
+        TextView orgName, date;
+
+        ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            rootView = itemView;
+            orgName = itemView.findViewById(R.id.orgName);
+            date = itemView.findViewById(R.id.date);
+            syncStatus = itemView.findViewById(R.id.syncStatus);
+        }
     }
 
 }

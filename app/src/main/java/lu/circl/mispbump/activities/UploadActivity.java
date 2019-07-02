@@ -1,5 +1,6 @@
 package lu.circl.mispbump.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -9,9 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,34 +28,67 @@ import lu.circl.mispbump.models.restModels.User;
 
 public class UploadActivity extends AppCompatActivity {
 
-    public static final String EXTRA_UPLOAD_INFO = "uploadInformation";
+    public static String EXTRA_UPLOAD_INFO = "uploadInformation";
 
     private PreferenceManager preferenceManager;
-    private MispRestClient restClient;
     private UploadInformation uploadInformation;
 
     private CoordinatorLayout rootLayout;
-
+    private MispRestClient restClient;
     private UploadAction availableAction, orgAction, userAction, serverAction;
+
+    private boolean errorWhileUpload;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
+
+        preferenceManager = PreferenceManager.getInstance(UploadActivity.this);
+        restClient = MispRestClient.getInstance(this);
+
         parseExtra();
-        init();
+        initViews();
+        startUpload();
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == android.R.id.home) {
+            saveCurrentState();
+            finish();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        saveCurrentState();
+    }
+
 
     private void parseExtra() {
-        String uploadInfoString = getIntent().getStringExtra(EXTRA_UPLOAD_INFO);
-        uploadInformation = new Gson().fromJson(uploadInfoString, UploadInformation.class);
-        assert uploadInformation != null;
+        Intent i = getIntent();
+
+        UUID currentUUID = (UUID) i.getSerializableExtra(EXTRA_UPLOAD_INFO);
+
+        for (UploadInformation ui : preferenceManager.getUploadInformationList()) {
+            if (ui.getUuid().compareTo(currentUUID) == 0) {
+                uploadInformation = ui;
+                return;
+            }
+        }
+
+        if (uploadInformation == null) {
+            throw new RuntimeException("Could not find UploadInfo with UUID {" + currentUUID.toString() + "}");
+        }
     }
 
-    private void init() {
-        restClient = MispRestClient.getInstance(this);
-        preferenceManager = PreferenceManager.getInstance(this);
-
+    private void initViews() {
         rootLayout = findViewById(R.id.rootLayout);
 
         // toolbar
@@ -68,32 +100,17 @@ public class UploadActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeAsUpIndicator(R.drawable.ic_close);
 
-        // fab
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startUpload();
-            }
-        });
-
         availableAction = findViewById(R.id.availableAction);
         orgAction = findViewById(R.id.orgAction);
         userAction = findViewById(R.id.userAction);
         serverAction = findViewById(R.id.serverAction);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                preferenceManager.addUploadInformation(uploadInformation);
-                finish();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
+    private void saveCurrentState() {
+        if (errorWhileUpload) {
+            uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
         }
+        preferenceManager.addUploadInformation(uploadInformation);
     }
 
     /**
@@ -122,6 +139,7 @@ public class UploadActivity extends AppCompatActivity {
         return syncUser;
     }
 
+
     private MispRestClient.AvailableCallback availableCallback = new MispRestClient.AvailableCallback() {
         @Override
         public void available() {
@@ -136,12 +154,15 @@ public class UploadActivity extends AppCompatActivity {
             availableAction.setError(error);
             uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
 
+            errorWhileUpload = true;
+
             Snackbar sb = Snackbar.make(rootLayout, error, Snackbar.LENGTH_INDEFINITE);
             sb.setAction("Retry", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     availableAction.setError(null);
                     availableAction.setCurrentUploadState(UploadAction.UploadState.LOADING);
+                    errorWhileUpload = false;
                     startUpload();
                 }
             });
@@ -165,9 +186,9 @@ public class UploadActivity extends AppCompatActivity {
         public void failure(String error) {
             orgAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
             orgAction.setError(error);
+            errorWhileUpload = true;
 
             uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-            preferenceManager.addUploadInformation(uploadInformation);
         }
     };
 
@@ -194,9 +215,9 @@ public class UploadActivity extends AppCompatActivity {
         public void failure(String error) {
             userAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
             userAction.setError(error);
+            errorWhileUpload = true;
 
             uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-            preferenceManager.addUploadInformation(uploadInformation);
         }
     };
 
@@ -210,17 +231,16 @@ public class UploadActivity extends AppCompatActivity {
         public void success(Server server) {
             serverAction.setCurrentUploadState(UploadAction.UploadState.DONE);
             uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.COMPLETE);
-            preferenceManager.addUploadInformation(uploadInformation);
-            finish();
+            saveCurrentState();
         }
 
         @Override
         public void failure(String error) {
             serverAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
             serverAction.setError(error);
+            errorWhileUpload = true;
 
             uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-            preferenceManager.addUploadInformation(uploadInformation);
         }
     };
 

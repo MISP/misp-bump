@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/bla"
+        android:id="@+id/delete"
         android:icon="@drawable/ic_delete_forever"
-        android:title="delete"
-        app:showAsAction="ifRoom"/>
+        android:title="Remove"
+        app:showAsAction="never"/>
 </menu>

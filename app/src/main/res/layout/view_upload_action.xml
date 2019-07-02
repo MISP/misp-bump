@@ -13,11 +13,13 @@
 
         <TextView
             android:id="@+id/title"
-            android:textAppearance="@style/Text.Title"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
+            android:text="000"
             android:layout_width="0dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAppearance="@style/Text.Title"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="8dp" />
 
         <ImageView
             android:id="@+id/stateView"
@@ -36,6 +38,7 @@
 
     <TextView
         android:id="@+id/error"
+        android:text="000"
         android:textAppearance="@style/Text.SubTitle"
         android:textColor="@color/status_red"
         android:layout_marginEnd="24dp"

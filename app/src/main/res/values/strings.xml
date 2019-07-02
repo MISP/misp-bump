@@ -6,7 +6,6 @@
     <string name="misp_automation_hint">MISP Automation Key</string>
     <string name="no_information">No Information</string>
     <string name="save_automation_key_hint">Save Automation Key</string>
-    <string name="home" translatable="false">Home</string>
     <string name="menu_login_help_label">Help</string>
     <string name="login_help_text"><b>MISP Server URL</b>\nPublic MISP URL\n\n<b>MISP Automation key</b>\nZu finden unter ...</string>
     <string name="ok" translatable="false">Okay</string>

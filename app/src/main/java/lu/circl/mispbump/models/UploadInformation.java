@@ -2,14 +2,13 @@ package lu.circl.mispbump.models;
 
 import androidx.annotation.NonNull;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 
-public class UploadInformation implements Serializable {
+public class UploadInformation {
 
     public enum SyncStatus {
         COMPLETE,
@@ -17,7 +16,7 @@ public class UploadInformation implements Serializable {
         PENDING
     }
 
-    private UUID id;
+    private UUID uuid;
 
     private SyncStatus currentSyncStatus = SyncStatus.PENDING;
 
@@ -29,19 +28,8 @@ public class UploadInformation implements Serializable {
     private Date date;
 
     public UploadInformation() {
-        this(null, null);
-    }
-
-    public UploadInformation(SyncInformation local) {
-        this(local, null);
-    }
-
-    public UploadInformation(SyncInformation local, SyncInformation remote) {
-        id = UUID.randomUUID();
+        uuid = UUID.randomUUID();
         date = Calendar.getInstance().getTime();
-
-        this.local = local;
-        this.remote = remote;
     }
 
     // getter and setter
@@ -67,11 +55,11 @@ public class UploadInformation implements Serializable {
         return remote;
     }
 
-    public UUID getId() {
-        return id;
+    public UUID getUuid() {
+        return uuid;
     }
-    public void setId(UUID id) {
-        this.id = id;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public void setDate() {

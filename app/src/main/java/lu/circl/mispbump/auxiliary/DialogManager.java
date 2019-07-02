@@ -20,6 +20,40 @@ import lu.circl.mispbump.security.DiffieHellman;
 public class DialogManager {
 
 
+    public static void syncAlreadyExistsDialog(Context context, final IDialogFeedback callback) {
+        final AlertDialog.Builder adb = new AlertDialog.Builder(context);
+
+        adb.setTitle("Sync information already exists");
+        adb.setMessage("You already synced with this organisation, would you like to update the information?" +
+                "\nUpdating the information will reset the current authkey!");
+        adb.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (callback != null) {
+                    callback.positive();
+                }
+            }
+        });
+
+        adb.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (callback != null) {
+                    callback.negative();
+                }
+            }
+        });
+
+        Activity act = (Activity) context;
+        act.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adb.create().show();
+            }
+        });
+    }
+
+
     public static void saveAndExitDialog(Context context, final IDialogFeedback callback) {
         final AlertDialog.Builder adb = new AlertDialog.Builder(context);
 
