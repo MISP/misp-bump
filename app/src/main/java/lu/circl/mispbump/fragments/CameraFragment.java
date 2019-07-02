@@ -1,8 +1,6 @@
 package lu.circl.mispbump.fragments;
 
 import android.Manifest;
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -33,7 +31,6 @@ import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicYuvToRGB;
 import android.renderscript.Type;
-import android.util.Log;
 import android.util.Size;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
@@ -120,8 +117,6 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
             }
         }
     }
-
-    private static final String TAG = "CAMERA";
 
     private View hideCamView;
 
@@ -374,19 +369,30 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
     @Override
     public void onResume() {
         super.onResume();
-        enablePreview();
+
+        hideCamView.setVisibility(View.GONE);
+        startBackgroundThread();
+
+        imageProcessingThread = new ImageProcessingThread();
+        imageProcessingThread.start();
+
+        if (autoFitTextureView.isAvailable()) {
+            openCamera(autoFitTextureView.getWidth(), autoFitTextureView.getHeight());
+        } else {
+            autoFitTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+        }
     }
 
     @Override
     public void onPause() {
+        super.onPause();
+
         closeCamera();
         stopBackgroundThread();
 
         if (imageProcessingThread.isAlive()) {
             imageProcessingThread.isRunning = false;
         }
-
-        super.onPause();
     }
 
     private void requestCameraPermission() {
@@ -463,7 +469,7 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
                         }
                         break;
                     default:
-                        Log.e(TAG, "Display rotation is invalid: " + displayRotation);
+                        return;
                 }
 
                 Point displaySize = new Point();
@@ -778,6 +784,7 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
     public interface QrScanCallback {
         void qrScanResult(String qrData);
     }
+
     private boolean readQrEnabled = true;
     private BarcodeDetector barcodeDetector;
     private RenderScript renderScript;
@@ -834,62 +841,62 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
         readQrEnabled = enabled;
     }
 
-    public void disablePreview() {
-
-        if (hideCamView.getAlpha() == 1 && hideCamView.getVisibility() == View.VISIBLE) {
-            closeCamera();
-            stopBackgroundThread();
-
-            if (imageProcessingThread.isAlive()) {
-                imageProcessingThread.isRunning = false;
-            }
-
-            return;
-        }
-
-        hideCamView.setAlpha(0f);
-        hideCamView.setVisibility(View.VISIBLE);
-        hideCamView.animate()
-                .alpha(1f)
-                .setDuration(250)
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        closeCamera();
-                        stopBackgroundThread();
-
-                        if (imageProcessingThread.isAlive()) {
-                            imageProcessingThread.isRunning = false;
-                        }
-                    }
-                });
-    }
-
-    public void enablePreview() {
-
-        startBackgroundThread();
-
-        imageProcessingThread = new ImageProcessingThread();
-        imageProcessingThread.start();
-
-        if (autoFitTextureView.isAvailable()) {
-            openCamera(autoFitTextureView.getWidth(), autoFitTextureView.getHeight());
-        } else {
-            autoFitTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
-        }
-
-        hideCamView.setVisibility(View.VISIBLE);
-        hideCamView.setAlpha(1f);
-        hideCamView.animate()
-                .alpha(0f)
-                .setDuration(1000)
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        hideCamView.setVisibility(View.GONE);
-                    }
-                });
-    }
+//    public void disablePreview() {
+//
+//        if (hideCamView.getAlpha() == 1 && hideCamView.getVisibility() == View.VISIBLE) {
+//            closeCamera();
+//            stopBackgroundThread();
+//
+//            if (imageProcessingThread.isAlive()) {
+//                imageProcessingThread.isRunning = false;
+//            }
+//
+//            return;
+//        }
+//
+//        hideCamView.setAlpha(0f);
+//        hideCamView.setVisibility(View.VISIBLE);
+//        hideCamView.animate()
+//                .alpha(1f)
+//                .setDuration(250)
+//                .setListener(new AnimatorListenerAdapter() {
+//                    @Override
+//                    public void onAnimationEnd(Animator animation) {
+//                        closeCamera();
+//                        stopBackgroundThread();
+//
+//                        if (imageProcessingThread.isAlive()) {
+//                            imageProcessingThread.isRunning = false;
+//                        }
+//                    }
+//                });
+//    }
+//
+//    public void enablePreview() {
+//
+//        startBackgroundThread();
+//
+//        imageProcessingThread = new ImageProcessingThread();
+//        imageProcessingThread.start();
+//
+//        if (autoFitTextureView.isAvailable()) {
+//            openCamera(autoFitTextureView.getWidth(), autoFitTextureView.getHeight());
+//        } else {
+//            autoFitTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+//        }
+//
+//        hideCamView.setVisibility(View.VISIBLE);
+//        hideCamView.setAlpha(1f);
+//        hideCamView.animate()
+//                .alpha(0f)
+//                .setDuration(1000)
+//                .setListener(new AnimatorListenerAdapter() {
+//                    @Override
+//                    public void onAnimationEnd(Animator animation) {
+//                        hideCamView.setVisibility(View.GONE);
+//                    }
+//                });
+//    }
 
     private void setUpBarcodeDetector() {
         barcodeDetector = new BarcodeDetector.Builder(getActivity())

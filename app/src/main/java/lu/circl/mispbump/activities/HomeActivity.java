@@ -87,7 +87,7 @@ public class HomeActivity extends AppCompatActivity {
         syncFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, SyncActivity.class));
+                startActivity(new Intent(HomeActivity.this, ExchangeActivity.class));
             }
         });
     }
@@ -112,6 +112,7 @@ public class HomeActivity extends AppCompatActivity {
             uploadInfoAdapter.setItems(uploadInformationList);
         }
     }
+
 
     private OnRecyclerItemClickListener<Integer> onRecyclerItemClickListener() {
         return new OnRecyclerItemClickListener<Integer>() {

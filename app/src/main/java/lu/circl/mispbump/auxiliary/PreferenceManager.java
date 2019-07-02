@@ -407,6 +407,7 @@ public class PreferenceManager {
 
         for (UploadInformation ui : cachedUploadInformationList) {
             if (ui.getUuid().compareTo(uuid) == 0) {
+                // if is last element, then clear everything including IV and key in KeyStore
                 if (cachedUploadInformationList.size() == 1) {
                     clearUploadInformation();
                 } else {

@@ -20,13 +20,21 @@ import lu.circl.mispbump.security.DiffieHellman;
 public class DialogManager {
 
 
-    public static void syncAlreadyExistsDialog(Context context, final IDialogFeedback callback) {
+    public static void syncAlreadyExistsDialog(SyncInformation oldSync, SyncInformation newSync, Context context, final IDialogFeedback callback) {
         final AlertDialog.Builder adb = new AlertDialog.Builder(context);
 
-        adb.setTitle("Sync information already exists");
-        adb.setMessage("You already synced with this organisation, would you like to update the information?" +
-                "\nUpdating the information will reset the current authkey!");
-        adb.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+        // this dialog needs definite user feedback
+        adb.setCancelable(false);
+
+        if (oldSync.organisation.name.equals(newSync.organisation.name)) {
+            adb.setTitle("Already Synced with " + oldSync.organisation.name);
+        } else {
+            adb.setTitle("Already Synced with " + oldSync.organisation.name + "(Now:" + newSync.organisation.name + ")");
+        }
+
+        adb.setMessage("");
+
+        adb.setPositiveButton("Override Credentials", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (callback != null) {
@@ -35,7 +43,7 @@ public class DialogManager {
             }
         });
 
-        adb.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+        adb.setNegativeButton("Just Update Content", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (callback != null) {
@@ -298,4 +306,6 @@ public class DialogManager {
         void positive();
         void negative();
     }
+
+
 }

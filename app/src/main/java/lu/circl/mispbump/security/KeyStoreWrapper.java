@@ -3,13 +3,11 @@ package lu.circl.mispbump.security;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
-import android.util.Log;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -29,8 +27,6 @@ import javax.crypto.spec.GCMParameterSpec;
 
 public class KeyStoreWrapper {
 
-    private static final String TAG = "KeyStoreWrapper";
-
     public static final String USER_INFO_ALIAS = "ALIAS_USER_INFO";
     public static final String USER_ORGANISATION_INFO_ALIAS = "ALIAS_USER_ORGANISATION_INFO";
     public static final String AUTOMATION_ALIAS = "ALIAS_AUTOMATION_KEY";
@@ -44,6 +40,7 @@ public class KeyStoreWrapper {
 
     /**
      * Wraps the android key store to easily encrypt and decrypt sensitive data.
+     *
      * @param alias identifies a key store entry (see public static ALIAS variables).
      */
     public KeyStoreWrapper(String alias) {
@@ -75,7 +72,6 @@ public class KeyStoreWrapper {
     }
 
     /**
-     *
      * @return SecretKey associated with the given alias.
      */
     private SecretKey getStoredKey() {
@@ -102,6 +98,7 @@ public class KeyStoreWrapper {
 
     /**
      * Generates a new key.
+     *
      * @return the newly generated key.
      */
     private SecretKey generateKey() {
@@ -154,12 +151,13 @@ public class KeyStoreWrapper {
 
     /**
      * Encrypt data with given algorithm and key associated with alias.
+     *
      * @param data data to encrypt.
      * @return encrypted data as String.
-     * @throws NoSuchPaddingException padding not found
-     * @throws NoSuchAlgorithmException algorithm not found
-     * @throws InvalidKeyException invalid key
-     * @throws BadPaddingException bad padding
+     * @throws NoSuchPaddingException    padding not found
+     * @throws NoSuchAlgorithmException  algorithm not found
+     * @throws InvalidKeyException       invalid key
+     * @throws BadPaddingException       bad padding
      * @throws IllegalBlockSizeException illegal block size
      */
     public String encrypt(String data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
@@ -181,22 +179,17 @@ public class KeyStoreWrapper {
 
     /**
      * Decrypts data with given algorithm and key associated with alias.
+     *
      * @param input encrypted data.
      * @return decrypted data as String.
-     * @throws NoSuchPaddingException padding not found
-     * @throws NoSuchAlgorithmException algorithm not found
+     * @throws NoSuchPaddingException             padding not found
+     * @throws NoSuchAlgorithmException           algorithm not found
      * @throws InvalidAlgorithmParameterException invalid algorithm parameters
-     * @throws InvalidKeyException invalid key
-     * @throws BadPaddingException bad padding
-     * @throws IllegalBlockSizeException illegal block size
+     * @throws InvalidKeyException                invalid key
+     * @throws BadPaddingException                bad padding
+     * @throws IllegalBlockSizeException          illegal block size
      */
     public String decrypt(String input) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-
-        // extract iv from save data
-//        String[] parts = input.split(":::");
-//        byte[] iv = Base64.decode(parts[0], Base64.DEFAULT);
-//        byte[] data = Base64.decode(parts[1], Base64.DEFAULT);
-
         byte[] in = Base64.decode(input, Base64.NO_WRAP);
         IvAndData ivAndData = splitCombinedArray(in, 12);
 
@@ -217,9 +210,6 @@ public class KeyStoreWrapper {
 
             KeyStore ks = KeyStore.getInstance(KEYSTORE_PROVIDER);
             ks.load(null);
-
-            Log.i(TAG, "Size: " + ks.size());
-
             Enumeration<String> aliases = ks.aliases();
 
             while (aliases.hasMoreElements()) {
@@ -240,14 +230,12 @@ public class KeyStoreWrapper {
 
     /**
      * Combine IV and encrypted data.
-     * @param iv initialisation vector
+     *
+     * @param iv            initialisation vector
      * @param encryptedData encrypted data
      * @return combination of iv and encrypted data
      */
     private byte[] getCombinedArray(byte[] iv, byte[] encryptedData) {
-
-        Log.i(TAG, "iv length = " + iv.length);
-
         byte[] combined = new byte[iv.length + encryptedData.length];
         for (int i = 0; i < combined.length; ++i) {
             combined[i] = i < iv.length ? iv[i] : encryptedData[i - iv.length];

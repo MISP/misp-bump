@@ -22,10 +22,14 @@ public class QrCodeGenerator {
     }
 
     public Bitmap generateQrCode(String content) {
-        int size = getDisplaySize().x;
 
-        if (size > getDisplaySize().y) {
-            size = getDisplaySize().y;
+        Point displaySize = new Point();
+        callingActivity.getWindowManager().getDefaultDisplay().getSize(displaySize);
+
+        int size = displaySize.x;
+
+        if (size > displaySize.y) {
+            size = displaySize.y;
         }
 
         size = (int)(size * 0.8);
@@ -43,13 +47,6 @@ public class QrCodeGenerator {
         }
 
         return null;
-    }
-
-    public Point getDisplaySize() {
-        Point displaySize = new Point();
-        callingActivity.getWindowManager().getDefaultDisplay().getSize(displaySize);
-
-        return displaySize;
     }
 
     private Bitmap createBitmap(BitMatrix matrix) {

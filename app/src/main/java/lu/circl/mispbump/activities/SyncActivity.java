@@ -30,7 +30,6 @@ import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.auxiliary.QrCodeGenerator;
 import lu.circl.mispbump.auxiliary.RandomString;
 import lu.circl.mispbump.fragments.CameraFragment;
-import lu.circl.mispbump.fragments.UploadSettingsFragment;
 import lu.circl.mispbump.models.SyncInformation;
 import lu.circl.mispbump.models.UploadInformation;
 import lu.circl.mispbump.security.DiffieHellman;
@@ -101,6 +100,7 @@ public class SyncActivity extends AppCompatActivity {
         diffieHellman = DiffieHellman.getInstance();
 
         qrCodeGenerator = new QrCodeGenerator(SyncActivity.this);
+
         publicKeyQrCode = qrCodeGenerator.generateQrCode(DiffieHellman.publicKeyToString(diffieHellman.getPublicKey()));
 
         uploadInformation = new UploadInformation();
@@ -111,7 +111,7 @@ public class SyncActivity extends AppCompatActivity {
 
         qrFrame = findViewById(R.id.qrFrame);
         qrCode = findViewById(R.id.qrCode);
-        qrHint = findViewById(R.id.qrHint);
+        qrHint = findViewById(R.id.qrInfo);
 
         prevButton = findViewById(R.id.prevButton);
         prevButton.setOnClickListener(onPrevClicked);
@@ -153,7 +153,6 @@ public class SyncActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         String camTag = CameraFragment.class.getSimpleName();
-        String settingsTag = UploadSettingsFragment.class.getSimpleName();
 
         switch (state) {
             case PUBLIC_KEY:
@@ -165,11 +164,6 @@ public class SyncActivity extends AppCompatActivity {
                     cameraFragment = new CameraFragment();
                     cameraFragment.setOnQrAvailableListener(onReadQrCode);
                     fragmentTransaction.add(R.id.fragmentContainer, cameraFragment, camTag);
-                }
-
-                UploadSettingsFragment uploadSettingsFragment = (UploadSettingsFragment) fragmentManager.findFragmentByTag(settingsTag);
-                if (uploadSettingsFragment != null) {
-                    fragmentTransaction.hide(uploadSettingsFragment);
                 }
 
                 fragmentTransaction.commit();
@@ -206,7 +200,7 @@ public class SyncActivity extends AppCompatActivity {
                         nextButton.setImageDrawable(getDrawable(R.drawable.ic_arrow_forward));
                         prevButton.setVisibility(View.VISIBLE);
                         nextButton.setVisibility(View.VISIBLE);
-                        cameraFragment.disablePreview();
+//                        cameraFragment.disablePreview();
                         qrReceivedFeedback(true);
                         break;
                     case SYNC_INFO_SHOW:
@@ -214,7 +208,7 @@ public class SyncActivity extends AppCompatActivity {
                         nextButton.setImageDrawable(getDrawable(R.drawable.ic_arrow_forward));
                         nextButton.setVisibility(View.INVISIBLE);
                         prevButton.setVisibility(View.VISIBLE);
-                        cameraFragment.enablePreview();
+//                        cameraFragment.enablePreview();
                         qrReceivedFeedback(false);
                         break;
                     case SYNC_INFO_SHOW_AND_RECEIVED:
@@ -222,7 +216,7 @@ public class SyncActivity extends AppCompatActivity {
                         nextButton.setImageDrawable(getDrawable(R.drawable.ic_check));
                         nextButton.setVisibility(View.VISIBLE);
                         prevButton.setVisibility(View.VISIBLE);
-                        cameraFragment.disablePreview();
+//                        cameraFragment.disablePreview();
                         qrReceivedFeedback(true);
                         break;
                 }
@@ -294,17 +288,17 @@ public class SyncActivity extends AppCompatActivity {
                         if (uploadInformationList != null) {
                             for (final UploadInformation ui : uploadInformationList) {
                                 if (ui.getRemote().organisation.uuid.equals(remoteSyncInfo.organisation.uuid)) {
-                                    DialogManager.syncAlreadyExistsDialog(SyncActivity.this, new DialogManager.IDialogFeedback() {
-                                        @Override
-                                        public void positive() {
-                                            uploadInformation.setUuid(ui.getUuid());
-                                        }
-
-                                        @Override
-                                        public void negative() {
-                                            finish();
-                                        }
-                                    });
+//                                    DialogManager.syncAlreadyExistsDialog(SyncActivity.this, new DialogManager.IDialogFeedback() {
+//                                        @Override
+//                                        public void positive() {
+//                                            uploadInformation.setUuid(ui.getUuid());
+//                                        }
+//
+//                                        @Override
+//                                        public void negative() {
+//                                            finish();
+//                                        }
+//                                    });
                                 }
                             }
                         }

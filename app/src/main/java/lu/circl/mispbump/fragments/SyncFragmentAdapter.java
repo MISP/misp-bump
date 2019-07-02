@@ -60,11 +60,11 @@ public class SyncFragmentAdapter extends FragmentPagerAdapter {
 
     public void disableCameraPreview() {
         if (cameraFragment_1 != null) {
-            cameraFragment_1.disablePreview();
+//            cameraFragment_1.disablePreview();
         }
 
         if (cameraFragment_2 != null) {
-            cameraFragment_2.disablePreview();
+//            cameraFragment_2.disablePreview();
         }
     }
 

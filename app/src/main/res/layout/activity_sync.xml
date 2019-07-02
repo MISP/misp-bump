@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"/>
 
             <TextView
-                android:id="@+id/qrHint"
+                android:id="@+id/qrInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_info_outline"
@@ -47,7 +47,7 @@
                 android:textColor="@color/colorPrimaryDark"/>
 
             <TextView
-                android:id="@+id/qrHint2"
+                android:id="@+id/qrInfoStatic"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_info_outline"
@@ -97,63 +97,5 @@
             app:srcCompat="@drawable/ic_arrow_forward"/>
 
     </LinearLayout>
-
-    <!--<LinearLayout-->
-    <!--app:layout_behavior=".customViews.ExtendedBottomSheetBehavior"-->
-    <!--android:id="@+id/bottomSheet"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:orientation="vertical"-->
-    <!--android:background="@drawable/rect_rounded_top"-->
-    <!--android:backgroundTint="@color/colorPrimary"-->
-    <!--app:behavior_peekHeight="64dp">-->
-
-    <!--<LinearLayout-->
-    <!--android:orientation="horizontal"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content">-->
-
-    <!--<ImageButton-->
-    <!--android:id="@+id/prevButton"-->
-    <!--android:layout_width="64dp"-->
-    <!--android:layout_height="64dp"-->
-    <!--android:background="?attr/selectableItemBackground"-->
-    <!--android:padding="8dp"-->
-    <!--app:layout_constraintStart_toStartOf="parent"-->
-    <!--app:layout_constraintTop_toTopOf="parent"-->
-    <!--app:srcCompat="@drawable/ic_arrow_back" />-->
-
-    <!--<ImageView-->
-    <!--android:visibility="invisible"-->
-    <!--android:id="@+id/bottomSheetIcon"-->
-    <!--android:layout_weight="1"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="32dp"-->
-    <!--android:layout_gravity="center_vertical"-->
-    <!--android:src="@drawable/ic_check_outline" />-->
-
-    <!--<ImageButton-->
-    <!--android:id="@+id/nextButton"-->
-    <!--android:layout_width="64dp"-->
-    <!--android:layout_height="64dp"-->
-    <!--android:background="?attr/selectableItemBackground"-->
-    <!--android:padding="8dp"-->
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-    <!--app:layout_constraintTop_toTopOf="parent"-->
-    <!--app:srcCompat="@drawable/ic_arrow_forward" />-->
-    <!--</LinearLayout>-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/bottomSheetText"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:paddingStart="16dp"-->
-    <!--android:paddingEnd="16dp"-->
-    <!--android:paddingBottom="16dp"-->
-    <!--android:gravity="top"-->
-    <!--android:layout_gravity="center"-->
-    <!--android:text="Received public key from partner"-->
-    <!--android:textColor="@color/white" />-->
-    <!--</LinearLayout>-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
