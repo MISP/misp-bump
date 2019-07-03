@@ -36,6 +36,7 @@
             android:theme="@style/AppTheme.Translucent" />
         <activity
             android:name=".activities.UploadInfoActivity"
+            android:configChanges="orientation|screenSize"
             android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.UploadActivity"

@@ -12,16 +12,13 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 import lu.circl.mispbump.R;
+import lu.circl.mispbump.auxiliary.MispRestClient;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.customViews.UploadAction;
 import lu.circl.mispbump.models.UploadInformation;
-import lu.circl.mispbump.auxiliary.MispRestClient;
-import lu.circl.mispbump.models.restModels.MispServer;
 import lu.circl.mispbump.models.restModels.Organisation;
 import lu.circl.mispbump.models.restModels.Server;
 import lu.circl.mispbump.models.restModels.User;
@@ -36,6 +33,63 @@ public class UploadActivity extends AppCompatActivity {
     private CoordinatorLayout rootLayout;
     private MispRestClient restClient;
     private UploadAction availableAction, orgAction, userAction, serverAction;
+
+    private MispRestClient.AvailableCallback availableCallback = new MispRestClient.AvailableCallback() {
+        @Override
+        public void available() {
+            mispAvailable(true, null);
+        }
+
+        @Override
+        public void unavailable(String error) {
+            mispAvailable(false, error);
+        }
+    };
+    private MispRestClient.OrganisationCallback organisationCallback = new MispRestClient.OrganisationCallback() {
+        @Override
+        public void success(Organisation organisation) {
+            organisationAdded(organisation);
+        }
+
+        @Override
+        public void failure(String error) {
+            organisationAdded(null);
+        }
+    };
+    private MispRestClient.UserCallback userCallback = new MispRestClient.UserCallback() {
+        @Override
+        public void success(User user) {
+            userAdded(user);
+        }
+
+        @Override
+        public void failure(String error) {
+            userAdded(null);
+        }
+    };
+    private MispRestClient.AllServersCallback allServersCallback = new MispRestClient.AllServersCallback() {
+        @Override
+        public void success(Server[] servers) {
+            allServersReceived(servers);
+        }
+
+        @Override
+        public void failure(String error) {
+            allServersReceived(null);
+        }
+    };
+    private MispRestClient.ServerCallback serverCallback = new MispRestClient.ServerCallback() {
+        @Override
+        public void success(Server server) {
+            serverAdded(server);
+        }
+
+        @Override
+        public void failure(String error) {
+            serverAdded(null);
+        }
+    };
+
 
     private boolean errorWhileUpload;
 
@@ -121,17 +175,12 @@ public class UploadActivity extends AppCompatActivity {
         restClient.isAvailable(availableCallback);
     }
 
+
     private User generateSyncUser(Organisation organisation) {
         User syncUser = new User();
         syncUser.org_id = organisation.id;
         syncUser.role_id = User.ROLE_SYNC_USER;
         syncUser.email = uploadInformation.getRemote().syncUserEmail;
-
-//        String emailSaveOrgName = organisation.name.replace(" ", "").toLowerCase();
-//        String syncUserEmailFormat = uploadInformation.getRemote().syncUserEmail;
-//        syncUser.email = syncUserEmailFormat.replace("[ORG]", emailSaveOrgName);
-//        uploadInformation.getLocal().syncUserEmail = syncUser.email;
-
         syncUser.password = uploadInformation.getRemote().syncUserPassword;
         syncUser.authkey = uploadInformation.getRemote().syncUserAuthkey;
         syncUser.termsaccepted = true;
@@ -139,24 +188,35 @@ public class UploadActivity extends AppCompatActivity {
         return syncUser;
     }
 
+    private Server generateSyncServer() {
+        Server server = new Server();
+        server.name = uploadInformation.getRemote().organisation.name + "'s Sync Server";
+        server.url = uploadInformation.getRemote().baseUrl;
+        server.remote_org_id = uploadInformation.getRemote().organisation.id;
+        server.authkey = uploadInformation.getLocal().syncUserAuthkey;
+        server.pull = uploadInformation.isPull();
+        server.push = uploadInformation.isPush();
+        server.caching_enabled = uploadInformation.isCached();
+        server.self_signed = uploadInformation.isAllowSelfSigned();
+        return server;
+    }
 
-    private MispRestClient.AvailableCallback availableCallback = new MispRestClient.AvailableCallback() {
-        @Override
-        public void available() {
+
+    private void mispAvailable(boolean available, String error) {
+        if (available) {
             availableAction.setCurrentUploadState(UploadAction.UploadState.DONE);
-            orgAction.setCurrentUploadState(UploadAction.UploadState.LOADING);
-            restClient.addOrganisation(uploadInformation.getRemote().organisation, organisationCallback);
-        }
+            availableAction.setError(null);
 
-        @Override
-        public void unavailable(String error) {
+            restClient.addOrganisation(uploadInformation.getRemote().organisation, organisationCallback);
+        } else {
             availableAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
             availableAction.setError(error);
-            uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
 
+            uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
             errorWhileUpload = true;
 
             Snackbar sb = Snackbar.make(rootLayout, error, Snackbar.LENGTH_INDEFINITE);
+
             sb.setAction("Retry", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -166,103 +226,83 @@ public class UploadActivity extends AppCompatActivity {
                     startUpload();
                 }
             });
+
             sb.show();
         }
-    };
+    }
 
-    private MispRestClient.OrganisationCallback organisationCallback = new MispRestClient.OrganisationCallback() {
-        @Override
-        public void success(Organisation organisation) {
+    private void organisationAdded(Organisation organisation) {
+        if (organisation != null) {
             orgAction.setCurrentUploadState(UploadAction.UploadState.DONE);
-            userAction.setCurrentUploadState(UploadAction.UploadState.LOADING);
 
-            // for later reference in add user callback
             uploadInformation.getRemote().organisation.id = organisation.id;
-
             restClient.addUser(generateSyncUser(organisation), userCallback);
-        }
-
-        @Override
-        public void failure(String error) {
-            orgAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
-            orgAction.setError(error);
-            errorWhileUpload = true;
-
-            uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-        }
-    };
-
-    private MispRestClient.UserCallback userCallback = new MispRestClient.UserCallback() {
-        @Override
-        public void success(User user) {
-            userAction.setCurrentUploadState(UploadAction.UploadState.DONE);
-
-            Server server = new Server();
-            server.name = uploadInformation.getRemote().organisation.name + "'s Sync Server";
-            server.url = uploadInformation.getRemote().baseUrl;
-            server.remote_org_id = uploadInformation.getRemote().organisation.id;
-            server.authkey = uploadInformation.getLocal().syncUserAuthkey;
-
-            server.pull = uploadInformation.isPull();
-            server.push = uploadInformation.isPush();
-            server.caching_enabled = uploadInformation.isCached();
-            server.self_signed = uploadInformation.isAllowSelfSigned();
-
-            restClient.addServer(server, serverCallback);
-        }
-
-        @Override
-        public void failure(String error) {
-            userAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
-            userAction.setError(error);
-            errorWhileUpload = true;
-
-            uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-        }
-    };
-
-    private MispRestClient.ServerCallback serverCallback = new MispRestClient.ServerCallback() {
-        @Override
-        public void success(List<MispServer> servers) {
-
-        }
-
-        @Override
-        public void success(Server server) {
-            serverAction.setCurrentUploadState(UploadAction.UploadState.DONE);
-            uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.COMPLETE);
-            saveCurrentState();
-        }
-
-        @Override
-        public void failure(String error) {
-            serverAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
-            serverAction.setError(error);
-            errorWhileUpload = true;
-
-            uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-        }
-    };
-
-
-    private int organisationExists() throws IOException {
-        final UUID uuidToCheck = UUID.fromString(uploadInformation.getRemote().organisation.uuid);
-
-        Organisation[] organisations = restClient.getAllOrganisations();
-
-        if (organisations != null) {
-            for (Organisation organisation : organisations) {
-                if (uuidToCheck.compareTo(UUID.fromString(organisation.uuid)) == 0) {
-                    return organisation.id;
+        } else {
+            restClient.getOrganisation(uploadInformation.getRemote().organisation.uuid, new MispRestClient.OrganisationCallback() {
+                @Override
+                public void success(Organisation organisation) {
+                    organisationAdded(organisation);
                 }
+
+                @Override
+                public void failure(String error) {
+                    uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
+                    orgAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
+                    orgAction.setError(error);
+                    errorWhileUpload = true;
+                }
+            });
+        }
+    }
+
+    private void userAdded(User user) {
+        if (user != null) {
+            userAction.setCurrentUploadState(UploadAction.UploadState.DONE);
+            restClient.getAllServers(allServersCallback);
+        } else {
+
+            restClient.getUser(uploadInformation.getRemote().syncUserEmail, new MispRestClient.UserCallback() {
+                @Override
+                public void success(User user) {
+                    userAdded(user);
+                }
+
+                @Override
+                public void failure(String error) {
+                    uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
+                    userAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
+                    userAction.setError(error);
+                    errorWhileUpload = true;
+                }
+            });
+        }
+    }
+
+    private void allServersReceived(Server[] servers) {
+        Server serverToUpload = generateSyncServer();
+
+        for (Server server : servers) {
+            if (server.remote_org_id.equals(serverToUpload.remote_org_id)) {
+                // server already exists
+                serverToUpload.id = server.id;
+                break;
             }
         }
 
-        return -1;
+        restClient.addServer(serverToUpload, serverCallback);
     }
 
-    private int userExists() {
-
-        return -1;
+    private void serverAdded(Server server) {
+        if (server != null) {
+            serverAction.setCurrentUploadState(UploadAction.UploadState.DONE);
+            uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.COMPLETE);
+            saveCurrentState();
+        } else {
+            uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
+            serverAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
+            serverAction.setError("Could not add server");
+            errorWhileUpload = true;
+        }
     }
+
 }

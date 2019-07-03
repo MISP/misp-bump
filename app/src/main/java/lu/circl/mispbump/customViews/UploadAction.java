@@ -53,6 +53,8 @@ public class UploadAction extends ConstraintLayout {
         errorView = baseView.findViewById(R.id.error);
         stateView = baseView.findViewById(R.id.stateView);
         progressBar = baseView.findViewById(R.id.progressBar);
+
+        setCurrentUploadState(UploadState.PENDING);
     }
 
 
@@ -85,7 +87,7 @@ public class UploadAction extends ConstraintLayout {
 
             case DONE:
                 stateView.setVisibility(VISIBLE);
-                stateView.setImageResource(R.drawable.ic_check);
+                stateView.setImageResource(R.drawable.ic_check_outline);
                 ImageViewCompat.setImageTintList(stateView, ColorStateList.valueOf(context.getColor(R.color.status_green)));
                 break;
 

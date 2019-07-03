@@ -33,6 +33,9 @@ public interface MispRestInterface {
     @GET("users/view/{value}")
     Call<MispUser> getUser(@Path("value") int userId);
 
+    @GET("admin/users")
+    Call<List<MispUser>> getAllUsers();
+
     @POST("admin/users/add")
     Call<MispUser> addUser(@Body User user);
 
@@ -50,7 +53,7 @@ public interface MispRestInterface {
     // server routes
 
     @GET("servers/index")
-    Call<List<MispServer>> getServers();
+    Call<List<MispServer>> getAllServers();
 
     @POST("servers/add")
     Call<Server> addServer(@Body Server server);

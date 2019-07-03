@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,8 +47,8 @@ public class UploadInfoActivity extends AppCompatActivity {
         preferenceManager = PreferenceManager.getInstance(UploadInfoActivity.this);
 
         // tint statusBar
-        getWindow().setStatusBarColor(getColor(R.color.white));
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        getWindow().setStatusBarColor(getColor(R.color.colorPrimary));
+//        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         parseExtra();
         initToolbar();
@@ -114,9 +115,12 @@ public class UploadInfoActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         assert ab != null;
 
-        ab.setTitle(uploadInformation.getRemote().organisation.name);
+        TextView toolbarTitle = findViewById(R.id.toolbarTitle);
+        toolbarTitle.setText(uploadInformation.getRemote().organisation.name);
+
         ab.setHomeAsUpIndicator(R.drawable.ic_close);
-        ab.setDisplayShowTitleEnabled(true);
+
+        ab.setDisplayShowTitleEnabled(false);
         ab.setDisplayHomeAsUpEnabled(true);
     }
 

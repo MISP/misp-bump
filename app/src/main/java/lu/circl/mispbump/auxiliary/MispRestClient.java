@@ -57,17 +57,28 @@ public class MispRestClient {
         void failure(String error);
     }
 
+    public interface AllUsersCallback {
+        void success(User[] users);
+        void failure(String error);
+    }
+
     public interface OrganisationCallback {
         void success(Organisation organisation);
+        void failure(String error);
+    }
 
+    public interface AllOrganisationsCallback {
+        void success(Organisation[] organisations);
         void failure(String error);
     }
 
     public interface ServerCallback {
-        void success(List<MispServer> servers);
-
         void success(Server server);
+        void failure(String error);
+    }
 
+    public interface AllServersCallback {
+        void success(Server[] servers);
         void failure(String error);
     }
 
@@ -100,7 +111,7 @@ public class MispRestClient {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create())
-                    .client(getCustomClient(true, false))
+                    .client(getCustomClient(true, true))
                     .build();
 
             mispRestInterface = retrofit.create(MispRestInterface.class);
@@ -250,6 +261,7 @@ public class MispRestClient {
      * @param userId   user identifier
      * @param callback {@link UserCallback} wrapper to return user directly
      */
+
     public void getUser(int userId, final UserCallback callback) {
         Call<MispUser> call = mispRestInterface.getUser(userId);
 
@@ -271,6 +283,57 @@ public class MispRestClient {
             public void onFailure(Call<MispUser> call, Throwable t) {
                 t.printStackTrace();
                 callback.failure(t.getMessage());
+            }
+        });
+    }
+
+    public void getUser(final String emailAddress, final UserCallback callback) {
+        getAllUsers(new AllUsersCallback() {
+            @Override
+            public void success(User[] users) {
+                for (User user : users) {
+                    if (user.email.equals(emailAddress)) {
+                        callback.success(user);
+                        return;
+                    }
+                }
+
+                callback.failure("Could not find user with email address {" + emailAddress + "}");
+            }
+
+            @Override
+            public void failure(String error) {
+                callback.failure(error);
+            }
+        });
+    }
+
+    public void getAllUsers(final AllUsersCallback callback) {
+        Call<List<MispUser>> call = mispRestInterface.getAllUsers();
+
+        call.enqueue(new Callback<List<MispUser>>() {
+            @Override
+            public void onResponse(Call<List<MispUser>> call, Response<List<MispUser>> response) {
+                if (!response.isSuccessful()) {
+                    callback.failure("Failed onResponse");
+                    return;
+                }
+
+                List<MispUser> mispUsers = response.body();
+                assert mispUsers != null;
+
+                User[] users = new User[mispUsers.size()];
+
+                for (int i = 0; i < users.length; i++) {
+                    users[i] = mispUsers.get(i).user;
+                }
+
+                callback.success(users);
+            }
+
+            @Override
+            public void onFailure(Call<List<MispUser>> call, Throwable t) {
+                callback.failure(extractError(t));
             }
         });
     }
@@ -335,45 +398,56 @@ public class MispRestClient {
         });
     }
 
-    public Organisation[] getAllOrganisations() throws IOException {
+    public void getOrganisation(final String uuid, final OrganisationCallback callback) {
+        getAllOrganisations(new AllOrganisationsCallback() {
+            @Override
+            public void success(Organisation[] organisations) {
+                for (Organisation organisation : organisations) {
+                    if (organisation.uuid.equals(uuid)) {
+                        callback.success(organisation);
+                        return;
+                    }
+                }
+
+                callback.failure("Could not find organisation with UUID {" + uuid + "}");
+            }
+
+            @Override
+            public void failure(String error) {
+                callback.failure(error);
+            }
+        });
+    }
+
+    public void getAllOrganisations(final AllOrganisationsCallback callback) {
         Call<List<MispOrganisation>> call = mispRestInterface.getAllOrganisations();
-        Response<List<MispOrganisation>> response = call.execute();
 
-        List<MispOrganisation> mispOrganisations = response.body();
-        Organisation[] organisations = new Organisation[mispOrganisations.size()];
+        call.enqueue(new Callback<List<MispOrganisation>>() {
+            @Override
+            public void onResponse(Call<List<MispOrganisation>> call, Response<List<MispOrganisation>> response) {
+                if (!response.isSuccessful()) {
+                    // TODO handle
+                    return;
+                }
 
-        for (int i = 0; i < mispOrganisations.size(); i++) {
-            organisations[i] = mispOrganisations.get(i).organisation;
-        }
+                List<MispOrganisation> mispOrganisations = response.body();
 
-        return organisations;
+                assert mispOrganisations != null;
 
-//        call.enqueue(new Callback<List<MispOrganisation>>() {
-//            @Override
-//            public void onResponse(Call<List<MispOrganisation>> call, Response<List<MispOrganisation>> response) {
-//                if (!response.isSuccessful()) {
-//                    // TODO handle
-//                    return;
-//                }
-//
-//                List<MispOrganisation> mispOrganisations = response.body();
-//
-//                assert mispOrganisations != null;
-//
-//                Organisation[] organisations = new Organisation[mispOrganisations.size()];
-//
-//                for (int i = 0; i < mispOrganisations.size(); i++) {
-//                    organisations[i] = mispOrganisations.get(i).organisation;
-//                }
-//
-//                callback.success(organisations);
-//            }
-//
-//            @Override
-//            public void onFailure(Call<List<MispOrganisation>> call, Throwable t) {
-//                callback.failure(extractError(t));
-//            }
-//        });
+                Organisation[] organisations = new Organisation[mispOrganisations.size()];
+
+                for (int i = 0; i < mispOrganisations.size(); i++) {
+                    organisations[i] = mispOrganisations.get(i).organisation;
+                }
+
+                callback.success(organisations);
+            }
+
+            @Override
+            public void onFailure(Call<List<MispOrganisation>> call, Throwable t) {
+                callback.failure(extractError(t));
+            }
+        });
     }
 
     /**
@@ -405,13 +479,17 @@ public class MispRestClient {
 
     // --- server routes ---
 
+    public void getServer() {
+
+    }
+
     /**
      * Get all servers on MISP instance.
      *
      * @param callback {@link OrganisationCallback} wrapper to return a list of servers directly
      */
-    public void getServers(final ServerCallback callback) {
-        Call<List<MispServer>> call = mispRestInterface.getServers();
+    public void getAllServers(final AllServersCallback callback) {
+        Call<List<MispServer>> call = mispRestInterface.getAllServers();
 
         call.enqueue(new Callback<List<MispServer>>() {
             @Override
@@ -419,7 +497,17 @@ public class MispRestClient {
                 if (!response.isSuccessful()) {
                     callback.failure(extractError(response));
                 } else {
-                    callback.success(response.body());
+
+                    List<MispServer> mispServers = response.body();
+                    assert mispServers != null;
+
+                    Server[] servers = new Server[mispServers.size()];
+
+                    for (int i = 0; i < servers.length; i++) {
+                        servers[i] = mispServers.get(i).server;
+                    }
+
+                    callback.success(servers);
                 }
             }
 
@@ -452,6 +540,7 @@ public class MispRestClient {
             @Override
             public void onFailure(Call<Server> call, Throwable t) {
                 callback.failure(t.getMessage());
+                throw new RuntimeException(t);
             }
         });
     }
