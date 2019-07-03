@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.widget.ImageViewCompat;
 
@@ -42,7 +41,7 @@ public class UploadAction extends ConstraintLayout {
         super(context, attrs);
         this.context = context;
 
-        View baseView = LayoutInflater.from(context).inflate(R.layout.view_upload_action_2, this);
+        View baseView = LayoutInflater.from(context).inflate(R.layout.view_upload_action, this);
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.UploadAction);
 

@@ -2,17 +2,15 @@ package lu.circl.mispbump.customViews;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import lu.circl.mispbump.R;
 
@@ -33,7 +31,12 @@ public class MaterialPreferenceText extends ConstraintLayout {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.MaterialPreferenceText);
 
         icon = view.findViewById(R.id.material_preference_src);
-        icon.setImageResource(a.getResourceId(R.styleable.MaterialPreferenceText_pref_icon, 0x0));
+        int imageRes = a.getResourceId(R.styleable.MaterialPreferenceText_pref_icon, 0x0);
+        if (imageRes != 0x0){
+            icon.setImageResource(imageRes);
+        } else {
+            icon.setVisibility(GONE);
+        }
 
         title = view.findViewById(R.id.material_preference_title);
         title.setText(a.getString(R.styleable.MaterialPreferenceText_title));

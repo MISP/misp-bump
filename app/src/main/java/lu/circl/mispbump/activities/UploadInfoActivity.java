@@ -1,14 +1,10 @@
 package lu.circl.mispbump.activities;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,33 +23,53 @@ import java.util.UUID;
 
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
-import lu.circl.mispbump.fragments.UploadInfoFragment;
+import lu.circl.mispbump.fragments.UploadCredentialsFragment;
 import lu.circl.mispbump.fragments.UploadSettingsFragment;
 import lu.circl.mispbump.models.UploadInformation;
 
 public class UploadInfoActivity extends AppCompatActivity {
 
-    public static String EXTRA_UPLOAD_INFO_UUID = "uploadInformation";
+    public static String EXTRA_UPLOAD_INFO_UUID = "uploadInformationUuid";
 
     private PreferenceManager preferenceManager;
     private UploadInformation uploadInformation;
     private ViewPagerAdapter viewPagerAdapter;
 
+    private FloatingActionButton fab;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_upload_information_2);
+        setContentView(R.layout.activity_upload_information);
 
         preferenceManager = PreferenceManager.getInstance(UploadInfoActivity.this);
 
         // tint statusBar
-        getWindow().setStatusBarColor(getColor(R.color.grey_light));
+        getWindow().setStatusBarColor(getColor(R.color.white));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         parseExtra();
         initToolbar();
         initViewPager();
         initViews();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // refresh current uploadInformation
+        if (uploadInformation != null) {
+            uploadInformation = preferenceManager.getUploadInformation(uploadInformation.getUuid());
+            initContent();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        saveCurrentSettings();
     }
 
     @Override
@@ -79,22 +95,6 @@ public class UploadInfoActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // refresh current uploadInformation
-        if (uploadInformation != null) {
-            uploadInformation = preferenceManager.getUploadInformation(uploadInformation.getUuid());
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        saveCurrentSettings();
-    }
-
 
     private void parseExtra() {
         Intent i = getIntent();
@@ -114,47 +114,9 @@ public class UploadInfoActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         assert ab != null;
 
-
-        TextView tv = findViewById(R.id.syncStatus);
-        int statusColor;
-        String statusText;
-        Drawable statusDrawable;
-
-        switch (uploadInformation.getCurrentSyncStatus()) {
-            case COMPLETE:
-                statusColor = getColor(R.color.status_green);
-                statusText = "Successfully uploaded";
-                statusDrawable = getDrawable(R.drawable.ic_check_outline);
-                break;
-
-            case FAILURE:
-                statusColor = getColor(R.color.status_red);
-                statusText = "Error while uploading";
-                statusDrawable = getDrawable(R.drawable.ic_error_outline);
-                break;
-
-            case PENDING:
-                statusColor = getColor(R.color.status_amber);
-                statusText = "Not uploaded yet";
-                statusDrawable = getDrawable(R.drawable.ic_pending);
-                break;
-
-            default:
-                statusColor = getColor(R.color.status_green);
-                statusText = "Successfully uploaded";
-                statusDrawable = getDrawable(R.drawable.ic_check_outline);
-                break;
-        }
-
-        tv.setText(statusText);
-        tv.setTextColor(statusColor);
-        tv.setCompoundDrawablesWithIntrinsicBounds(null, null, statusDrawable, null);
-        tv.setCompoundDrawableTintList(ColorStateList.valueOf(statusColor));
-
         ab.setTitle(uploadInformation.getRemote().organisation.name);
-
+        ab.setHomeAsUpIndicator(R.drawable.ic_close);
         ab.setDisplayShowTitleEnabled(true);
-        ab.setDisplayShowCustomEnabled(false);
         ab.setDisplayHomeAsUpEnabled(true);
     }
 
@@ -163,18 +125,19 @@ public class UploadInfoActivity extends AppCompatActivity {
         TabLayout tabLayout = findViewById(R.id.tabLayout);
 
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), uploadInformation);
-
         viewPager.setAdapter(viewPagerAdapter);
+
+        viewPager.addOnPageChangeListener(onPageChangeListener());
+
         tabLayout.setupWithViewPager(viewPager);
     }
 
     private void initViews() {
-        FloatingActionButton fab = findViewById(R.id.fab);
-
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // for the UploadActivity to have the latest settings of this UploadInfoObject
                 saveCurrentSettings();
 
                 Intent i = new Intent(UploadInfoActivity.this, UploadActivity.class);
@@ -182,6 +145,26 @@ public class UploadInfoActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+    }
+
+    private void initContent() {
+        switch (uploadInformation.getCurrentSyncStatus()) {
+            case COMPLETE:
+
+                break;
+
+            case FAILURE:
+
+                break;
+
+            case PENDING:
+
+                break;
+
+            default:
+
+                break;
+        }
     }
 
     private void saveCurrentSettings() {
@@ -194,14 +177,39 @@ public class UploadInfoActivity extends AppCompatActivity {
     }
 
 
+    private ViewPager.OnPageChangeListener onPageChangeListener() {
+        return new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                if (position == 0) {
+                    float scale = (1 - positionOffset);
+                    fab.setScaleX(scale);
+                    fab.setScaleY(scale);
+                }
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        };
+    }
+
+
     class ViewPagerAdapter extends FragmentPagerAdapter {
 
         private UploadSettingsFragment uploadSettingsFragment;
-        private UploadInfoFragment uploadInfoFragment = new UploadInfoFragment();
+        private UploadCredentialsFragment uploadCredentialsFragment;
 
         ViewPagerAdapter(@NonNull FragmentManager fm, UploadInformation uploadInformation) {
             super(fm, ViewPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
             uploadSettingsFragment = new UploadSettingsFragment(uploadInformation);
+            uploadCredentialsFragment = new UploadCredentialsFragment(uploadInformation);
         }
 
         @NonNull
@@ -212,7 +220,7 @@ public class UploadInfoActivity extends AppCompatActivity {
                     return uploadSettingsFragment;
 
                 case 1:
-                    return uploadInfoFragment;
+                    return uploadCredentialsFragment;
 
                 default:
                     uploadSettingsFragment = new UploadSettingsFragment();
@@ -225,7 +233,7 @@ public class UploadInfoActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Permissions";
+                    return "Settings";
 
                 case 1:
                     return "Credentials";

@@ -56,7 +56,7 @@ public class ExchangeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sync);
+        setContentView(R.layout.activity_exchange);
 
         preferenceManager = PreferenceManager.getInstance(ExchangeActivity.this);
         qrCodeGenerator = new QrCodeGenerator(ExchangeActivity.this);
@@ -259,7 +259,8 @@ public class ExchangeActivity extends AppCompatActivity {
                     case DATA_EXCHANGE:
                         try {
                             final SyncInformation remoteSyncInfo = new Gson().fromJson(diffieHellman.decrypt(qrData), SyncInformation.class);
-                            List<UploadInformation> uploadInformationList = preferenceManager.getUploadInformationList();
+
+                            final List<UploadInformation> uploadInformationList = preferenceManager.getUploadInformationList();
 
                             for (final UploadInformation ui : uploadInformationList) {
                                 if (ui.getRemote().organisation.uuid.equals(remoteSyncInfo.organisation.uuid)) {
@@ -274,7 +275,8 @@ public class ExchangeActivity extends AppCompatActivity {
                                         @Override
                                         public void negative() {
                                             // replace credentials too
-                                            preferenceManager.removeUploadInformation(ui.getUuid());
+                                            uploadInformationList.remove(ui);
+                                            preferenceManager.setUploadInformationList(uploadInformationList);
                                         }
                                     });
 

@@ -9,7 +9,7 @@
     android:focusableInTouchMode="false"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:foreground="?attr/selectableItemBackground">
+    android:foreground="?attr/selectableItemBackgroundBorderless">
 
     <ImageView
         tools:src="@drawable/ic_language"
@@ -20,9 +20,6 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:tint="@color/colorPrimaryDark"
-        android:clickable="false"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
         app:layout_constraintBottom_toBottomOf="@+id/material_preference_subtitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/material_preference_title"
@@ -36,10 +33,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:textAppearance="@style/Text.Title"
-        android:clickable="false"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
+        android:textAppearance="@style/AppTheme.TextAppearance.ListTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/material_preference_src"
         app:layout_constraintTop_toTopOf="parent" />
@@ -52,10 +46,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:textAppearance="@style/Text.SubTitle"
-        android:clickable="false"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
+        android:textAppearance="@style/AppTheme.TextAppearance.ListSubtitle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/material_preference_src"
