@@ -52,6 +52,7 @@ public class ExchangeActivity extends AppCompatActivity {
     private Bitmap publicKeyQr, dataQr;
 
     private SyncState currentSyncState;
+    private ReadQrStatus currentReadQrStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,7 +186,7 @@ public class ExchangeActivity extends AppCompatActivity {
 
     private void setReadQrStatus(ReadQrStatus status) {
 
-        Log.d("DEBUG", "QR STATUS: " + status);
+        currentReadQrStatus = status;
 
         final Drawable drawable;
         final int color;
@@ -251,9 +252,12 @@ public class ExchangeActivity extends AppCompatActivity {
                             diffieHellman.setForeignPublicKey(DiffieHellman.publicKeyFromString(qrData));
                             setSyncState(SyncState.KEY_EXCHANGE_DONE);
                         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-                            setReadQrStatus(ReadQrStatus.FAILURE);
+                            if (currentReadQrStatus == ReadQrStatus.PENDING) {
+                                setReadQrStatus(ReadQrStatus.FAILURE);
+                                Snackbar.make(rootLayout, "Public key not parsable", Snackbar.LENGTH_LONG).show();
+                            }
+
                             cameraFragment.setReadQrEnabled(true);
-                            Snackbar.make(rootLayout, "Public key not parsable", Snackbar.LENGTH_LONG).show();
                         }
                         break;
                     case DATA_EXCHANGE:
@@ -288,9 +292,12 @@ public class ExchangeActivity extends AppCompatActivity {
                             preferenceManager.addUploadInformation(uploadInformation);
                             setSyncState(SyncState.DATA_EXCHANGE_DONE);
                         } catch (JsonSyntaxException e) {
-                            setReadQrStatus(ReadQrStatus.FAILURE);
+                            if (currentReadQrStatus == ReadQrStatus.PENDING) {
+                                setReadQrStatus(ReadQrStatus.FAILURE);
+                                Snackbar.make(rootLayout, "Sync information not parsable", Snackbar.LENGTH_LONG).show();
+                            }
+
                             cameraFragment.setReadQrEnabled(true);
-                            Snackbar.make(rootLayout, "Sync information not parsable", Snackbar.LENGTH_LONG).show();
                         }
                         break;
                 }

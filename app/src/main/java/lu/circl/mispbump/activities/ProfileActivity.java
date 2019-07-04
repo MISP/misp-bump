@@ -6,28 +6,28 @@ import android.graphics.Shader;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.Random;
 
 import lu.circl.mispbump.R;
+import lu.circl.mispbump.auxiliary.MispRestClient;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.auxiliary.TileDrawable;
 import lu.circl.mispbump.customViews.MaterialPreferenceText;
-import lu.circl.mispbump.auxiliary.MispRestClient;
 import lu.circl.mispbump.models.restModels.Organisation;
 import lu.circl.mispbump.models.restModels.User;
 import lu.circl.mispbump.security.KeyStoreWrapper;
@@ -83,12 +83,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         final MaterialPreferenceText uuid = findViewById(R.id.uuid);
         uuid.setSubtitle(organisation.uuid);
-//        uuid.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Snackbar.make(rootLayout, "Copied to clipboard", Snackbar.LENGTH_LONG).show();
-//            }
-//        });
 
         MaterialPreferenceText nationality = findViewById(R.id.nationality);
         nationality.setSubtitle(organisation.nationality);
@@ -150,6 +144,7 @@ public class ProfileActivity extends AppCompatActivity {
                     public void success(Organisation organisation) {
                         fabLoadingDrawable.stop();
                         preferenceManager.setUserOrgInfo(organisation);
+                        Snackbar.make(rootLayout, "Successfully update profile", Snackbar.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -183,7 +178,7 @@ public class ProfileActivity extends AppCompatActivity {
         builder.setPositiveButton("Delete & Logout", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                PreferenceManager prefs = PreferenceManager.getInstance(getApplicationContext());
+                PreferenceManager prefs = PreferenceManager.getInstance(ProfileActivity.this);
                 prefs.clearAllData();
                 KeyStoreWrapper.deleteAllStoredKeys();
 
