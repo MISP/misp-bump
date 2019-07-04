@@ -19,7 +19,17 @@
             android:layout_height="?attr/actionBarSize"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            android:background="@color/colorPrimary" />
+            android:background="@color/colorPrimary">
+
+            <TextView
+                android:id="@+id/toolbarTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+                android:text="Upload"
+                android:layout_gravity="center"/>
+
+        </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -38,7 +48,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:description="Check if instance is available" />
+            app:description="MISP instance available" />
 
         <lu.circl.mispbump.customViews.UploadAction
             android:id="@+id/orgAction"
@@ -73,4 +83,12 @@
             app:layout_constraintTop_toTopOf="parent"
             app:description="Add sync server" />
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_check"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

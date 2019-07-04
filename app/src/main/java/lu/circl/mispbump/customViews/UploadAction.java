@@ -69,10 +69,10 @@ public class UploadAction extends ConstraintLayout {
     public void setError(String error) {
         if (error == null) {
             errorView.setVisibility(GONE);
+        } else {
+            errorView.setText(error);
+            errorView.setVisibility(VISIBLE);
         }
-
-        errorView.setText(error);
-        errorView.setVisibility(VISIBLE);
     }
 
     public void setCurrentUploadState(UploadState state) {

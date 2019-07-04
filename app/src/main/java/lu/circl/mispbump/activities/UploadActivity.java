@@ -5,12 +5,12 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.UUID;
 
@@ -30,7 +30,6 @@ public class UploadActivity extends AppCompatActivity {
     private PreferenceManager preferenceManager;
     private UploadInformation uploadInformation;
 
-    private CoordinatorLayout rootLayout;
     private MispRestClient restClient;
     private UploadAction availableAction, orgAction, userAction, serverAction;
 
@@ -90,6 +89,7 @@ public class UploadActivity extends AppCompatActivity {
         }
     };
 
+    private FloatingActionButton fab;
 
     private boolean errorWhileUpload;
 
@@ -143,14 +143,18 @@ public class UploadActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        rootLayout = findViewById(R.id.rootLayout);
+        getWindow().setStatusBarColor(getColor(R.color.colorPrimary));
+
+        fab = findViewById(R.id.fab);
+        fab.hide();
 
         // toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         assert ab != null;
-        ab.setDisplayShowTitleEnabled(true);
+
+        ab.setDisplayShowTitleEnabled(false);
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeAsUpIndicator(R.drawable.ic_close);
 
@@ -165,6 +169,44 @@ public class UploadActivity extends AppCompatActivity {
             uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
         }
         preferenceManager.addUploadInformation(uploadInformation);
+    }
+
+    private void setUploadActionState(UploadAction uploadAction, UploadAction.UploadState state, @Nullable String error) {
+        uploadAction.setCurrentUploadState(state);
+        uploadAction.setError(error);
+
+        switch (state) {
+            case PENDING:
+                if (fab.isShown()) {
+                    fab.hide();
+                }
+                break;
+            case LOADING:
+                errorWhileUpload = false;
+                if (fab.isShown()) {
+                    fab.hide();
+                }
+                break;
+            case DONE:
+                errorWhileUpload = false;
+                break;
+            case ERROR:
+                uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
+
+                fab.setImageResource(R.drawable.ic_autorenew);
+                fab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        setUploadActionState(availableAction, UploadAction.UploadState.LOADING, null);
+                        startUpload();
+                    }
+                });
+                if (!fab.isShown()) {
+                    fab.show();
+                }
+                errorWhileUpload = true;
+                break;
+        }
     }
 
 
@@ -204,35 +246,16 @@ public class UploadActivity extends AppCompatActivity {
 
     private void mispAvailable(boolean available, String error) {
         if (available) {
-            availableAction.setCurrentUploadState(UploadAction.UploadState.DONE);
-            availableAction.setError(null);
-
+            setUploadActionState(availableAction, UploadAction.UploadState.DONE, null);
             restClient.addOrganisation(uploadInformation.getRemote().organisation, organisationCallback);
         } else {
-            availableAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
-            availableAction.setError(error);
-            uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-            errorWhileUpload = true;
-
-            Snackbar sb = Snackbar.make(rootLayout, error, Snackbar.LENGTH_INDEFINITE);
-
-            sb.setAction("Retry", new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    availableAction.setError(null);
-                    availableAction.setCurrentUploadState(UploadAction.UploadState.LOADING);
-                    errorWhileUpload = false;
-                    startUpload();
-                }
-            });
-
-            sb.show();
+            setUploadActionState(availableAction, UploadAction.UploadState.ERROR, error);
         }
     }
 
     private void organisationAdded(Organisation organisation) {
         if (organisation != null) {
-            orgAction.setCurrentUploadState(UploadAction.UploadState.DONE);
+            setUploadActionState(orgAction, UploadAction.UploadState.DONE, null);
             uploadInformation.getRemote().organisation.id = organisation.id;
             restClient.addUser(generateSyncUser(organisation), userCallback);
         } else {
@@ -245,10 +268,7 @@ public class UploadActivity extends AppCompatActivity {
 
                 @Override
                 public void failure(String error) {
-                    uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-                    orgAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
-                    orgAction.setError(error);
-                    errorWhileUpload = true;
+                    setUploadActionState(orgAction, UploadAction.UploadState.ERROR, error);
                 }
             });
         }
@@ -256,7 +276,7 @@ public class UploadActivity extends AppCompatActivity {
 
     private void userAdded(User user) {
         if (user != null) {
-            userAction.setCurrentUploadState(UploadAction.UploadState.DONE);
+            setUploadActionState(userAction, UploadAction.UploadState.DONE, null);
             restClient.getAllServers(allServersCallback);
         } else {
             restClient.getUser(uploadInformation.getRemote().syncUserEmail, new MispRestClient.UserCallback() {
@@ -267,10 +287,7 @@ public class UploadActivity extends AppCompatActivity {
 
                 @Override
                 public void failure(String error) {
-                    uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-                    userAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
-                    userAction.setError(error);
-                    errorWhileUpload = true;
+                    setUploadActionState(userAction, UploadAction.UploadState.ERROR, error);
                 }
             });
         }
@@ -290,20 +307,26 @@ public class UploadActivity extends AppCompatActivity {
 
             restClient.addServer(serverToUpload, serverCallback);
         } else {
-            serverAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
+            setUploadActionState(serverAction, UploadAction.UploadState.ERROR, "Could not retrieve server information");
         }
     }
 
     private void serverAdded(Server server) {
         if (server != null) {
-            serverAction.setCurrentUploadState(UploadAction.UploadState.DONE);
+            setUploadActionState(serverAction, UploadAction.UploadState.DONE, null);
             uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.COMPLETE);
             saveCurrentState();
+
+            fab.setImageResource(R.drawable.ic_check);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+            fab.show();
         } else {
-            uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-            serverAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
-            serverAction.setError("Could not add server");
-            errorWhileUpload = true;
+            setUploadActionState(serverAction, UploadAction.UploadState.ERROR, "Could not add server");
         }
     }
 }
