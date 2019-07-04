@@ -167,14 +167,6 @@ public class UploadActivity extends AppCompatActivity {
         preferenceManager.addUploadInformation(uploadInformation);
     }
 
-    /**
-     * Start upload to misp instance.
-     */
-    private void startUpload() {
-        availableAction.setCurrentUploadState(UploadAction.UploadState.LOADING);
-        restClient.isAvailable(availableCallback);
-    }
-
 
     private User generateSyncUser(Organisation organisation) {
         User syncUser = new User();
@@ -202,6 +194,14 @@ public class UploadActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Start upload to misp instance.
+     */
+    private void startUpload() {
+        availableAction.setCurrentUploadState(UploadAction.UploadState.LOADING);
+        restClient.isAvailable(availableCallback);
+    }
+
     private void mispAvailable(boolean available, String error) {
         if (available) {
             availableAction.setCurrentUploadState(UploadAction.UploadState.DONE);
@@ -211,7 +211,6 @@ public class UploadActivity extends AppCompatActivity {
         } else {
             availableAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
             availableAction.setError(error);
-
             uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
             errorWhileUpload = true;
 
@@ -234,10 +233,10 @@ public class UploadActivity extends AppCompatActivity {
     private void organisationAdded(Organisation organisation) {
         if (organisation != null) {
             orgAction.setCurrentUploadState(UploadAction.UploadState.DONE);
-
             uploadInformation.getRemote().organisation.id = organisation.id;
             restClient.addUser(generateSyncUser(organisation), userCallback);
         } else {
+            // search by UUID because the error does not give the actual ID
             restClient.getOrganisation(uploadInformation.getRemote().organisation.uuid, new MispRestClient.OrganisationCallback() {
                 @Override
                 public void success(Organisation organisation) {
@@ -260,7 +259,6 @@ public class UploadActivity extends AppCompatActivity {
             userAction.setCurrentUploadState(UploadAction.UploadState.DONE);
             restClient.getAllServers(allServersCallback);
         } else {
-
             restClient.getUser(uploadInformation.getRemote().syncUserEmail, new MispRestClient.UserCallback() {
                 @Override
                 public void success(User user) {
@@ -279,17 +277,21 @@ public class UploadActivity extends AppCompatActivity {
     }
 
     private void allServersReceived(Server[] servers) {
-        Server serverToUpload = generateSyncServer();
+        if (servers != null) {
+            Server serverToUpload = generateSyncServer();
 
-        for (Server server : servers) {
-            if (server.remote_org_id.equals(serverToUpload.remote_org_id)) {
-                // server already exists
-                serverToUpload.id = server.id;
-                break;
+            for (Server server : servers) {
+                if (server.remote_org_id.equals(serverToUpload.remote_org_id)) {
+                    // server already exists: override id to update instead
+                    serverToUpload.id = server.id;
+                    break;
+                }
             }
-        }
 
-        restClient.addServer(serverToUpload, serverCallback);
+            restClient.addServer(serverToUpload, serverCallback);
+        } else {
+            serverAction.setCurrentUploadState(UploadAction.UploadState.ERROR);
+        }
     }
 
     private void serverAdded(Server server) {
@@ -304,5 +306,4 @@ public class UploadActivity extends AppCompatActivity {
             errorWhileUpload = true;
         }
     }
-
 }

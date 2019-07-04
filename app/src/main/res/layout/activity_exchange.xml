@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootLayout"
@@ -10,7 +9,7 @@
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <FrameLayout
         android:id="@+id/qrFrame"
@@ -26,13 +25,13 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/qrCode"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/qrInfo"
@@ -44,7 +43,7 @@
                 android:gravity="center_vertical"
                 android:padding="8dp"
                 android:text="Scan your partners QR code"
-                android:textColor="@color/colorPrimaryDark"/>
+                android:textColor="@color/black" />
 
             <TextView
                 android:id="@+id/qrInfoStatic"
@@ -52,12 +51,12 @@
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_info_outline"
                 android:drawablePadding="8dp"
-                android:drawableTint="@color/colorPrimaryDark"
+                android:drawableTint="@color/colorIconDark"
                 android:gravity="center_vertical"
-                android:padding="8dp"
                 android:lines="2"
+                android:padding="8dp"
                 android:text="Continue if your partner also scanned this QR code"
-                android:textColor="@color/colorPrimaryDark"/>
+                android:textColor="@color/black" />
 
         </LinearLayout>
     </FrameLayout>
@@ -79,12 +78,12 @@
             android:padding="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_arrow_back"/>
+            app:srcCompat="@drawable/ic_arrow_back" />
 
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <ImageButton
             android:id="@+id/nextButton"
@@ -94,7 +93,7 @@
             android:padding="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_arrow_forward"/>
+            app:srcCompat="@drawable/ic_arrow_forward" />
 
     </LinearLayout>
 

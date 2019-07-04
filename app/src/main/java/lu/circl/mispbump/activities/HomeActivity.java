@@ -53,10 +53,10 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_settings) {
-            startActivity(new Intent(HomeActivity.this, PreferenceActivity.class));
-            return true;
-        }
+//        if (item.getItemId() == R.id.menu_settings) {
+//            startActivity(new Intent(HomeActivity.this, PreferenceActivity.class));
+//            return true;
+//        }
 
         if (item.getItemId() == R.id.menu_profile) {
             startActivity(new Intent(HomeActivity.this, ProfileActivity.class));

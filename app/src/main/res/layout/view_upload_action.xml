@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
-    android:foreground="?attr/selectableItemBackgroundBorderless">
+    android:foreground="?attr/selectableItemBackgroundBorderless"
+    android:animateLayoutChanges="true">
 
     <ImageView
         android:id="@+id/stateView"
@@ -31,10 +32,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:layout_marginEnd="16dp"
+        android:textAppearance="@style/AppTheme.TextAppearance.ListTitle"
         app:layout_constraintEnd_toStartOf="@+id/stateView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Title (upload action)" />
+        tools:text="Add Organisation" />
 
     <TextView
         android:visibility="gone"
@@ -42,8 +44,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:textAppearance="@style/AppTheme.TextAppearance.ListSubtitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title"
-        tools:text="Error" />
+        tools:text="Organisation B added successfully" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

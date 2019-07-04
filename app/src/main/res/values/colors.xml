@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#047EB4</color>
-    <color name="colorPrimaryDark">#023850</color>
+    <color name="colorPrimaryDark">#066796</color>
     <color name="colorAccent">#12B3FA</color>
+
+    <color name="colorIconLight">#FFFFFF</color>
+    <color name="colorIconDark">#023850</color>
 
     <color name="dividerColor">#33000000</color>
 

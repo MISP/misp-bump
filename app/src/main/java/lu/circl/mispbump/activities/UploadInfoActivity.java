@@ -23,6 +23,7 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.UUID;
 
 import lu.circl.mispbump.R;
+import lu.circl.mispbump.auxiliary.DialogManager;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.fragments.UploadCredentialsFragment;
 import lu.circl.mispbump.fragments.UploadSettingsFragment;
@@ -83,7 +84,17 @@ public class UploadInfoActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.delete:
-                // TODO delete
+                DialogManager.deleteSyncInformationDialog(UploadInfoActivity.this, new DialogManager.IDialogFeedback() {
+                    @Override
+                    public void positive() {
+                        preferenceManager.removeUploadInformation(uploadInformation.getUuid());
+                        finish();
+                    }
+
+                    @Override
+                    public void negative() {}
+                });
+
                 return true;
 
             case android.R.id.home:

@@ -48,6 +48,9 @@ public class UploadCredentialsFragment extends Fragment {
         MaterialPreferenceText baseUrl = v.findViewById(R.id.baseUrl);
         baseUrl.setSubtitle(uploadInformation.getRemote().baseUrl);
 
+        MaterialPreferenceText email = v.findViewById(R.id.email);
+        email.setSubtitle(uploadInformation.getLocal().syncUserEmail);
+
         MaterialPasswordView authkey = v.findViewById(R.id.authkey);
         authkey.setPassword(uploadInformation.getRemote().syncUserAuthkey);
         authkey.addOnCopyClickedListener(onCopyClickListener);

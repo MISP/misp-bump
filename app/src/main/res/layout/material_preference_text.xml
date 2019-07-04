@@ -19,7 +19,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:tint="@color/colorPrimaryDark"
+        android:tint="@color/colorIconDark"
         app:layout_constraintBottom_toBottomOf="@+id/material_preference_subtitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/material_preference_title"
