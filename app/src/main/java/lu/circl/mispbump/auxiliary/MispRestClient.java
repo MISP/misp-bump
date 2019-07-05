@@ -59,26 +59,31 @@ public class MispRestClient {
 
     public interface AllUsersCallback {
         void success(User[] users);
+
         void failure(String error);
     }
 
     public interface OrganisationCallback {
         void success(Organisation organisation);
+
         void failure(String error);
     }
 
     public interface AllOrganisationsCallback {
         void success(Organisation[] organisations);
+
         void failure(String error);
     }
 
     public interface ServerCallback {
         void success(Server server);
+
         void failure(String error);
     }
 
     public interface AllServersCallback {
         void success(Server[] servers);
+
         void failure(String error);
     }
 
@@ -97,21 +102,41 @@ public class MispRestClient {
         return instance;
     }
 
+    public static MispRestClient getInstance(Context context, String url) {
+        if (instance == null) {
+            instance = new MispRestClient(context, url);
+        }
+
+        return instance;
+    }
+
+
+    private MispRestClient(Context context) {
+        this(context, null);
+    }
+
     /**
      * Initializes the rest client to communicate with a MISP instance.
      *
      * @param context needed to access the preferences for loading credentials
      */
-    private MispRestClient(Context context) {
+    private MispRestClient(Context context, String url) {
+
         preferenceManager = PreferenceManager.getInstance(context);
 
-        String url = preferenceManager.getServerUrl();
+        if (url == null) {
+            url = preferenceManager.getServerUrl();
+        }
 
+        initMispRestInterface(url);
+    }
+
+    public void initMispRestInterface(String url) {
         try {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create())
-                    .client(getCustomClient(true, true))
+                    .client(getCustomClient(true, false))
                     .build();
 
             mispRestInterface = retrofit.create(MispRestInterface.class);
@@ -120,9 +145,9 @@ public class MispRestClient {
         }
     }
 
+
     /**
-     *
-     * @param unsafe whether to accept all certificates or only trusted ones
+     * @param unsafe  whether to accept all certificates or only trusted ones
      * @param logging whether to log Retrofit calls (for debugging)
      * @return {@link OkHttpClient}
      */
@@ -159,7 +184,7 @@ public class MispRestClient {
                 // Create an ssl socket factory with our all-trusting manager
                 final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
-                builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
+                builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
                 builder.hostnameVerifier(new HostnameVerifier() {
                     @Override
                     public boolean verify(String hostname, SSLSession session) {
@@ -222,7 +247,6 @@ public class MispRestClient {
             }
         });
     }
-
 
 
     /**
@@ -549,8 +573,9 @@ public class MispRestClient {
 
     /**
      * Converts error {@link Response}s to human readable info.
+     *
      * @param response erroneous response
-     * @param <T> type of response
+     * @param <T>      type of response
      * @return human readable String that describes the error
      */
     private <T> String extractError(Response<T> response) {
@@ -603,6 +628,7 @@ public class MispRestClient {
 
     /**
      * Converts a {@link Throwable} to a human readable error message.
+     *
      * @param t throwable
      * @return human readable String that describes the error.
      */

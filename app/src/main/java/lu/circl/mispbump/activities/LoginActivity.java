@@ -33,6 +33,8 @@ import lu.circl.mispbump.models.restModels.User;
 public class LoginActivity extends AppCompatActivity {
 
     private PreferenceManager preferenceManager;
+    private MispRestClient mispRestClient;
+
     private ConstraintLayout constraintLayout;
     private TextInputLayout serverAutomationKey;
     private TextInputLayout serverUrl;
@@ -42,6 +44,12 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        preferenceManager = PreferenceManager.getInstance(this);
+        mispRestClient = MispRestClient.getInstance(LoginActivity.this);
+
+        getWindow().setStatusBarColor(getColor(R.color.colorPrimary));
+
         initializeViews();
     }
 
@@ -62,17 +70,18 @@ public class LoginActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     private void initializeViews() {
+        constraintLayout = findViewById(R.id.rootLayout);
+
         // populate Toolbar (Actionbar)
         Toolbar myToolbar = findViewById(R.id.appbar);
         setSupportActionBar(myToolbar);
-
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
             ab.setDisplayHomeAsUpEnabled(false);
+            ab.setDisplayShowTitleEnabled(false);
         }
-
-        constraintLayout = findViewById(R.id.rootLayout);
 
         Button downloadInfoButton = findViewById(R.id.login_download_button);
         downloadInfoButton.setOnClickListener(onClickDownload);
@@ -80,8 +89,6 @@ public class LoginActivity extends AppCompatActivity {
         serverUrl = findViewById(R.id.login_server_url);
         serverAutomationKey = findViewById(R.id.login_automation_key);
         progressBar = findViewById(R.id.login_progressbar);
-
-        preferenceManager = PreferenceManager.getInstance(this);
     }
 
     /**
@@ -91,8 +98,8 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
 
-            String url = Objects.requireNonNull(serverUrl.getEditText()).getText().toString();
-            String authkey = Objects.requireNonNull(serverAutomationKey.getEditText()).getText().toString();
+            final String url = Objects.requireNonNull(serverUrl.getEditText()).getText().toString();
+            final String authkey = Objects.requireNonNull(serverAutomationKey.getEditText()).getText().toString();
 
             boolean error = false;
 
@@ -113,14 +120,7 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            // save authkey
-            preferenceManager.setAutomationKey(authkey);
-
-            // save url
-            preferenceManager.setServerUrl(url);
-
-            // instance of MispRestClient with given URL
-            final MispRestClient mispRestClient = MispRestClient.getInstance(getApplicationContext());
+            mispRestClient.initMispRestInterface(url);
 
             // display progress bar
             progressBar.setVisibility(View.VISIBLE);
@@ -137,6 +137,13 @@ public class LoginActivity extends AppCompatActivity {
                                 @Override
                                 public void success(Organisation organisation) {
                                     preferenceManager.setUserOrgInfo(organisation);
+
+                                    // save authkey
+                                    preferenceManager.setAutomationKey(authkey);
+
+                                    // save url
+                                    preferenceManager.setServerUrl(url);
+
                                     progressBar.setVisibility(View.GONE);
                                     Intent home = new Intent(getApplicationContext(), HomeActivity.class);
                                     startActivity(home);
@@ -170,7 +177,7 @@ public class LoginActivity extends AppCompatActivity {
     };
 
     /**
-     * Check if url is valid.
+     * TODO: Check if url is valid.
      *
      * @param url url to check
      * @return true or false
@@ -186,7 +193,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Check if automation key is valid.
+     * TODO: Check if automation key is valid.
      *
      * @param automationKey the key to check
      * @return true or false

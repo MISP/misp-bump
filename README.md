@@ -1,14 +1,17 @@
 # Screenshots
 
+## Login
+
+![Login](./screenshots/mispbump-login.png)
+
 ## Home
-Entrypoint of the app.
 
 Actions: **Profile View** (Menubar) and **New Sync** (Floating Action Button)
 
 ![Home (Empty)](./screenshots/mispbump-home-0.png)
 
 ## Profile
-Basic information about the organisation that is currently logged in.
+Organisation information loaded automatically from your MISP instance
 
 Actions: **Delete and logout** (Menubar) and **Update Info** (Floating Action Button)
 
@@ -34,7 +37,7 @@ After a successfull exchange an entry for this organisation will appear.
 
 Actions: **Delete Sync information** (Menubar) and **Upload** (Floating Action Button in settings tab)
 
-**Credentials:** With this credentials you will be able to log in on the other MISP instance (SyncUser)
+**Credentials:** With these credentials you will be able to log in on the other MISP instance (SyncUser)
 
 ![Profile](./screenshots/mispbump-sync-info-credentials.png)
 
