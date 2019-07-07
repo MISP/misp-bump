@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -27,14 +28,15 @@ public class MaterialPreferenceSwitch extends ConstraintLayout {
 
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.MaterialPreferenceSwitch);
         String title = a.getString(R.styleable.MaterialPreferenceSwitch_title);
-        String subTitle = a.getString(R.styleable.MaterialPreferenceSwitch_subtitle);
+        final String onText = a.getString(R.styleable.MaterialPreferenceSwitch_onText);
+        final String offText = a.getString(R.styleable.MaterialPreferenceSwitch_offText);
         a.recycle();
 
         titleView = view.findViewById(R.id.material_preference_title);
         titleView.setText(title);
 
         subTitleView = view.findViewById(R.id.material_preference_subtitle);
-        subTitleView.setText(subTitle);
+        subTitleView.setText(offText);
 
         switchView = view.findViewById(R.id.material_preference_switch);
 
@@ -43,6 +45,17 @@ public class MaterialPreferenceSwitch extends ConstraintLayout {
             public void onClick(View v) {
                 if (switchView.isEnabled()) {
                     switchView.setChecked(!switchView.isChecked());
+                }
+            }
+        });
+
+        switchView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    subTitleView.setText(onText);
+                } else {
+                    subTitleView.setText(offText);
                 }
             }
         });

@@ -1,14 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MispBump</string>
     <string name="login">Anmelden</string>
     <string name="logout">Abmelden</string>
     <string name="menu_login_help_label">Hilfe</string>
     <string name="misp_automation_hint">MISP Automatisierungs-Schlüssel</string>
     <string name="no_information">Keine Informationen</string>
     <string name="save_automation_key_hint">Automatisierungs-Schlüssel speichern</string>
-    <string name="login_help_text"><b>MISP Server URL</b>\nDie URL unter der Ihre MISP Instanz erreichbar ist.\n\n<b>MISP Automatisierungs Schlüssel</b>\nZu finden unter ...</string>
+    <string name="login_help_text"><b>MISP Server URL</b>\nDie URL unter der Ihre MISP Instanz erreichbar ist.\n\n<b>MISP Automatisierungs Schlüssel</b></string>
     <string name="qr_code">QR code</string>
     <string name="sync">Synchronisation</string>
     <string name="no_syncs_hint">Sie haben noch keine MISP Instanzen verknüpft</string>
+    <string name="activity_exchange_scan_partner_qr_hint">Scannen den QR code ihres Partners</string>
+    <string name="activity_exchange_continue_if_scanned">Fahren sie fort, sobald dieser QR Code gescannt wurde</string>
+    <string name="button_continue">Weiter</string>
+    <string name="button_prev">Zurück</string>
+    <string name="nationality">Nationalität</string>
+    <string name="sector">Sektor</string>
+    <string name="description">Beschreibung</string>
+    <string name="settings">Einstellungen</string>
+    <string name="credentials">Zugangsdaten</string>
+    <string name="authkey">Authentifizierungsschlüssel</string>
+    <string name="password">Passwort</string>
+    <string name="fragment_upload_settings_title">Diese Organisation soll die folgenden Rechte erhalten</string>
+    <string name="settings_self_signed_title">Selbstsignierte Zertifikate erlauben</string>
+    <string name="settings_self_signed_on">Zertifikate von unbekannten CA\'s werden akzeptiert (nicht empfohlen)</string>
+    <string name="settings_self_signed_off">Nur Zertifikate von bekannten CA\'s werden akzeptiert</string>
+    <string name="settings_push_off">Ereignisse und deren Attribute können nicht hochgeladen werden</string>
+    <string name="settings_push_on">Ereignisse und deren Attribute können hochgeladen werden</string>
+    <string name="settings_pull_off">Ereignisse und deren Attribute können nicht heruntergeladen werden</string>
+    <string name="settings_pull_on">Ereignisse und deren Attribute können heruntergeladen werden</string>
+    <string name="settings_cache_off">Ereignisse und deren Attribute werden nicht zwischengespeichert</string>
+    <string name="settings_cache_on">Ereignisse und deren Attribute werden zwischengespeichert</string>
+    <string name="settings_cache_title">Zwischenspeichern</string>
+    <string name="settings_pull_title">Herunterladen</string>
+    <string name="settings_push_title">Hochladen</string>
+    <string name="upload">Hochladen</string>
+    <string name="upload_action_available">MISP Instanz erreichbar</string>
+    <string name="upload_action_add_org">Organisation hinzufügen</string>
+    <string name="upload_action_add_server">Server hinzufügen</string>
+    <string name="upload_action_add_user">Benutzer hinzufügen</string>
 </resources>

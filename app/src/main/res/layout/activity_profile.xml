@@ -26,10 +26,11 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription" />
 
             <ImageView
-                android:id="@+id/circle"
+                android:id="@+id/accountImage"
                 android:layout_width="112dp"
                 android:layout_height="112dp"
                 android:layout_above="@id/orgName"
@@ -39,7 +40,8 @@
                 android:tint="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/toolbar" />
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/orgName"
@@ -48,7 +50,7 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginEnd="24dp"
                 android:layout_marginBottom="8dp"
-                android:text="Organisation A"
+                tools:text="Organisation A"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="24sp"
@@ -56,7 +58,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/circle" />
+                app:layout_constraintTop_toBottomOf="@+id/accountImage" />
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -100,7 +102,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/uuid"
             app:pref_icon="@drawable/ic_language"
-            app:title="Nationality"/>
+            app:title="@string/nationality"/>
 
         <lu.circl.mispbump.customViews.MaterialPreferenceText
             android:id="@+id/sector"
@@ -111,7 +113,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/nationality"
             app:pref_icon="@drawable/ic_sector"
-            app:title="Sector"/>
+            app:title="@string/sector"/>
 
         <lu.circl.mispbump.customViews.MaterialPreferenceText
             android:id="@+id/description"
@@ -122,7 +124,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sector"
             app:pref_icon="@drawable/ic_description"
-            app:title="Description"/>
+            app:title="@string/description"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

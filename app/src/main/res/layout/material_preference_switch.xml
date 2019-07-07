@@ -42,7 +42,9 @@
         app:layout_constraintEnd_toStartOf="@id/material_preference_switch"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/material_preference_title"
-        tools:text="Subtitle" />
+        tools:text="Subtitle"
+        android:inAnimation="@anim/push_up_in"
+        android:outAnimation="@anim/push_up_out"/>
 
     <Switch
         android:id="@+id/material_preference_switch"

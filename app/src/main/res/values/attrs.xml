@@ -12,7 +12,8 @@
 
     <declare-styleable name="MaterialPreferenceSwitch">
         <attr name="title"/>
-        <attr name="subtitle"/>
+        <attr name="onText" format="string"/>
+        <attr name="offText" format="string"/>
     </declare-styleable>
 
     <declare-styleable name="MaterialPasswordView">

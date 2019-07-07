@@ -248,10 +248,10 @@ public class UploadInfoActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Settings";
+                    return getString(R.string.settings);
 
                 case 1:
-                    return "Credentials";
+                    return getString(R.string.credentials);
 
                 default:
                     return "N/A";

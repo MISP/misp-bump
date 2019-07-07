@@ -26,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-                android:text="Upload"
+                android:text="@string/upload"
                 android:layout_gravity="center"/>
 
         </androidx.appcompat.widget.Toolbar>
@@ -48,7 +48,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:description="MISP instance available" />
+            app:description="@string/upload_action_available" />
 
         <lu.circl.mispbump.customViews.UploadAction
             android:id="@+id/orgAction"
@@ -59,7 +59,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:description="Add organisation" />
+            app:description="@string/upload_action_add_org" />
 
         <lu.circl.mispbump.customViews.UploadAction
             android:id="@+id/userAction"
@@ -70,7 +70,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:description="Add sync user" />
+            app:description="@string/upload_action_add_user" />
 
         <lu.circl.mispbump.customViews.UploadAction
             android:id="@+id/serverAction"
@@ -81,7 +81,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:description="Add sync server" />
+            app:description="@string/upload_action_add_server" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

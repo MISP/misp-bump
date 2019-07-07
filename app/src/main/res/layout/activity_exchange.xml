@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootLayout"
@@ -11,55 +12,50 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/qrFrame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@drawable/rect_rounded"
         android:backgroundTint="#99FFFFFF"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
         android:padding="8dp"
         tools:layout_height="256dp"
         tools:layout_width="256dp">
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/qrCode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/qr_code" />
+
+        <TextView
+            android:id="@+id/qrInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_info_outline"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/status_amber"
             android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:padding="8dp"
+            android:text="@string/activity_exchange_scan_partner_qr_hint"
+            android:textColor="@color/black" />
 
-            <ImageView
-                android:id="@+id/qrCode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/qrInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_info_outline"
-                android:drawablePadding="8dp"
-                android:drawableTint="@color/status_amber"
-                android:gravity="center_vertical"
-                android:padding="8dp"
-                android:text="Scan your partners QR code"
-                android:textColor="@color/black" />
-
-            <TextView
-                android:id="@+id/qrInfoStatic"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_info_outline"
-                android:drawablePadding="8dp"
-                android:drawableTint="@color/colorIconDark"
-                android:gravity="center_vertical"
-                android:lines="2"
-                android:padding="8dp"
-                android:text="Continue if your partner also scanned this QR code"
-                android:textColor="@color/black" />
-
-        </LinearLayout>
-    </FrameLayout>
+        <TextView
+            android:id="@+id/qrInfoStatic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_info_outline"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/colorIconDark"
+            android:gravity="center_vertical"
+            android:lines="2"
+            android:padding="8dp"
+            android:text="@string/activity_exchange_continue_if_scanned"
+            android:textColor="@color/black" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/bottom"
@@ -78,7 +74,8 @@
             android:padding="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_arrow_back" />
+            app:srcCompat="@drawable/ic_arrow_back"
+            android:contentDescription="@string/button_prev" />
 
         <View
             android:layout_width="0dp"
@@ -93,7 +90,8 @@
             android:padding="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_arrow_forward" />
+            app:srcCompat="@drawable/ic_arrow_forward"
+            android:contentDescription="@string/button_continue" />
 
     </LinearLayout>
 
