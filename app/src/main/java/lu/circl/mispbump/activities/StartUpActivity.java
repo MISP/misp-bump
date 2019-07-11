@@ -17,13 +17,16 @@ public class StartUpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (isUserLoggedIn()) {
-            Intent home = new Intent(this, HomeActivity.class);
-            startActivity(home);
-        } else {
-            Intent login = new Intent(this, LoginActivity.class);
-            startActivity(login);
-        }
+//        if (isUserLoggedIn()) {
+//            Intent home = new Intent(this, HomeActivity.class);
+//            startActivity(home);
+//        } else {
+//            Intent login = new Intent(this, LoginActivity.class);
+//            startActivity(login);
+//        }
+
+        Intent i = new Intent(this, ExchangeActivity2.class);
+        startActivity(i);
 
         // closes the activity to prevent going back to this (empty) activity
         finish();

@@ -29,6 +29,12 @@
             android:name=".activities.HomeActivity"
             android:label="@string/app_name" />
         <activity
+            android:name=".activities.ExchangeActivity2"
+            android:configChanges="orientation|screenSize"
+            android:parentActivityName=".activities.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Translucent" />
+        <activity
             android:name=".activities.ExchangeActivity"
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".activities.HomeActivity"
