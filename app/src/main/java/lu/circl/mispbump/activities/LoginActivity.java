@@ -33,7 +33,6 @@ import lu.circl.mispbump.models.restModels.User;
 public class LoginActivity extends AppCompatActivity {
 
     private PreferenceManager preferenceManager;
-    private MispRestClient mispRestClient;
 
     private ConstraintLayout constraintLayout;
     private TextInputLayout serverAutomationKey;
@@ -46,7 +45,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         preferenceManager = PreferenceManager.getInstance(this);
-        mispRestClient = MispRestClient.getInstance(LoginActivity.this);
 
         getWindow().setStatusBarColor(getColor(R.color.colorPrimary));
 
@@ -97,7 +95,6 @@ public class LoginActivity extends AppCompatActivity {
     private View.OnClickListener onClickDownload = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
             final String url = Objects.requireNonNull(serverUrl.getEditText()).getText().toString();
             final String authkey = Objects.requireNonNull(serverAutomationKey.getEditText()).getText().toString();
 
@@ -120,7 +117,7 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            mispRestClient.initMispRestInterface(url);
+            final MispRestClient mispRestClient = MispRestClient.getInstance(url, authkey);
 
             // display progress bar
             progressBar.setVisibility(View.VISIBLE);

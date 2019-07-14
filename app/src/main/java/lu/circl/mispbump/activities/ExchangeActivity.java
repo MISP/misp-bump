@@ -44,8 +44,8 @@ public class ExchangeActivity extends AppCompatActivity {
     private CameraFragment cameraFragment;
 
     private CoordinatorLayout rootLayout;
-    private View qrFrame;
-    private TextView qrInfo;
+    private View qrFrame, scanFeedbackView, continueHintView, fragmentContainer;
+    private TextView scanFeedbackText;
     private ImageView qrCode;
     private ImageButton prevButton, nextButton;
 
@@ -57,7 +57,7 @@ public class ExchangeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_exchange);
+        setContentView(R.layout.activity_exchange_2);
 
         preferenceManager = PreferenceManager.getInstance(ExchangeActivity.this);
         qrCodeGenerator = new QrCodeGenerator(ExchangeActivity.this);
@@ -76,10 +76,14 @@ public class ExchangeActivity extends AppCompatActivity {
 
     private void initViews() {
         rootLayout = findViewById(R.id.rootLayout);
+        fragmentContainer = findViewById(R.id.fragmentContainer);
 
         qrFrame = findViewById(R.id.qrFrame);
         qrCode = findViewById(R.id.qrCode);
-        qrInfo = findViewById(R.id.qrInfo);
+
+        scanFeedbackView = findViewById(R.id.scanFeedbackView);
+        scanFeedbackText = findViewById(R.id.scanFeedbackText);
+        continueHintView = findViewById(R.id.continueHint);
 
         prevButton = findViewById(R.id.prevButton);
         prevButton.setOnClickListener(onPrevClicked());
@@ -185,7 +189,6 @@ public class ExchangeActivity extends AppCompatActivity {
     }
 
     private void setReadQrStatus(ReadQrStatus status) {
-
         currentReadQrStatus = status;
 
         final Drawable drawable;
@@ -206,15 +209,31 @@ public class ExchangeActivity extends AppCompatActivity {
                 break;
             default:
                 drawable = getDrawable(R.drawable.ic_info_outline);
-                color = getColor(R.color.status_green);
+                color = getColor(R.color.status_amber);
                 break;
         }
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                qrInfo.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
-                qrInfo.setCompoundDrawableTintList(ColorStateList.valueOf(color));
+                scanFeedbackText.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+                scanFeedbackText.setCompoundDrawableTintList(ColorStateList.valueOf(color));
+
+                if (currentReadQrStatus == ReadQrStatus.SUCCESS) {
+                    continueHintView.setVisibility(View.VISIBLE);
+
+                    continueHintView.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white)));
+                    scanFeedbackView.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white)));
+                    qrFrame.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white)));
+
+                    fragmentContainer.animate().alpha(0).setDuration(250).start();
+                } else {
+                    fragmentContainer.animate().alpha(1).setDuration(250).start();
+
+                    continueHintView.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white_80)));
+                    scanFeedbackView.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white_80)));
+                    qrFrame.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white_80)));
+                }
             }
         });
     }
