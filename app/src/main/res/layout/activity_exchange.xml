@@ -1,98 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark">
 
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:id="@+id/qrFrame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@drawable/rect_rounded"
-        android:backgroundTint="#99FFFFFF"
-        android:gravity="center_vertical"
+        android:animateLayoutChanges="true"
         android:orientation="vertical"
-        android:padding="8dp"
-        tools:layout_height="256dp"
-        tools:layout_width="256dp">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="25dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@id/navbar_bottom">
 
-        <ImageView
-            android:id="@+id/qrCode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/qr_code" />
-
-        <TextView
-            android:id="@+id/qrInfo"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/qrFrame"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_info_outline"
-            android:drawablePadding="8dp"
-            android:drawableTint="@color/status_amber"
-            android:gravity="center_vertical"
-            android:padding="8dp"
-            android:text="@string/activity_exchange_scan_partner_qr_hint"
-            android:textColor="@color/black" />
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rect_rounded"
+            android:backgroundTint="@color/white_80"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/navbar_bottom">
 
-        <TextView
-            android:id="@+id/qrInfoStatic"
+            <TextView
+                android:id="@+id/qrContentInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/public_key"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                android:textColor="@color/black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/qrCode" />
+
+            <ImageButton
+                android:id="@+id/qrInfoButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_info_outline"
+                android:tint="@color/black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <ImageView
+                android:id="@+id/qrCode"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="12dp"
+                android:src="@color/white"
+                app:layout_constraintBottom_toTopOf="@+id/qrInfoButton"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/scanFeedbackView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_info_outline"
-            android:drawablePadding="8dp"
-            android:drawableTint="@color/colorIconDark"
-            android:gravity="center_vertical"
-            android:lines="2"
-            android:padding="8dp"
-            android:text="@string/activity_exchange_continue_if_scanned"
-            android:textColor="@color/black" />
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rect_rounded"
+            android:backgroundTint="@color/white_80">
+
+            <TextView
+                android:id="@+id/scanFeedbackText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp"
+                android:drawableStart="@drawable/ic_check_outline"
+                android:drawableTint="@color/status_green"
+                android:drawablePadding="8dp"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                android:gravity="center_vertical"
+                tools:text="Public key received"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/continueHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:background="@drawable/rect_rounded"
+            android:backgroundTint="@color/white">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp"
+                android:drawableStart="@drawable/ic_info_outline"
+                android:drawableTint="@color/status_amber"
+                android:drawablePadding="8dp"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                android:gravity="center_vertical"
+                android:text="Continue if your partner scanned this QR code"/>
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/bottom"
-        android:layout_width="match_parent"
+        android:id="@+id/navbar_bottom"
+        android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_gravity="bottom"
         android:background="@drawable/rect_rounded_top"
         android:backgroundTint="@color/colorPrimary"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
             android:id="@+id/prevButton"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:background="?attr/selectableItemBackground"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/button_prev"
             android:padding="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_arrow_back"
-            android:contentDescription="@string/button_prev" />
+            app:srcCompat="@drawable/ic_arrow_back" />
 
-        <View
+        <TextView
+            android:visibility="invisible"
+            android:id="@+id/hint"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="Scan each others QR codes"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+            android:textColor="@color/white" />
 
         <ImageButton
             android:id="@+id/nextButton"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:background="?attr/selectableItemBackground"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/button_continue"
             android:padding="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_arrow_forward"
-            android:contentDescription="@string/button_continue" />
-
+            app:srcCompat="@drawable/ic_arrow_forward" />
     </LinearLayout>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

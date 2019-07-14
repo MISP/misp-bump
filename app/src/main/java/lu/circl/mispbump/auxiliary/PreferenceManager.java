@@ -210,7 +210,7 @@ public class PreferenceManager {
      * @return decrypted automation key associated with the current user. If no user exists an empty
      * String is returned.
      */
-    public String getAutomationKey() {
+    public String getAuthKey() {
 
         if (!preferences.contains(AUTOMATION_KEY)) {
             return "";
@@ -284,12 +284,12 @@ public class PreferenceManager {
     public String getServerUrl() {
 
         if (!preferences.contains(SERVER_URL)) {
-            return "";
+            return null;
         }
 
         try {
             KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.SERVER_URL_ALIAS);
-            return keyStoreWrapper.decrypt(preferences.getString(SERVER_URL, ""));
+            return keyStoreWrapper.decrypt(preferences.getString(SERVER_URL, null));
 
         } catch (NoSuchPaddingException e) {
             e.printStackTrace();
@@ -305,7 +305,7 @@ public class PreferenceManager {
             e.printStackTrace();
         }
 
-        return "";
+        return null;
     }
 
     /**

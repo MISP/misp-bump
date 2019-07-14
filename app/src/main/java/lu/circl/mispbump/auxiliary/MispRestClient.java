@@ -1,7 +1,8 @@
 package lu.circl.mispbump.auxiliary;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+
+import androidx.annotation.NonNull;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,98 +46,25 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MispRestClient {
 
 
-    public interface AvailableCallback {
-        void available();
-
-        void unavailable(String error);
-    }
-
-    public interface UserCallback {
-        void success(User user);
-
-        void failure(String error);
-    }
-
-    public interface AllUsersCallback {
-        void success(User[] users);
-
-        void failure(String error);
-    }
-
-    public interface OrganisationCallback {
-        void success(Organisation organisation);
-
-        void failure(String error);
-    }
-
-    public interface AllOrganisationsCallback {
-        void success(Organisation[] organisations);
-
-        void failure(String error);
-    }
-
-    public interface ServerCallback {
-        void success(Server server);
-
-        void failure(String error);
-    }
-
-    public interface AllServersCallback {
-        void success(Server[] servers);
-
-        void failure(String error);
-    }
-
-
     private static MispRestClient instance;
-
-    private PreferenceManager preferenceManager;
     private MispRestInterface mispRestInterface;
 
-
-    public static MispRestClient getInstance(Context context) {
+    public static MispRestClient getInstance(String url, String authkey) {
         if (instance == null) {
-            instance = new MispRestClient(context);
+            instance = new MispRestClient();
         }
+
+        instance.initMispRestInterface(url, authkey);
 
         return instance;
     }
 
-    public static MispRestClient getInstance(Context context, String url) {
-        if (instance == null) {
-            instance = new MispRestClient(context, url);
-        }
-
-        return instance;
-    }
-
-
-    private MispRestClient(Context context) {
-        this(context, null);
-    }
-
-    /**
-     * Initializes the rest client to communicate with a MISP instance.
-     *
-     * @param context needed to access the preferences for loading credentials
-     */
-    private MispRestClient(Context context, String url) {
-
-        preferenceManager = PreferenceManager.getInstance(context);
-
-        if (url == null) {
-            url = preferenceManager.getServerUrl();
-        }
-
-        initMispRestInterface(url);
-    }
-
-    public void initMispRestInterface(String url) {
+    public void initMispRestInterface(String url, String authkey) {
         try {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create())
-                    .client(getCustomClient(true, false))
+                    .client(getCustomClient(true, false, authkey))
                     .build();
 
             mispRestInterface = retrofit.create(MispRestInterface.class);
@@ -151,7 +79,7 @@ public class MispRestClient {
      * @param logging whether to log Retrofit calls (for debugging)
      * @return {@link OkHttpClient}
      */
-    private OkHttpClient getCustomClient(boolean unsafe, boolean logging) {
+    private OkHttpClient getCustomClient(boolean unsafe, boolean logging, final String authkey) {
         try {
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -206,7 +134,7 @@ public class MispRestClient {
                     Request.Builder ongoing = chain.request().newBuilder();
                     ongoing.addHeader("Accept", "application/json");
                     ongoing.addHeader("Content-Type", "application/json");
-                    ongoing.addHeader("Authorization", preferenceManager.getAutomationKey());
+                    ongoing.addHeader("Authorization", authkey);
                     return chain.proceed(ongoing.build());
                 }
             });
@@ -228,7 +156,7 @@ public class MispRestClient {
         Call<Version> call = mispRestInterface.pyMispVersion();
         call.enqueue(new Callback<Version>() {
             @Override
-            public void onResponse(Call<Version> call, Response<Version> response) {
+            public void onResponse(@NonNull Call<Version> call, @NonNull Response<Version> response) {
                 if (!response.isSuccessful()) {
                     if (response.code() == 403) {
                         callback.available();
@@ -242,7 +170,7 @@ public class MispRestClient {
             }
 
             @Override
-            public void onFailure(Call<Version> call, Throwable t) {
+            public void onFailure(@NonNull Call<Version> call, @NonNull Throwable t) {
                 callback.unavailable(extractError(t));
             }
         });
@@ -259,7 +187,7 @@ public class MispRestClient {
 
         call.enqueue(new Callback<MispUser>() {
             @Override
-            public void onResponse(Call<MispUser> call, Response<MispUser> response) {
+            public void onResponse(@NonNull Call<MispUser> call, @NonNull Response<MispUser> response) {
                 if (!response.isSuccessful()) {
                     callback.failure(extractError(response));
                 } else {
@@ -272,7 +200,7 @@ public class MispRestClient {
             }
 
             @Override
-            public void onFailure(Call<MispUser> call, Throwable t) {
+            public void onFailure(@NonNull Call<MispUser> call, @NonNull Throwable t) {
                 t.printStackTrace();
                 callback.failure(t.getMessage());
             }
@@ -291,7 +219,7 @@ public class MispRestClient {
 
         call.enqueue(new Callback<MispUser>() {
             @Override
-            public void onResponse(Call<MispUser> call, Response<MispUser> response) {
+            public void onResponse(@NonNull Call<MispUser> call, @NonNull Response<MispUser> response) {
                 if (!response.isSuccessful()) {
                     callback.failure(extractError(response));
                 } else {
@@ -304,7 +232,7 @@ public class MispRestClient {
             }
 
             @Override
-            public void onFailure(Call<MispUser> call, Throwable t) {
+            public void onFailure(@NonNull Call<MispUser> call, @NonNull Throwable t) {
                 t.printStackTrace();
                 callback.failure(t.getMessage());
             }
@@ -337,7 +265,7 @@ public class MispRestClient {
 
         call.enqueue(new Callback<List<MispUser>>() {
             @Override
-            public void onResponse(Call<List<MispUser>> call, Response<List<MispUser>> response) {
+            public void onResponse(@NonNull Call<List<MispUser>> call, @NonNull Response<List<MispUser>> response) {
                 if (!response.isSuccessful()) {
                     callback.failure("Failed onResponse");
                     return;
@@ -356,7 +284,7 @@ public class MispRestClient {
             }
 
             @Override
-            public void onFailure(Call<List<MispUser>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<MispUser>> call, @NonNull Throwable t) {
                 callback.failure(extractError(t));
             }
         });
@@ -373,7 +301,7 @@ public class MispRestClient {
 
         call.enqueue(new Callback<MispUser>() {
             @Override
-            public void onResponse(Call<MispUser> call, Response<MispUser> response) {
+            public void onResponse(@NonNull Call<MispUser> call, @NonNull Response<MispUser> response) {
                 if (!response.isSuccessful()) {
                     callback.failure(extractError(response));
                 } else {
@@ -383,7 +311,7 @@ public class MispRestClient {
             }
 
             @Override
-            public void onFailure(Call<MispUser> call, Throwable t) {
+            public void onFailure(@NonNull Call<MispUser> call, @NonNull Throwable t) {
                 callback.failure(t.getMessage());
             }
         });
@@ -403,7 +331,7 @@ public class MispRestClient {
 
         call.enqueue(new Callback<MispOrganisation>() {
             @Override
-            public void onResponse(Call<MispOrganisation> call, Response<MispOrganisation> response) {
+            public void onResponse(@NonNull Call<MispOrganisation> call, @NonNull Response<MispOrganisation> response) {
                 if (!response.isSuccessful()) {
                     callback.failure(extractError(response));
                 } else {
@@ -416,7 +344,7 @@ public class MispRestClient {
             }
 
             @Override
-            public void onFailure(Call<MispOrganisation> call, Throwable t) {
+            public void onFailure(@NonNull Call<MispOrganisation> call, @NonNull Throwable t) {
                 callback.failure(t.getMessage());
             }
         });
@@ -448,7 +376,7 @@ public class MispRestClient {
 
         call.enqueue(new Callback<List<MispOrganisation>>() {
             @Override
-            public void onResponse(Call<List<MispOrganisation>> call, Response<List<MispOrganisation>> response) {
+            public void onResponse(@NonNull Call<List<MispOrganisation>> call, @NonNull Response<List<MispOrganisation>> response) {
                 if (!response.isSuccessful()) {
                     // TODO handle
                     return;
@@ -468,7 +396,7 @@ public class MispRestClient {
             }
 
             @Override
-            public void onFailure(Call<List<MispOrganisation>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<MispOrganisation>> call, @NonNull Throwable t) {
                 callback.failure(extractError(t));
             }
         });
@@ -485,7 +413,7 @@ public class MispRestClient {
 
         call.enqueue(new Callback<MispOrganisation>() {
             @Override
-            public void onResponse(Call<MispOrganisation> call, Response<MispOrganisation> response) {
+            public void onResponse(@NonNull Call<MispOrganisation> call, @NonNull Response<MispOrganisation> response) {
                 if (!response.isSuccessful()) {
                     callback.failure(extractError(response));
                 } else {
@@ -495,7 +423,7 @@ public class MispRestClient {
             }
 
             @Override
-            public void onFailure(Call<MispOrganisation> call, Throwable t) {
+            public void onFailure(@NonNull Call<MispOrganisation> call, @NonNull Throwable t) {
                 callback.failure(t.getMessage());
             }
         });
@@ -517,7 +445,7 @@ public class MispRestClient {
 
         call.enqueue(new Callback<List<MispServer>>() {
             @Override
-            public void onResponse(Call<List<MispServer>> call, Response<List<MispServer>> response) {
+            public void onResponse(@NonNull Call<List<MispServer>> call, @NonNull Response<List<MispServer>> response) {
                 if (!response.isSuccessful()) {
                     callback.failure(extractError(response));
                 } else {
@@ -536,7 +464,7 @@ public class MispRestClient {
             }
 
             @Override
-            public void onFailure(Call<List<MispServer>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<MispServer>> call, @NonNull Throwable t) {
                 callback.failure(t.getMessage());
             }
         });
@@ -553,7 +481,7 @@ public class MispRestClient {
 
         call.enqueue(new Callback<Server>() {
             @Override
-            public void onResponse(Call<Server> call, Response<Server> response) {
+            public void onResponse(@NonNull Call<Server> call, @NonNull Response<Server> response) {
                 if (!response.isSuccessful()) {
                     callback.failure(extractError(response));
                 } else {
@@ -562,7 +490,7 @@ public class MispRestClient {
             }
 
             @Override
-            public void onFailure(Call<Server> call, Throwable t) {
+            public void onFailure(@NonNull Call<Server> call, @NonNull Throwable t) {
                 callback.failure(t.getMessage());
                 throw new RuntimeException(t);
             }
@@ -647,5 +575,49 @@ public class MispRestClient {
         }
 
         return t.getMessage();
+    }
+
+    // interfaces
+
+    public interface AvailableCallback {
+        void available();
+
+        void unavailable(String error);
+    }
+
+    public interface UserCallback {
+        void success(User user);
+
+        void failure(String error);
+    }
+
+    public interface AllUsersCallback {
+        void success(User[] users);
+
+        void failure(String error);
+    }
+
+    public interface OrganisationCallback {
+        void success(Organisation organisation);
+
+        void failure(String error);
+    }
+
+    public interface AllOrganisationsCallback {
+        void success(Organisation[] organisations);
+
+        void failure(String error);
+    }
+
+    public interface ServerCallback {
+        void success(Server server);
+
+        void failure(String error);
+    }
+
+    public interface AllServersCallback {
+        void success(Server[] servers);
+
+        void failure(String error);
     }
 }

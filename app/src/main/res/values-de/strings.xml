@@ -39,4 +39,9 @@
     <string name="upload_action_add_org">Organisation hinzufügen</string>
     <string name="upload_action_add_server">Server hinzufügen</string>
     <string name="upload_action_add_user">Benutzer hinzufügen</string>
+    <string name="public_key">Öffentlicher Schlüssel</string>
+    <string name="scan_qr_hint">Scannen Sie den QR code ihres Partners</string>
+    <string name="public_key_received_hint">Öffentlicher Schlüssel empfangen</string>
+    <string name="sync_info_received_hint">Synchronisations-Informationen empfangen</string>
+    <string name="sync_information">Synchronisations-Informationen</string>
 </resources>

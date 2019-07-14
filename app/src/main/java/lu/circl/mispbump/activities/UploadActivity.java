@@ -99,7 +99,7 @@ public class UploadActivity extends AppCompatActivity {
         setContentView(R.layout.activity_upload);
 
         preferenceManager = PreferenceManager.getInstance(UploadActivity.this);
-        restClient = MispRestClient.getInstance(this);
+        restClient = MispRestClient.getInstance(preferenceManager.getServerUrl(), preferenceManager.getAuthKey());
 
         parseExtra();
         initViews();
