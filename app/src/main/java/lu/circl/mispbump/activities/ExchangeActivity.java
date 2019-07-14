@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -43,9 +43,9 @@ public class ExchangeActivity extends AppCompatActivity {
 
     private CameraFragment cameraFragment;
 
-    private CoordinatorLayout rootLayout;
+    private ConstraintLayout rootLayout;
     private View qrFrame, scanFeedbackView, continueHintView, fragmentContainer;
-    private TextView scanFeedbackText;
+    private TextView scanFeedbackText, qrContentInfo;
     private ImageView qrCode;
     private ImageButton prevButton, nextButton;
 
@@ -57,7 +57,7 @@ public class ExchangeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_exchange_2);
+        setContentView(R.layout.activity_exchange);
 
         preferenceManager = PreferenceManager.getInstance(ExchangeActivity.this);
         qrCodeGenerator = new QrCodeGenerator(ExchangeActivity.this);
@@ -84,6 +84,7 @@ public class ExchangeActivity extends AppCompatActivity {
         scanFeedbackView = findViewById(R.id.scanFeedbackView);
         scanFeedbackText = findViewById(R.id.scanFeedbackText);
         continueHintView = findViewById(R.id.continueHint);
+        qrContentInfo = findViewById(R.id.qrContentInfo);
 
         prevButton = findViewById(R.id.prevButton);
         prevButton.setOnClickListener(onPrevClicked());
@@ -130,15 +131,12 @@ public class ExchangeActivity extends AppCompatActivity {
             @Override
             public void run() {
                 qrCode.setImageBitmap(bitmap);
-                qrFrame.setVisibility(View.VISIBLE);  // TODO animate
+                qrFrame.setVisibility(View.VISIBLE);
             }
         });
     }
 
     private void setSyncState(SyncState state) {
-
-        Log.d("DEBUG", "current sync state: " + state);
-
         currentSyncState = state;
 
         runOnUiThread(new Runnable() {
@@ -151,8 +149,11 @@ public class ExchangeActivity extends AppCompatActivity {
                         nextButton.setVisibility(View.GONE);
 
                         setCameraPreviewEnabled(true);
-                        setReadQrStatus(ReadQrStatus.PENDING);
                         showQrCode(publicKeyQr);
+
+                        setReadQrStatus(ReadQrStatus.PENDING);
+                        scanFeedbackText.setText(R.string.scan_qr_hint);
+                        qrContentInfo.setText(R.string.public_key);
                         break;
                     case KEY_EXCHANGE_DONE:
                         prevButton.setImageDrawable(getDrawable(R.drawable.ic_close));
@@ -161,8 +162,11 @@ public class ExchangeActivity extends AppCompatActivity {
                         nextButton.setVisibility(View.VISIBLE);
 
                         setCameraPreviewEnabled(false);
-                        setReadQrStatus(ReadQrStatus.SUCCESS);
                         showQrCode(publicKeyQr);
+
+                        setReadQrStatus(ReadQrStatus.SUCCESS);
+                        scanFeedbackText.setText(R.string.public_key_received_hint);
+                        qrContentInfo.setText(R.string.public_key);
                         break;
                     case DATA_EXCHANGE:
                         prevButton.setImageDrawable(getDrawable(R.drawable.ic_arrow_back));
@@ -170,8 +174,11 @@ public class ExchangeActivity extends AppCompatActivity {
                         nextButton.setVisibility(View.GONE);
 
                         setCameraPreviewEnabled(true);
-                        setReadQrStatus(ReadQrStatus.PENDING);
                         showQrCode(dataQr);
+
+                        setReadQrStatus(ReadQrStatus.PENDING);
+                        scanFeedbackText.setText(R.string.scan_qr_hint);
+                        qrContentInfo.setText(R.string.sync_information);
                         break;
                     case DATA_EXCHANGE_DONE:
                         prevButton.setImageDrawable(getDrawable(R.drawable.ic_arrow_back));
@@ -180,8 +187,11 @@ public class ExchangeActivity extends AppCompatActivity {
                         nextButton.setVisibility(View.VISIBLE);
 
                         setCameraPreviewEnabled(false);
-                        setReadQrStatus(ReadQrStatus.SUCCESS);
                         showQrCode(dataQr);
+
+                        setReadQrStatus(ReadQrStatus.SUCCESS);
+                        scanFeedbackText.setText(R.string.sync_info_received_hint);
+                        qrContentInfo.setText(R.string.public_key);
                         break;
                 }
             }
@@ -213,29 +223,22 @@ public class ExchangeActivity extends AppCompatActivity {
                 break;
         }
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                scanFeedbackText.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
-                scanFeedbackText.setCompoundDrawableTintList(ColorStateList.valueOf(color));
+        scanFeedbackText.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+        scanFeedbackText.setCompoundDrawableTintList(ColorStateList.valueOf(color));
 
-                if (currentReadQrStatus == ReadQrStatus.SUCCESS) {
-                    continueHintView.setVisibility(View.VISIBLE);
+        if (currentReadQrStatus == ReadQrStatus.SUCCESS) {
+            continueHintView.setVisibility(View.VISIBLE);
+            scanFeedbackView.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white)));
+            qrFrame.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white)));
 
-                    continueHintView.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white)));
-                    scanFeedbackView.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white)));
-                    qrFrame.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white)));
+            fragmentContainer.animate().alpha(0).setDuration(250).start();
+        } else {
+            continueHintView.setVisibility(View.GONE);
+            scanFeedbackView.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white_80)));
+            qrFrame.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white_80)));
 
-                    fragmentContainer.animate().alpha(0).setDuration(250).start();
-                } else {
-                    fragmentContainer.animate().alpha(1).setDuration(250).start();
-
-                    continueHintView.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white_80)));
-                    scanFeedbackView.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white_80)));
-                    qrFrame.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white_80)));
-                }
-            }
-        });
+            fragmentContainer.animate().alpha(1).setDuration(250).start();
+        }
     }
 
     private void setCameraPreviewEnabled(boolean enabled) {
