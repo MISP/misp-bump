@@ -1,68 +1,42 @@
-# Screenshots
+# MISPbump
+Simple and secure synchronisation of MISP instances
 
-## Login
+# What is MISPbump?
+With MISPbump admins can easily synchronize MISP instances by exchanging relevant information via encrypted QR codes.
 
-![Login](./screenshots/mispbump-login.png)
+Note: only **use case 1** from the [documentation](https://www.circl.lu/doc/misp/sharing/) is supported.
 
-## Home
+# How does MISPbump work?
+First of all: MISP admins login by providing the base URL of their instance and their authkey (automationkey).
 
-Actions: **Profile View** (Menubar) and **New Sync** (Floating Action Button)
+On a successfull login the users profile and the linked organisation information will be downloaded automatically.
+This information can be updated at any time from the profile view.
 
-![Home (Empty)](./screenshots/mispbump-home-0.png)
+From the main screen you can start a synchronisation process by pressing the dedicated button.
 
-## Profile
-Organisation information loaded automatically from your MISP instance
+The synchronisation process consists of 3 steps:
+1. Key Exchange (unencrypted QR code)
+1. Synchronisation Information Exchange (with shared secret encrypted QR code)
+1. Upload information to own MISP instance
 
-Actions: **Delete and logout** (Menubar) and **Update Info** (Floating Action Button)
+#### 1. Key Exchange
+[Diffie–Hellman key exchange](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange) ([Elliptic Curve](https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman)), where the public part is exchanged via a QR code.
+The result is a shared secret which will be used to encrypt the information passed via QR code in step 2.
 
-![Profile](./screenshots/mispbump-profile.png)
+#### 2. Synchronisation Information Exchange
+Local information like Organisation name, UUID, description and User information is encrypted with a from step 1 derived key.
+The information can now be securely exchanged via QR code.
 
-## Sync
+#### 3. Upload information to MISP instance
+Uploading the information to the MISP instance is accomplished with MISP's REST API.
 
-Core functionality of MISPbump.
+Uploading consists of the following steps:
+1. Create organisation
+1. Create Sync User & add to organisation
+1. Create Sync Server & populate with information above
 
-**First Step:** Exchange keys to derive a shared secret
+After that the two MISP instances are connected.
 
-![Profile](./screenshots/mispbump-sync-0.png)
-![Profile](./screenshots/mispbump-sync-1.png)
-
-**Second Step:** Exchange encrypted sync information
-
-![Profile](./screenshots/mispbump-sync-2.png)
-![Profile](./screenshots/mispbump-sync-3.png)
-
-## Sync information
-
-After a successfull exchange an entry for this organisation will appear.
-
-Actions: **Delete Sync information** (Menubar) and **Upload** (Floating Action Button in settings tab)
-
-**Credentials:** With these credentials you will be able to log in on the other MISP instance (SyncUser)
-
-![Profile](./screenshots/mispbump-sync-info-credentials.png)
-
-**Settings:** These are typical settings which are also available from the MISP web interface.
-
-![Profile](./screenshots/mispbump-sync-info-settings.png)
-
-## Upload
-
-Shows the status of the upload to your MISP instance.
-If errors occure they will be displayed and the user can restart the process.
-
-![Profile](./screenshots/mispbump-upload-1.png)
-![Profile](./screenshots/mispbump-upload-2.png)
-
-## Home with successfull sync
-
-![Home (Synced)](./screenshots/mispbump-home.png)
-
-
-# What does this app?
-1. Exchange public keys to make following communication private (via QR code)
-    + Diffie Hellman key exchange
-2. Exchange encrypted information needed to sync two MISP instances
-3. Upload information to MISP instance.
-
-# MISPBump
-![Alt text](./poster/mispbump.png)
+# Dependencies
++ [Retrofit](https://github.com/square/retrofit)
++ [ZXing](https://github.com/zxing/zxing)
