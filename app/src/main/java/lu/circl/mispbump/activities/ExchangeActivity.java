@@ -68,7 +68,6 @@ public class ExchangeActivity extends AppCompatActivity {
 
         uploadInformation = new UploadInformation();
         publicKeyQr = generatePublicKeyBitmap();
-        dataQr = generateLocalSyncInfoBitmap();
 
         setSyncState(SyncState.KEY_EXCHANGE);
     }
@@ -112,7 +111,7 @@ public class ExchangeActivity extends AppCompatActivity {
 
     private Bitmap generateLocalSyncInfoBitmap() {
         uploadInformation.setLocal(generateLocalSyncInfo());
-        return qrCodeGenerator.generateQrCode(new Gson().toJson(uploadInformation.getLocal()));
+        return qrCodeGenerator.generateQrCode(diffieHellman.encrypt(new Gson().toJson(uploadInformation.getLocal())));
     }
 
     private SyncInformation generateLocalSyncInfo() {
@@ -273,6 +272,7 @@ public class ExchangeActivity extends AppCompatActivity {
                         try {
                             diffieHellman.setForeignPublicKey(DiffieHellman.publicKeyFromString(qrData));
                             setSyncState(SyncState.KEY_EXCHANGE_DONE);
+                            dataQr = generateLocalSyncInfoBitmap();
                         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
                             if (currentReadQrStatus == ReadQrStatus.PENDING) {
                                 setReadQrStatus(ReadQrStatus.FAILURE);
