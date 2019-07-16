@@ -29,6 +29,7 @@ import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.auxiliary.TileDrawable;
 import lu.circl.mispbump.customViews.MaterialPreferenceText;
 import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.User;
 import lu.circl.mispbump.security.KeyStoreWrapper;
 
@@ -131,14 +132,22 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     public void updateProfile() {
-//        progressBar.setVisibility(View.VISIBLE);
+        mispRestClient.getRoles(new MispRestClient.AllRolesCallback() {
+            @Override
+            public void success(Role[] roles) {
+                preferenceManager.setRoles(roles);
+            }
+
+            @Override
+            public void failure(String error) {
+                Snackbar.make(rootLayout, error, Snackbar.LENGTH_LONG).show();
+            }
+        });
 
         mispRestClient.getMyUser(new MispRestClient.UserCallback() {
             @Override
             public void success(final User user) {
-
                 preferenceManager.setUserInfo(user);
-
                 mispRestClient.getOrganisation(user.org_id, new MispRestClient.OrganisationCallback() {
                     @Override
                     public void success(Organisation organisation) {
@@ -178,8 +187,7 @@ public class ProfileActivity extends AppCompatActivity {
         builder.setPositiveButton("Delete & Logout", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                PreferenceManager prefs = PreferenceManager.getInstance(ProfileActivity.this);
-                prefs.clearAllData();
+                preferenceManager.clearAllData();
                 KeyStoreWrapper.deleteAllStoredKeys();
 
                 Intent login = new Intent(getApplicationContext(), LoginActivity.class);

@@ -2,7 +2,6 @@ package lu.circl.mispbump.auxiliary;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -21,16 +20,14 @@ import javax.crypto.NoSuchPaddingException;
 
 import lu.circl.mispbump.models.UploadInformation;
 import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.User;
 import lu.circl.mispbump.security.KeyStoreWrapper;
 
 public class PreferenceManager {
 
-    private static final String TAG = "PreferenceManager";
-
     private static final String PREFERENCES_FILE = "user_settings";
 
-    private static final String SAVE_CREDENTIALS = "save_credentials";
     private static final String SERVER_URL = "server_url";
     private static final String AUTOMATION_KEY = "user_automation";
 
@@ -38,6 +35,8 @@ public class PreferenceManager {
     private static final String USER_ORG_INFOS = "user_org_infos";
 
     private static final String UPLOAD_INFO = "upload_info";
+
+    private static final String MISP_ROLES = "misp_roles";
 
     private SharedPreferences preferences;
     private static PreferenceManager instance;
@@ -58,6 +57,36 @@ public class PreferenceManager {
         }
 
         return instance;
+    }
+
+
+    /**
+     * Save downloaded MISP roles on device.
+     * @param roles {@link Role}
+     */
+    public void setRoles(Role[] roles) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(MISP_ROLES, new Gson().toJson(roles));
+        editor.apply();
+    }
+
+    /**
+     * Gets downloaded and saved MISP roles if available.
+     * <p/>
+     * Roles are downloaded on login and updated with each profile update.
+     *
+     * @return {@link Role}[] or null
+     */
+    public Role[] getRoles() {
+        Type type = new TypeToken<Role[]>() {}.getType();
+        String rolesString = preferences.getString(MISP_ROLES, "");
+
+        assert rolesString != null;
+        if (rolesString.isEmpty()) {
+            return null;
+        } else {
+            return new Gson().fromJson(rolesString, type);
+        }
     }
 
 
@@ -430,26 +459,13 @@ public class PreferenceManager {
     }
 
 
-    /**
-     * Set if credentials (authkey & server url) should be saved locally.
-     *
-     * @param save enable or disable
-     * @deprecated currently not used because automation key is needed to do requests to your misp instance.
-     * If this should be an option in future: misp automation key would be needed on each sync process.
-     */
-    public void setSaveCredentials(boolean save) {
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean(SAVE_CREDENTIALS, save);
-        editor.apply();
-    }
-
-    public boolean getSaveCredentials() {
-        return preferences.getBoolean(SAVE_CREDENTIALS, false);
-    }
-
-
     public void clearAllData() {
         SharedPreferences.Editor editor = preferences.edit();
+
+        clearServerUrl();
+        clearAutomationKey();
+        clearUploadInformation();
+
         editor.clear();
         editor.apply();
     }

@@ -3,13 +3,6 @@ package lu.circl.mispbump.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,13 +10,22 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.util.Objects;
 
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.auxiliary.DialogManager;
-import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.auxiliary.MispRestClient;
+import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.User;
 
 /**
@@ -126,6 +128,19 @@ public class LoginActivity extends AppCompatActivity {
             mispRestClient.isAvailable(new MispRestClient.AvailableCallback() {
                 @Override
                 public void available() {
+                    mispRestClient.getRoles(new MispRestClient.AllRolesCallback() {
+                        @Override
+                        public void success(Role[] roles) {
+                            preferenceManager.setRoles(roles);
+                        }
+
+                        @Override
+                        public void failure(String error) {
+                            // TODO what to do if an error occures?
+                            Snackbar.make(constraintLayout, error, Snackbar.LENGTH_LONG).show();
+                        }
+                    });
+
                     mispRestClient.getMyUser(new MispRestClient.UserCallback() {
                         @Override
                         public void success(final User user) {
