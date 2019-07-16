@@ -2,15 +2,25 @@ package lu.circl.mispbump.security;
 
 import android.util.Base64;
 
-import javax.crypto.*;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyAgreement;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * This class provides the functionality generate a shared secret key.
@@ -39,10 +49,11 @@ public class DiffieHellman {
 
     /**
      * Singleton pattern
+     *
      * @return {@link DiffieHellman}
      */
     public static DiffieHellman getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new DiffieHellman();
         }
 
@@ -71,6 +82,7 @@ public class DiffieHellman {
 
     /**
      * Encrypts data.
+     *
      * @param data data to encrypt
      * @return To String converted and encrypted data
      */
@@ -82,16 +94,16 @@ public class DiffieHellman {
             byte[] cipherText = c.doFinal(data.getBytes(StandardCharsets.UTF_8));
             return Base64.encodeToString(cipherText, Base64.NO_WRAP);
 
-        } catch (BadPaddingException | InvalidKeyException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
+        } catch (BadPaddingException | InvalidKeyException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
             e.printStackTrace();
         }
+
         return data;
     }
 
     /**
      * Decrypts data with the current shared secret.
+     *
      * @param data data to decrypt
      * @return To String converted and decrypted data
      */
@@ -113,6 +125,7 @@ public class DiffieHellman {
 
     /**
      * Generates a shared secret and derives an initialisation vector from it.
+     *
      * @param pk public key of the sync partner
      */
     public void setForeignPublicKey(PublicKey pk) {
@@ -122,8 +135,9 @@ public class DiffieHellman {
             byte[] tmpSharedSecret = keyAgreement.generateSecret();
             sharedSecret = Arrays.copyOfRange(tmpSharedSecret, 0, 32);
 
-            byte[] inputVector = Arrays.copyOfRange(sharedSecret, 32, 48);
+            byte[] inputVector = Arrays.copyOfRange(tmpSharedSecret, 32, 48);
             ivParameterSpec = new IvParameterSpec(inputVector);
+
         } catch (InvalidKeyException e) {
             e.printStackTrace();
         }
