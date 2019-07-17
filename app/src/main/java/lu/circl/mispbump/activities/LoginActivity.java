@@ -130,36 +130,47 @@ public class LoginActivity extends AppCompatActivity {
                 public void available() {
                     mispRestClient.getRoles(new MispRestClient.AllRolesCallback() {
                         @Override
-                        public void success(Role[] roles) {
+                        public void success(final Role[] roles) {
+
                             preferenceManager.setRoles(roles);
-                        }
 
-                        @Override
-                        public void failure(String error) {
-                            // TODO what to do if an error occures?
-                            Snackbar.make(constraintLayout, error, Snackbar.LENGTH_LONG).show();
-                        }
-                    });
-
-                    mispRestClient.getMyUser(new MispRestClient.UserCallback() {
-                        @Override
-                        public void success(final User user) {
-                            preferenceManager.setUserInfo(user);
-                            mispRestClient.getOrganisation(user.org_id, new MispRestClient.OrganisationCallback() {
+                            mispRestClient.getMyUser(new MispRestClient.UserCallback() {
                                 @Override
-                                public void success(Organisation organisation) {
-                                    preferenceManager.setUserOrgInfo(organisation);
+                                public void success(final User user) {
+                                    preferenceManager.setUserInfo(user);
+                                    for (Role role: roles) {
+                                        if (role.getId().equals(user.role_id)) {
+                                            if (!role.getPermAdmin()) {
+                                                progressBar.setVisibility(View.GONE);
+                                                Snackbar.make(constraintLayout, "You have no admin rights", Snackbar.LENGTH_LONG).show();
+                                                return;
+                                            }
+                                        }
+                                    }
 
-                                    // save authkey
-                                    preferenceManager.setAutomationKey(authkey);
+                                    mispRestClient.getOrganisation(user.org_id, new MispRestClient.OrganisationCallback() {
+                                        @Override
+                                        public void success(Organisation organisation) {
+                                            preferenceManager.setUserOrgInfo(organisation);
 
-                                    // save url
-                                    preferenceManager.setServerUrl(url);
+                                            // save authkey
+                                            preferenceManager.setAutomationKey(authkey);
 
-                                    progressBar.setVisibility(View.GONE);
-                                    Intent home = new Intent(getApplicationContext(), HomeActivity.class);
-                                    startActivity(home);
-                                    finish();
+                                            // save url
+                                            preferenceManager.setServerUrl(url);
+
+                                            progressBar.setVisibility(View.GONE);
+                                            Intent home = new Intent(getApplicationContext(), HomeActivity.class);
+                                            startActivity(home);
+                                            finish();
+                                        }
+
+                                        @Override
+                                        public void failure(String error) {
+                                            progressBar.setVisibility(View.GONE);
+                                            Snackbar.make(constraintLayout, error, Snackbar.LENGTH_LONG).show();
+                                        }
+                                    });
                                 }
 
                                 @Override
@@ -181,8 +192,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void unavailable(String error) {
                     progressBar.setVisibility(View.GONE);
-                    Snackbar sb = Snackbar.make(constraintLayout, error, Snackbar.LENGTH_LONG);
-                    sb.show();
+                    Snackbar.make(constraintLayout, error, Snackbar.LENGTH_LONG).show();
                 }
             });
         }
