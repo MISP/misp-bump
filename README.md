@@ -10,9 +10,9 @@ Note: only **use case 1** from the [documentation](https://www.circl.lu/doc/misp
 First of all: MISP admins login by providing the base URL of their instance and their authkey (automationkey).
 
 On a successfull login the admins profile and the linked organisation information will be downloaded automatically.  
-This information can be updated at any time from the profile view.
+This information can be updated at any time in the profile screen.
 
-From the main screen you can start a synchronisation process by pressing the dedicated button.
+In the main screen you can start a synchronisation process by pressing the dedicated button.
 
 The synchronisation process consists of 3 steps:
 1. **Key Exchange**  
@@ -28,7 +28,7 @@ The synchronisation process consists of 3 steps:
     + Generated: sync user authkey, sync user password  
         (your partner will create a sync user with these credentials)
 
-    The Synchronisation information is encrypted with AES using the shared secret (from step 1).
+    The synchronisation information is encrypted with AES using the shared secret (from step 1).
 
     The sync process information will be saved securely on the device, that means the upload can be started any time in the future.
 
@@ -38,8 +38,8 @@ The synchronisation process consists of 3 steps:
 
     Uploading consists of the following steps:
     1. Create organisation
-    1. Create Sync User & add to organisation
-    1. Create Sync Server & populate with information above
+    1. Create sync user & add to organisation
+    1. Create sync server & populate with information above
 
 After that the two MISP instances are connected.
 
