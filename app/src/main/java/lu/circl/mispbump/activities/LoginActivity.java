@@ -28,10 +28,6 @@ import lu.circl.mispbump.models.restModels.Organisation;
 import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.User;
 
-/**
- * This activity is shown when the current device has no misp user and organisation associated with it.
- * It takes care of downloading all information necessary for a sync with other misp instances.
- */
 public class LoginActivity extends AppCompatActivity {
 
     private PreferenceManager preferenceManager;
@@ -66,7 +62,6 @@ public class LoginActivity extends AppCompatActivity {
             return true;
         }
 
-        // invoke superclass to handle unrecognized item (eg. homeAsUp)
         return super.onOptionsItemSelected(item);
     }
 
@@ -74,7 +69,6 @@ public class LoginActivity extends AppCompatActivity {
     private void initializeViews() {
         constraintLayout = findViewById(R.id.rootLayout);
 
-        // populate Toolbar (Actionbar)
         Toolbar myToolbar = findViewById(R.id.appbar);
         setSupportActionBar(myToolbar);
         ActionBar ab = getSupportActionBar();
@@ -84,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         Button downloadInfoButton = findViewById(R.id.login_download_button);
-        downloadInfoButton.setOnClickListener(onClickDownload);
+        downloadInfoButton.setOnClickListener(onLogin);
 
         serverUrl = findViewById(R.id.login_server_url);
         serverAutomationKey = findViewById(R.id.login_automation_key);
@@ -92,9 +86,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Is called when the user clicks on the login button.
+     * Called when the user clicks on the login button.
      */
-    private View.OnClickListener onClickDownload = new View.OnClickListener() {
+    private View.OnClickListener onLogin = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             final String url = Objects.requireNonNull(serverUrl.getEditText()).getText().toString();
@@ -131,18 +125,17 @@ public class LoginActivity extends AppCompatActivity {
                     mispRestClient.getRoles(new MispRestClient.AllRolesCallback() {
                         @Override
                         public void success(final Role[] roles) {
-
                             preferenceManager.setRoles(roles);
 
                             mispRestClient.getMyUser(new MispRestClient.UserCallback() {
                                 @Override
                                 public void success(final User user) {
                                     preferenceManager.setUserInfo(user);
-                                    for (Role role: roles) {
+                                    for (Role role : roles) {
                                         if (role.getId().equals(user.role_id)) {
                                             if (!role.getPermAdmin()) {
                                                 progressBar.setVisibility(View.GONE);
-                                                Snackbar.make(constraintLayout, "You have no admin rights", Snackbar.LENGTH_LONG).show();
+                                                Snackbar.make(constraintLayout, "No admin is associated with this authkey.", Snackbar.LENGTH_LONG).show();
                                                 return;
                                             }
                                         }
