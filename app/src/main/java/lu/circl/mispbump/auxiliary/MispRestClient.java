@@ -23,9 +23,11 @@ import javax.net.ssl.X509TrustManager;
 
 import lu.circl.mispbump.interfaces.MispRestInterface;
 import lu.circl.mispbump.models.restModels.MispOrganisation;
+import lu.circl.mispbump.models.restModels.MispRole;
 import lu.circl.mispbump.models.restModels.MispServer;
 import lu.circl.mispbump.models.restModels.MispUser;
 import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.Server;
 import lu.circl.mispbump.models.restModels.User;
 import lu.circl.mispbump.models.restModels.Version;
@@ -172,6 +174,36 @@ public class MispRestClient {
             @Override
             public void onFailure(@NonNull Call<Version> call, @NonNull Throwable t) {
                 callback.unavailable(extractError(t));
+            }
+        });
+    }
+
+    public void getRoles(final AllRolesCallback callback) {
+        Call<List<MispRole>> call = mispRestInterface.getRoles();
+        call.enqueue(new Callback<List<MispRole>>() {
+            @Override
+            public void onResponse(Call<List<MispRole>> call, Response<List<MispRole>> response) {
+
+                if (!response.isSuccessful()) {
+                    callback.failure(extractError(response));
+                    return;
+                }
+
+                List<MispRole> mispRoles = response.body();
+                assert mispRoles != null;
+
+                Role[] roles = new Role[mispRoles.size()];
+
+                for (int i = 0; i < roles.length; i++) {
+                    roles[i] = mispRoles.get(i).role;
+                }
+
+                callback.success(roles);
+            }
+
+            @Override
+            public void onFailure(Call<List<MispRole>> call, Throwable t) {
+                callback.failure(extractError(t));
             }
         });
     }
@@ -617,6 +649,12 @@ public class MispRestClient {
 
     public interface AllServersCallback {
         void success(Server[] servers);
+
+        void failure(String error);
+    }
+
+    public interface AllRolesCallback {
+        void success(Role[] roles);
 
         void failure(String error);
     }

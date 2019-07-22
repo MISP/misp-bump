@@ -3,6 +3,7 @@ package lu.circl.mispbump.interfaces;
 import java.util.List;
 
 import lu.circl.mispbump.models.restModels.MispOrganisation;
+import lu.circl.mispbump.models.restModels.MispRole;
 import lu.circl.mispbump.models.restModels.MispServer;
 import lu.circl.mispbump.models.restModels.MispUser;
 import lu.circl.mispbump.models.restModels.Organisation;
@@ -24,6 +25,9 @@ public interface MispRestInterface {
 
     @GET("servers/getPyMISPVersion")
     Call<Version> pyMispVersion();
+
+    @GET("admin/roles")
+    Call<List<MispRole>> getRoles();
 
     // user routes
 

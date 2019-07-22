@@ -3,13 +3,6 @@ package lu.circl.mispbump.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,19 +10,24 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.util.Objects;
 
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.auxiliary.DialogManager;
-import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.auxiliary.MispRestClient;
+import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.User;
 
-/**
- * This activity is shown when the current device has no misp user and organisation associated with it.
- * It takes care of downloading all information necessary for a sync with other misp instances.
- */
 public class LoginActivity extends AppCompatActivity {
 
     private PreferenceManager preferenceManager;
@@ -64,7 +62,6 @@ public class LoginActivity extends AppCompatActivity {
             return true;
         }
 
-        // invoke superclass to handle unrecognized item (eg. homeAsUp)
         return super.onOptionsItemSelected(item);
     }
 
@@ -72,7 +69,6 @@ public class LoginActivity extends AppCompatActivity {
     private void initializeViews() {
         constraintLayout = findViewById(R.id.rootLayout);
 
-        // populate Toolbar (Actionbar)
         Toolbar myToolbar = findViewById(R.id.appbar);
         setSupportActionBar(myToolbar);
         ActionBar ab = getSupportActionBar();
@@ -82,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         Button downloadInfoButton = findViewById(R.id.login_download_button);
-        downloadInfoButton.setOnClickListener(onClickDownload);
+        downloadInfoButton.setOnClickListener(onLogin);
 
         serverUrl = findViewById(R.id.login_server_url);
         serverAutomationKey = findViewById(R.id.login_automation_key);
@@ -90,9 +86,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Is called when the user clicks on the login button.
+     * Called when the user clicks on the login button.
      */
-    private View.OnClickListener onClickDownload = new View.OnClickListener() {
+    private View.OnClickListener onLogin = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             final String url = Objects.requireNonNull(serverUrl.getEditText()).getText().toString();
@@ -126,25 +122,48 @@ public class LoginActivity extends AppCompatActivity {
             mispRestClient.isAvailable(new MispRestClient.AvailableCallback() {
                 @Override
                 public void available() {
-                    mispRestClient.getMyUser(new MispRestClient.UserCallback() {
+                    mispRestClient.getRoles(new MispRestClient.AllRolesCallback() {
                         @Override
-                        public void success(final User user) {
-                            preferenceManager.setUserInfo(user);
-                            mispRestClient.getOrganisation(user.org_id, new MispRestClient.OrganisationCallback() {
+                        public void success(final Role[] roles) {
+                            preferenceManager.setRoles(roles);
+
+                            mispRestClient.getMyUser(new MispRestClient.UserCallback() {
                                 @Override
-                                public void success(Organisation organisation) {
-                                    preferenceManager.setUserOrgInfo(organisation);
+                                public void success(final User user) {
+                                    preferenceManager.setUserInfo(user);
+                                    for (Role role : roles) {
+                                        if (role.getId().equals(user.role_id)) {
+                                            if (!role.getPermAdmin()) {
+                                                progressBar.setVisibility(View.GONE);
+                                                Snackbar.make(constraintLayout, "No admin is associated with this authkey.", Snackbar.LENGTH_LONG).show();
+                                                return;
+                                            }
+                                        }
+                                    }
 
-                                    // save authkey
-                                    preferenceManager.setAutomationKey(authkey);
+                                    mispRestClient.getOrganisation(user.org_id, new MispRestClient.OrganisationCallback() {
+                                        @Override
+                                        public void success(Organisation organisation) {
+                                            preferenceManager.setUserOrgInfo(organisation);
 
-                                    // save url
-                                    preferenceManager.setServerUrl(url);
+                                            // save authkey
+                                            preferenceManager.setAutomationKey(authkey);
 
-                                    progressBar.setVisibility(View.GONE);
-                                    Intent home = new Intent(getApplicationContext(), HomeActivity.class);
-                                    startActivity(home);
-                                    finish();
+                                            // save url
+                                            preferenceManager.setServerUrl(url);
+
+                                            progressBar.setVisibility(View.GONE);
+                                            Intent home = new Intent(getApplicationContext(), HomeActivity.class);
+                                            startActivity(home);
+                                            finish();
+                                        }
+
+                                        @Override
+                                        public void failure(String error) {
+                                            progressBar.setVisibility(View.GONE);
+                                            Snackbar.make(constraintLayout, error, Snackbar.LENGTH_LONG).show();
+                                        }
+                                    });
                                 }
 
                                 @Override
@@ -166,8 +185,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void unavailable(String error) {
                     progressBar.setVisibility(View.GONE);
-                    Snackbar sb = Snackbar.make(constraintLayout, error, Snackbar.LENGTH_LONG);
-                    sb.show();
+                    Snackbar.make(constraintLayout, error, Snackbar.LENGTH_LONG).show();
                 }
             });
         }
