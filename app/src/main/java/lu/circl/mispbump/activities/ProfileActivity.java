@@ -79,23 +79,23 @@ public class ProfileActivity extends AppCompatActivity {
         Organisation organisation = preferenceManager.getUserOrganisation();
 
         TextView name = findViewById(R.id.orgName);
-        name.setText(organisation.name);
+        name.setText(organisation.getName());
 
         final MaterialPreferenceText uuid = findViewById(R.id.uuid);
-        uuid.setSubtitle(organisation.uuid);
+        uuid.setSubtitle(organisation.getUuid());
 
         MaterialPreferenceText nationality = findViewById(R.id.nationality);
-        nationality.setSubtitle(organisation.nationality);
+        nationality.setSubtitle(organisation.getNationality());
 
         MaterialPreferenceText sector = findViewById(R.id.sector);
-        if (organisation.sector == null) {
+        if (organisation.getSector() == null) {
             sector.setVisibility(View.GONE);
         } else {
-            sector.setSubtitle(organisation.sector);
+            sector.setSubtitle(organisation.getSector());
         }
 
         MaterialPreferenceText description = findViewById(R.id.description);
-        description.setSubtitle(organisation.description);
+        description.setSubtitle(organisation.getDescription());
     }
 
     @Override

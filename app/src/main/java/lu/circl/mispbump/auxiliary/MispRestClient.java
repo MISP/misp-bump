@@ -355,7 +355,7 @@ public class MispRestClient {
             @Override
             public void success(Organisation[] organisations) {
                 for (Organisation organisation : organisations) {
-                    if (organisation.uuid.equals(uuid)) {
+                    if (organisation.getUuid().equals(uuid)) {
                         callback.success(organisation);
                         return;
                     }

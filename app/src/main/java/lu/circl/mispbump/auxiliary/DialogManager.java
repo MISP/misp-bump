@@ -26,10 +26,10 @@ public class DialogManager {
         // this dialog needs definite user feedback
         adb.setCancelable(false);
 
-        if (oldSync.organisation.name.equals(newSync.organisation.name)) {
-            adb.setTitle("Already Synced with " + oldSync.organisation.name);
+        if (oldSync.organisation.getName().equals(newSync.organisation.getName())) {
+            adb.setTitle("Already Synced with " + oldSync.organisation.getName());
         } else {
-            adb.setTitle("Already Synced with " + oldSync.organisation.name + "(Now:" + newSync.organisation.name + ")");
+            adb.setTitle("Already Synced with " + oldSync.organisation.getName() + "(Now:" + newSync.organisation.getName() + ")");
         }
 
         adb.setMessage("");
@@ -142,7 +142,7 @@ public class DialogManager {
         final AlertDialog.Builder adb = new AlertDialog.Builder(context);
 
         adb.setTitle("Sync information received");
-        adb.setMessage(syncInformation.organisation.name);
+        adb.setMessage(syncInformation.organisation.getName());
         adb.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
