@@ -118,7 +118,7 @@ public class ExchangeActivity extends AppCompatActivity {
         SyncInformation syncInformation = new SyncInformation();
         syncInformation.organisation = preferenceManager.getUserOrganisation().toSyncOrganisation();
         syncInformation.syncUserAuthkey = new RandomString(40).nextString();
-        syncInformation.baseUrl = preferenceManager.getServerUrl();
+        syncInformation.baseUrl = preferenceManager.getUserCredentials().first;
         syncInformation.syncUserPassword = new RandomString(16).nextString();
         syncInformation.syncUserEmail = preferenceManager.getUserInfo().email;
         return syncInformation;

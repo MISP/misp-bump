@@ -61,12 +61,12 @@ public class MispRestClient {
         return instance;
     }
 
-    public void initMispRestInterface(String url, String authkey) {
+    private void initMispRestInterface(String url, String authkey) {
         try {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create())
-                    .client(getCustomClient(true, false, authkey))
+                    .client(getCustomClient(true, true, authkey))
                     .build();
 
             mispRestInterface = retrofit.create(MispRestInterface.class);
@@ -370,7 +370,7 @@ public class MispRestClient {
                     if (response.body() != null) {
                         callback.success(response.body().organisation);
                     } else {
-                        callback.failure("Response body was nul");
+                        callback.failure("Response was empty");
                     }
                 }
             }
@@ -410,7 +410,6 @@ public class MispRestClient {
             @Override
             public void onResponse(@NonNull Call<List<MispOrganisation>> call, @NonNull Response<List<MispOrganisation>> response) {
                 if (!response.isSuccessful()) {
-                    // TODO handle
                     return;
                 }
 
@@ -604,6 +603,12 @@ public class MispRestClient {
 
         if (t instanceof NoRouteToHostException) {
             return "Server is not available (no route to host)";
+        }
+
+        try {
+            throw new Exception(t);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return t.getMessage();

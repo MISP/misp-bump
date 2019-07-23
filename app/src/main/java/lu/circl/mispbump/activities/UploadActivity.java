@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.util.Pair;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -99,7 +100,8 @@ public class UploadActivity extends AppCompatActivity {
         setContentView(R.layout.activity_upload);
 
         preferenceManager = PreferenceManager.getInstance(UploadActivity.this);
-        restClient = MispRestClient.getInstance(preferenceManager.getServerUrl(), preferenceManager.getAuthKey());
+        Pair<String, String> credentials = preferenceManager.getUserCredentials();
+        restClient = MispRestClient.getInstance(credentials.first, credentials.second);
 
         parseExtra();
         initViews();

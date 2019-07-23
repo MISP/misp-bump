@@ -33,7 +33,7 @@ public class LoginActivity extends AppCompatActivity {
     private PreferenceManager preferenceManager;
 
     private ConstraintLayout constraintLayout;
-    private TextInputLayout serverAutomationKey;
+    private TextInputLayout serverAuthkey;
     private TextInputLayout serverUrl;
     private ProgressBar progressBar;
 
@@ -81,7 +81,7 @@ public class LoginActivity extends AppCompatActivity {
         downloadInfoButton.setOnClickListener(onLogin);
 
         serverUrl = findViewById(R.id.login_server_url);
-        serverAutomationKey = findViewById(R.id.login_automation_key);
+        serverAuthkey = findViewById(R.id.login_automation_key);
         progressBar = findViewById(R.id.login_progressbar);
     }
 
@@ -92,12 +92,12 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             final String url = Objects.requireNonNull(serverUrl.getEditText()).getText().toString();
-            final String authkey = Objects.requireNonNull(serverAutomationKey.getEditText()).getText().toString();
+            final String authkey = Objects.requireNonNull(serverAuthkey.getEditText()).getText().toString();
 
             boolean error = false;
 
             serverUrl.setError(null);
-            serverAutomationKey.setError(null);
+            serverAuthkey.setError(null);
 
             if (!isValidUrl(url)) {
                 error = true;
@@ -106,7 +106,7 @@ public class LoginActivity extends AppCompatActivity {
 
             if (!isValidAutomationKey(authkey)) {
                 error = true;
-                serverAutomationKey.setError("Invalid automation key");
+                serverAuthkey.setError("Invalid automation key");
             }
 
             if (error) {
@@ -145,14 +145,10 @@ public class LoginActivity extends AppCompatActivity {
                                         @Override
                                         public void success(Organisation organisation) {
                                             preferenceManager.setUserOrgInfo(organisation);
-
-                                            // save authkey
-                                            preferenceManager.setAutomationKey(authkey);
-
-                                            // save url
-                                            preferenceManager.setServerUrl(url);
+                                            preferenceManager.setUserCredentials(url, authkey);
 
                                             progressBar.setVisibility(View.GONE);
+
                                             Intent home = new Intent(getApplicationContext(), HomeActivity.class);
                                             startActivity(home);
                                             finish();

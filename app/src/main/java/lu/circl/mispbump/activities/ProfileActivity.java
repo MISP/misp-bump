@@ -17,6 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.util.Pair;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -48,7 +49,8 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         preferenceManager = PreferenceManager.getInstance(this);
-        mispRestClient = MispRestClient.getInstance(preferenceManager.getServerUrl(), preferenceManager.getAuthKey());
+        Pair<String, String> credentials = preferenceManager.getUserCredentials();
+        mispRestClient = MispRestClient.getInstance(credentials.first, credentials.second);
 
         init();
         populateInformationViews();
