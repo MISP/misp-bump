@@ -127,7 +127,7 @@ public class UploadInfoActivity extends AppCompatActivity {
         assert ab != null;
 
         TextView toolbarTitle = findViewById(R.id.toolbarTitle);
-        toolbarTitle.setText(uploadInformation.getRemote().organisation.name);
+        toolbarTitle.setText(uploadInformation.getRemote().organisation.getName());
 
         ab.setHomeAsUpIndicator(R.drawable.ic_close);
 

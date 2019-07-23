@@ -2,12 +2,10 @@ package lu.circl.mispbump.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import lu.circl.mispbump.auxiliary.PreferenceManager;
-import lu.circl.mispbump.models.restModels.User;
 
 /**
  * Starts either the login or home activity.
@@ -32,7 +30,6 @@ public class StartUpActivity extends AppCompatActivity {
 
     private boolean isUserLoggedIn() {
         PreferenceManager preferenceManager = PreferenceManager.getInstance(this);
-        User user = preferenceManager.getUserInfo();
-        return user != null;
+        return preferenceManager.getUserCredentials() != null && preferenceManager.getUserInfo() != null;
     }
 }
