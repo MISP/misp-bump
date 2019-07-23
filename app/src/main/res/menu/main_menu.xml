@@ -8,9 +8,9 @@
         android:title="Profile"
         app:showAsAction="ifRoom"/>
 
-    <!--<item-->
-        <!--android:id="@+id/menu_settings"-->
-        <!--android:icon="@drawable/ic_settings"-->
-        <!--android:title="Settings"-->
-        <!--app:showAsAction="never"/>-->
+    <item
+        android:id="@+id/menu_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="Settings"
+        app:showAsAction="never"/>
 </menu>

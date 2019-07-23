@@ -45,6 +45,7 @@
             android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.PreferenceActivity"
+            android:label="@string/settings"
             android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.ProfileActivity"

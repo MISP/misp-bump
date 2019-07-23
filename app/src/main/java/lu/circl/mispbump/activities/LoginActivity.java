@@ -3,7 +3,6 @@ package lu.circl.mispbump.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -210,6 +209,6 @@ public class LoginActivity extends AppCompatActivity {
      * @return true or false
      */
     private boolean isValidAutomationKey(String automationKey) {
-        return !TextUtils.isEmpty(automationKey);
+        return !automationKey.equals("");
     }
 }
