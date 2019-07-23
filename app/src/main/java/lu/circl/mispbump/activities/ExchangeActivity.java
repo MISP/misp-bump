@@ -118,7 +118,7 @@ public class ExchangeActivity extends AppCompatActivity {
         SyncInformation syncInformation = new SyncInformation();
         syncInformation.organisation = preferenceManager.getUserOrganisation().toSyncOrganisation();
         syncInformation.syncUserAuthkey = new RandomString(40).nextString();
-        syncInformation.baseUrl = preferenceManager.getServerUrl();
+        syncInformation.baseUrl = preferenceManager.getUserCredentials().first;
         syncInformation.syncUserPassword = new RandomString(16).nextString();
         syncInformation.syncUserEmail = preferenceManager.getUserInfo().email;
         return syncInformation;
@@ -289,7 +289,7 @@ public class ExchangeActivity extends AppCompatActivity {
                             final List<UploadInformation> uploadInformationList = preferenceManager.getUploadInformationList();
 
                             for (final UploadInformation ui : uploadInformationList) {
-                                if (ui.getRemote().organisation.uuid.equals(remoteSyncInfo.organisation.uuid)) {
+                                if (ui.getRemote().organisation.getUuid().equals(remoteSyncInfo.organisation.getUuid())) {
                                     DialogManager.syncAlreadyExistsDialog(ui.getRemote(), remoteSyncInfo, ExchangeActivity.this, new DialogManager.IDialogFeedback() {
                                         @Override
                                         public void positive() {

@@ -17,6 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.util.Pair;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -29,6 +30,7 @@ import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.auxiliary.TileDrawable;
 import lu.circl.mispbump.customViews.MaterialPreferenceText;
 import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.User;
 import lu.circl.mispbump.security.KeyStoreWrapper;
 
@@ -47,7 +49,8 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         preferenceManager = PreferenceManager.getInstance(this);
-        mispRestClient = MispRestClient.getInstance(preferenceManager.getServerUrl(), preferenceManager.getAuthKey());
+        Pair<String, String> credentials = preferenceManager.getUserCredentials();
+        mispRestClient = MispRestClient.getInstance(credentials.first, credentials.second);
 
         init();
         populateInformationViews();
@@ -79,23 +82,23 @@ public class ProfileActivity extends AppCompatActivity {
         Organisation organisation = preferenceManager.getUserOrganisation();
 
         TextView name = findViewById(R.id.orgName);
-        name.setText(organisation.name);
+        name.setText(organisation.getName());
 
         final MaterialPreferenceText uuid = findViewById(R.id.uuid);
-        uuid.setSubtitle(organisation.uuid);
+        uuid.setSubtitle(organisation.getUuid());
 
         MaterialPreferenceText nationality = findViewById(R.id.nationality);
-        nationality.setSubtitle(organisation.nationality);
+        nationality.setSubtitle(organisation.getNationality());
 
         MaterialPreferenceText sector = findViewById(R.id.sector);
-        if (organisation.sector == null) {
+        if (organisation.getSector() == null) {
             sector.setVisibility(View.GONE);
         } else {
-            sector.setSubtitle(organisation.sector);
+            sector.setSubtitle(organisation.getSector());
         }
 
         MaterialPreferenceText description = findViewById(R.id.description);
-        description.setSubtitle(organisation.description);
+        description.setSubtitle(organisation.getDescription());
     }
 
     @Override
@@ -131,14 +134,22 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     public void updateProfile() {
-//        progressBar.setVisibility(View.VISIBLE);
+        mispRestClient.getRoles(new MispRestClient.AllRolesCallback() {
+            @Override
+            public void success(Role[] roles) {
+                preferenceManager.setRoles(roles);
+            }
+
+            @Override
+            public void failure(String error) {
+                Snackbar.make(rootLayout, error, Snackbar.LENGTH_LONG).show();
+            }
+        });
 
         mispRestClient.getMyUser(new MispRestClient.UserCallback() {
             @Override
             public void success(final User user) {
-
                 preferenceManager.setUserInfo(user);
-
                 mispRestClient.getOrganisation(user.org_id, new MispRestClient.OrganisationCallback() {
                     @Override
                     public void success(Organisation organisation) {
@@ -178,8 +189,7 @@ public class ProfileActivity extends AppCompatActivity {
         builder.setPositiveButton("Delete & Logout", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                PreferenceManager prefs = PreferenceManager.getInstance(ProfileActivity.this);
-                prefs.clearAllData();
+                preferenceManager.clearAllData();
                 KeyStoreWrapper.deleteAllStoredKeys();
 
                 Intent login = new Intent(getApplicationContext(), LoginActivity.class);

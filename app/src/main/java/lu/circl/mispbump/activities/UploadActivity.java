@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.util.Pair;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -99,7 +100,8 @@ public class UploadActivity extends AppCompatActivity {
         setContentView(R.layout.activity_upload);
 
         preferenceManager = PreferenceManager.getInstance(UploadActivity.this);
-        restClient = MispRestClient.getInstance(preferenceManager.getServerUrl(), preferenceManager.getAuthKey());
+        Pair<String, String> credentials = preferenceManager.getUserCredentials();
+        restClient = MispRestClient.getInstance(credentials.first, credentials.second);
 
         parseExtra();
         initViews();
@@ -212,7 +214,7 @@ public class UploadActivity extends AppCompatActivity {
 
     private User generateSyncUser(Organisation organisation) {
         User syncUser = new User();
-        syncUser.org_id = organisation.id;
+        syncUser.org_id = organisation.getId();
         syncUser.role_id = User.ROLE_SYNC_USER;
         syncUser.email = uploadInformation.getRemote().syncUserEmail;
         syncUser.password = uploadInformation.getRemote().syncUserPassword;
@@ -224,9 +226,9 @@ public class UploadActivity extends AppCompatActivity {
 
     private Server generateSyncServer() {
         Server server = new Server();
-        server.name = uploadInformation.getRemote().organisation.name + "'s Sync Server";
+        server.name = uploadInformation.getRemote().organisation.getName() + "'s Sync Server";
         server.url = uploadInformation.getRemote().baseUrl;
-        server.remote_org_id = uploadInformation.getRemote().organisation.id;
+        server.remote_org_id = uploadInformation.getRemote().organisation.getId();
         server.authkey = uploadInformation.getLocal().syncUserAuthkey;
         server.pull = uploadInformation.isPull();
         server.push = uploadInformation.isPush();
@@ -256,11 +258,11 @@ public class UploadActivity extends AppCompatActivity {
     private void organisationAdded(Organisation organisation) {
         if (organisation != null) {
             setUploadActionState(orgAction, UploadAction.UploadState.DONE, null);
-            uploadInformation.getRemote().organisation.id = organisation.id;
+            uploadInformation.getRemote().organisation.setId(organisation.getId());
             restClient.addUser(generateSyncUser(organisation), userCallback);
         } else {
             // search by UUID because the error does not give the actual ID
-            restClient.getOrganisation(uploadInformation.getRemote().organisation.uuid, new MispRestClient.OrganisationCallback() {
+            restClient.getOrganisation(uploadInformation.getRemote().organisation.getUuid(), new MispRestClient.OrganisationCallback() {
                 @Override
                 public void success(Organisation organisation) {
                     organisationAdded(organisation);

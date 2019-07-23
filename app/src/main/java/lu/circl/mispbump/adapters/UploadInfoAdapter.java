@@ -45,7 +45,7 @@ public class UploadInfoAdapter extends RecyclerView.Adapter<UploadInfoAdapter.Vi
         final UploadInformation item = items.get(position);
 
         holder.date.setText(item.getDateString());
-        holder.orgName.setText(item.getRemote().organisation.name);
+        holder.orgName.setText(item.getRemote().organisation.getName());
 
         switch (item.getCurrentSyncStatus()) {
             case COMPLETE:

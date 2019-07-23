@@ -2,7 +2,8 @@ package lu.circl.mispbump.auxiliary;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
+
+import androidx.core.util.Pair;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -21,23 +22,21 @@ import javax.crypto.NoSuchPaddingException;
 
 import lu.circl.mispbump.models.UploadInformation;
 import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.User;
 import lu.circl.mispbump.security.KeyStoreWrapper;
 
 public class PreferenceManager {
 
-    private static final String TAG = "PreferenceManager";
-
     private static final String PREFERENCES_FILE = "user_settings";
 
-    private static final String SAVE_CREDENTIALS = "save_credentials";
-    private static final String SERVER_URL = "server_url";
-    private static final String AUTOMATION_KEY = "user_automation";
-
+    private static final String USER_CREDENTIALS = "user_credentials";
     private static final String USER_INFOS = "user_infos";
     private static final String USER_ORG_INFOS = "user_org_infos";
 
     private static final String UPLOAD_INFO = "upload_info";
+
+    private static final String MISP_ROLES = "misp_roles";
 
     private SharedPreferences preferences;
     private static PreferenceManager instance;
@@ -58,6 +57,38 @@ public class PreferenceManager {
         }
 
         return instance;
+    }
+
+
+    /**
+     * Save downloaded MISP roles on device.
+     *
+     * @param roles {@link Role}
+     */
+    public void setRoles(Role[] roles) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(MISP_ROLES, new Gson().toJson(roles));
+        editor.apply();
+    }
+
+    /**
+     * Gets downloaded and saved MISP roles if available.
+     * <p/>
+     * Roles are downloaded on login and updated with each profile update.
+     *
+     * @return {@link Role}[] or null
+     */
+    public Role[] getRoles() {
+        Type type = new TypeToken<Role[]>() {
+        }.getType();
+        String rolesString = preferences.getString(MISP_ROLES, "");
+
+        assert rolesString != null;
+        if (rolesString.isEmpty()) {
+            return null;
+        } else {
+            return new Gson().fromJson(rolesString, type);
+        }
     }
 
 
@@ -180,145 +211,32 @@ public class PreferenceManager {
     }
 
 
-    /**
-     * Encrypts the automation key and stores it in preferences.
-     *
-     * @param automationKey key entered in {@link lu.circl.mispbump.activities.LoginActivity}
-     */
-    public void setAutomationKey(String automationKey) {
+    public void setUserCredentials(String url, String authkey) {
         try {
-            KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.AUTOMATION_ALIAS);
+            KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.USER_CREDENTIALS_ALIAS);
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(AUTOMATION_KEY, keyStoreWrapper.encrypt(automationKey));
+            editor.putString(USER_CREDENTIALS, keyStoreWrapper.encrypt(new Gson().toJson(new Pair<>(url, authkey))));
             editor.apply();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * Decrypts the stored automation key and returns it.
-     *
-     * @return decrypted automation key associated with the current user. If no user exists an empty
-     * String is returned.
-     */
-    public String getAuthKey() {
-
-        if (!preferences.contains(AUTOMATION_KEY)) {
-            return "";
-        }
-
-        try {
-            KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.AUTOMATION_ALIAS);
-            return keyStoreWrapper.decrypt(preferences.getString(AUTOMATION_KEY, ""));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
-
-        return "";
-    }
-
-    /**
-     * Delete the key to decrypt this entry and the entry itself.
-     */
-    public void clearAutomationKey() {
-        // remove the key from KeyStore
-        KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.AUTOMATION_ALIAS);
-        keyStoreWrapper.deleteStoredKey();
-
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.remove(AUTOMATION_KEY);
-        editor.apply();
-    }
-
-
-    /**
-     * Encrypts the server url and stores it in preferences.
-     *
-     * @param serverUrl url of the corresponding misp instance
-     */
-    public void setServerUrl(String serverUrl) {
-        try {
-
-            KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.SERVER_URL_ALIAS);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(SERVER_URL, keyStoreWrapper.encrypt(serverUrl));
-            editor.apply();
-
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Decrypts the stored server url and returns it
-     *
-     * @return decrypted misp instance url
-     */
-    public String getServerUrl() {
-
-        if (!preferences.contains(SERVER_URL)) {
+    public Pair<String, String> getUserCredentials() {
+        if (!preferences.contains(USER_CREDENTIALS)) {
             return null;
         }
 
         try {
-            KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.SERVER_URL_ALIAS);
-            return keyStoreWrapper.decrypt(preferences.getString(SERVER_URL, null));
-
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
+            KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.USER_CREDENTIALS_ALIAS);
+            Type type = new TypeToken<Pair<String, String>>() {}.getType();
+            String serializedCreds = keyStoreWrapper.decrypt(preferences.getString(USER_CREDENTIALS, ""));
+            return new Gson().fromJson(serializedCreds, type);
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
 
         return null;
-    }
-
-    /**
-     * Delete the key to decrypt this entry and the entry itself.
-     */
-    public void clearServerUrl() {
-        // remove the key from KeyStore
-        KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.SERVER_URL_ALIAS);
-        keyStoreWrapper.deleteStoredKey();
-
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.remove(SERVER_URL);
-        editor.apply();
     }
 
 
@@ -328,7 +246,8 @@ public class PreferenceManager {
         KeyStoreWrapper ksw = new KeyStoreWrapper(KeyStoreWrapper.UPLOAD_INFORMATION_ALIAS);
         String storedUploadInfoString = preferences.getString(UPLOAD_INFO, null);
 
-        Type type = new TypeToken<List<UploadInformation>>() {}.getType();
+        Type type = new TypeToken<List<UploadInformation>>() {
+        }.getType();
 
         if (storedUploadInfoString == null || storedUploadInfoString.isEmpty()) {
             cachedUploadInformationList = new ArrayList<>();
@@ -430,26 +349,13 @@ public class PreferenceManager {
     }
 
 
-    /**
-     * Set if credentials (authkey & server url) should be saved locally.
-     *
-     * @param save enable or disable
-     * @deprecated currently not used because automation key is needed to do requests to your misp instance.
-     * If this should be an option in future: misp automation key would be needed on each sync process.
-     */
-    public void setSaveCredentials(boolean save) {
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean(SAVE_CREDENTIALS, save);
-        editor.apply();
-    }
-
-    public boolean getSaveCredentials() {
-        return preferences.getBoolean(SAVE_CREDENTIALS, false);
-    }
-
-
     public void clearAllData() {
         SharedPreferences.Editor editor = preferences.edit();
+
+//        clearServerUrl();
+//        clearAutomationKey();
+        clearUploadInformation();
+
         editor.clear();
         editor.apply();
     }

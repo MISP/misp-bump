@@ -29,8 +29,7 @@ public class KeyStoreWrapper {
 
     public static final String USER_INFO_ALIAS = "ALIAS_USER_INFO";
     public static final String USER_ORGANISATION_INFO_ALIAS = "ALIAS_USER_ORGANISATION_INFO";
-    public static final String AUTOMATION_ALIAS = "ALIAS_AUTOMATION_KEY";
-    public static final String SERVER_URL_ALIAS = "ALIAS_SERVER_URL";
+    public static final String USER_CREDENTIALS_ALIAS = "ALIAS_USER_CREDENTIALS";
     public static final String UPLOAD_INFORMATION_ALIAS = "ALIAS_UPLOAD_INFORMATION";
 
     private static final String KEYSTORE_PROVIDER = "AndroidKeyStore";
