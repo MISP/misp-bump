@@ -4,13 +4,9 @@ import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.net.NoRouteToHostException;
 import java.security.cert.CertificateException;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
@@ -462,10 +458,6 @@ public class MispRestClient {
 
     // --- server routes ---
 
-    public void getServer() {
-
-    }
-
     /**
      * Get all servers on MISP instance.
      *
@@ -549,40 +541,19 @@ public class MispRestClient {
 
             // forbidden
             case 403:
-                try {
-                    assert response.errorBody() != null;
-                    JSONObject jsonError = new JSONObject(response.errorBody().string());
-
-                    String name = jsonError.getString("name") + "\n";
-
-                    if (name.startsWith("Authentication failed")) {
-                        return "Authentication failed";
-                    }
-
-                    String reasons = "";
-                    JSONObject errorReasons = jsonError.getJSONObject("errors");
-
-                    Iterator<String> errorKeys = errorReasons.keys();
-
-                    while (errorKeys.hasNext()) {
-                        reasons = reasons.concat(errorReasons.getString(errorKeys.next()) + "\n");
-                    }
-
-                    return name + reasons;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                return "Could not parse (403) error";
+                return "Authentification failed";
 
             // not found
             case 404:
                 return "Not found";
-        }
 
-        return "Unknown error";
+            // No permission (method not allowed)
+            case 405:
+                return "No admin permission";
+
+            default:
+                return response.message();
+        }
     }
 
     /**
