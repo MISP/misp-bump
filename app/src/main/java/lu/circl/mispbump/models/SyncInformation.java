@@ -1,6 +1,8 @@
 package lu.circl.mispbump.models;
 
+
 import lu.circl.mispbump.models.restModels.Organisation;
+
 
 /**
  * A Class that holds the information needed synchronize two misp instances.
@@ -14,7 +16,8 @@ public class SyncInformation {
     public String syncUserAuthkey;
     public String baseUrl;
 
-    public SyncInformation() {}
+    public SyncInformation() {
+    }
 
     @Override
     public String toString() {

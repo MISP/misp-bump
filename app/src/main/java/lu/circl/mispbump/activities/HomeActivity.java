@@ -1,5 +1,6 @@
 package lu.circl.mispbump.activities;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +24,7 @@ import lu.circl.mispbump.adapters.UploadInfoAdapter;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.interfaces.OnRecyclerItemClickListener;
 import lu.circl.mispbump.models.UploadInformation;
+
 
 public class HomeActivity extends AppCompatActivity {
 

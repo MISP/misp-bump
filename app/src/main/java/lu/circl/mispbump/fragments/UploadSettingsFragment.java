@@ -1,7 +1,7 @@
 package lu.circl.mispbump.fragments;
 
+
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.customViews.MaterialPreferenceSwitch;
 import lu.circl.mispbump.models.UploadInformation;
+
 
 public class UploadSettingsFragment extends Fragment {
 

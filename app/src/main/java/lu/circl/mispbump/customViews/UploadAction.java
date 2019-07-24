@@ -1,5 +1,6 @@
 package lu.circl.mispbump.customViews;
 
+
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
@@ -14,6 +15,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.widget.ImageViewCompat;
 
 import lu.circl.mispbump.R;
+
 
 public class UploadAction extends ConstraintLayout {
 
@@ -64,6 +66,7 @@ public class UploadAction extends ConstraintLayout {
 
     /**
      * Displays an error message for the upload action.
+     *
      * @param error a string to show or null to hide
      */
     public void setError(String error) {

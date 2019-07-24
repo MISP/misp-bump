@@ -1,10 +1,13 @@
 package lu.circl.mispbump.models.restModels;
 
+
 import com.google.gson.annotations.SerializedName;
+
 
 public class Server {
 
-    public Server() {}
+    public Server() {
+    }
 
     public Server(String name, String url, String authkey, Integer remote_org_id) {
         this.name = name;

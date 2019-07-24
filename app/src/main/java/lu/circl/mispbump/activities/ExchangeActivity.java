@@ -1,5 +1,6 @@
 package lu.circl.mispbump.activities;
 
+
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -33,6 +34,7 @@ import lu.circl.mispbump.fragments.CameraFragment;
 import lu.circl.mispbump.models.SyncInformation;
 import lu.circl.mispbump.models.UploadInformation;
 import lu.circl.mispbump.security.DiffieHellman;
+
 
 public class ExchangeActivity extends AppCompatActivity {
 

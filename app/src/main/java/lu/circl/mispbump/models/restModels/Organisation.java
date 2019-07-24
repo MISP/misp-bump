@@ -1,5 +1,6 @@
 package lu.circl.mispbump.models.restModels;
 
+
 /**
  * Information gathered from Misp API about a organisation.
  */

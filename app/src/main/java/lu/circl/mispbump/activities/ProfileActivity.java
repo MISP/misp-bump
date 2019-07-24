@@ -1,5 +1,6 @@
 package lu.circl.mispbump.activities;
 
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Shader;
@@ -33,6 +34,7 @@ import lu.circl.mispbump.models.restModels.Organisation;
 import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.User;
 import lu.circl.mispbump.security.KeyStoreWrapper;
+
 
 public class ProfileActivity extends AppCompatActivity {
 

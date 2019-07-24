@@ -1,9 +1,9 @@
 package lu.circl.mispbump.auxiliary;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.util.Log;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -12,6 +12,7 @@ import java.security.PublicKey;
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.models.SyncInformation;
 import lu.circl.mispbump.security.DiffieHellman;
+
 
 /**
  * Creates and show dialogs.
@@ -134,8 +135,8 @@ public class DialogManager {
      * Dialog to display a received public key.
      *
      * @param syncInformation {@link SyncInformation}
-     * @param context   needed to build and show the dialog
-     * @param callback  {@link IDialogFeedback}
+     * @param context         needed to build and show the dialog
+     * @param callback        {@link IDialogFeedback}
      */
     public static void syncInformationDialog(SyncInformation syncInformation, Context context, final IDialogFeedback callback) {
 
@@ -216,7 +217,6 @@ public class DialogManager {
      */
     public static void loginHelpDialog(Context context) {
         final AlertDialog.Builder adb = new AlertDialog.Builder(context);
-//        adb.setTitle(R.string.app_name);
         adb.setMessage(R.string.login_help_text);
         adb.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
@@ -304,6 +304,7 @@ public class DialogManager {
      */
     public interface IDialogFeedback {
         void positive();
+
         void negative();
     }
 

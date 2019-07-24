@@ -1,11 +1,13 @@
 package lu.circl.mispbump.customViews;
 
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 import lu.circl.mispbump.R;
+
 
 public class FixedAspectRatioFrameLayout extends FrameLayout {
     private int mAspectRatioWidth;

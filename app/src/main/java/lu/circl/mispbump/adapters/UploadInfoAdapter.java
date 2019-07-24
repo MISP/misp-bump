@@ -1,5 +1,6 @@
 package lu.circl.mispbump.adapters;
 
+
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import java.util.List;
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.interfaces.OnRecyclerItemClickListener;
 import lu.circl.mispbump.models.UploadInformation;
+
 
 public class UploadInfoAdapter extends RecyclerView.Adapter<UploadInfoAdapter.ViewHolder> {
 
@@ -114,5 +116,4 @@ public class UploadInfoAdapter extends RecyclerView.Adapter<UploadInfoAdapter.Vi
             syncStatus = itemView.findViewById(R.id.syncStatus);
         }
     }
-
 }

@@ -1,5 +1,6 @@
 package lu.circl.mispbump.auxiliary;
 
+
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -25,6 +26,7 @@ import lu.circl.mispbump.models.restModels.Organisation;
 import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.User;
 import lu.circl.mispbump.security.KeyStoreWrapper;
+
 
 public class PreferenceManager {
 
@@ -229,7 +231,8 @@ public class PreferenceManager {
 
         try {
             KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.USER_CREDENTIALS_ALIAS);
-            Type type = new TypeToken<Pair<String, String>>() {}.getType();
+            Type type = new TypeToken<Pair<String, String>>() {
+            }.getType();
             String serializedCreds = keyStoreWrapper.decrypt(preferences.getString(USER_CREDENTIALS, ""));
             return new Gson().fromJson(serializedCreds, type);
         } catch (InvalidKeyException | InvalidAlgorithmParameterException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException e) {

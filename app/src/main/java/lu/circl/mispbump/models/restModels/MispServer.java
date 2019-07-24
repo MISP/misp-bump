@@ -1,12 +1,16 @@
 package lu.circl.mispbump.models.restModels;
 
-import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
+
 public class MispServer {
 
-    public MispServer() {}
+    public MispServer() {
+    }
 
     public MispServer(Server server, Organisation organisation, Organisation remoteOrganisation) {
         this.server = server;

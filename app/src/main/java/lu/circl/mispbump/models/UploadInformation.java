@@ -1,5 +1,6 @@
 package lu.circl.mispbump.models;
 
+
 import androidx.annotation.NonNull;
 
 import java.text.SimpleDateFormat;
@@ -7,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
+
 
 public class UploadInformation {
 
@@ -37,6 +39,7 @@ public class UploadInformation {
     public void setCurrentSyncStatus(SyncStatus status) {
         currentSyncStatus = status;
     }
+
     public SyncStatus getCurrentSyncStatus() {
         return currentSyncStatus;
     }
@@ -44,6 +47,7 @@ public class UploadInformation {
     public void setLocal(SyncInformation local) {
         this.local = local;
     }
+
     public SyncInformation getLocal() {
         return local;
     }
@@ -51,6 +55,7 @@ public class UploadInformation {
     public void setRemote(SyncInformation remote) {
         this.remote = remote;
     }
+
     public SyncInformation getRemote() {
         return remote;
     }
@@ -58,6 +63,7 @@ public class UploadInformation {
     public UUID getUuid() {
         return uuid;
     }
+
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
@@ -65,12 +71,15 @@ public class UploadInformation {
     public void setDate() {
         setDate(Calendar.getInstance().getTime());
     }
+
     public void setDate(Date date) {
         this.date = date;
     }
+
     public Date getDate() {
         return date;
     }
+
     public String getDateString() {
         SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         return df.format(date);
@@ -79,6 +88,7 @@ public class UploadInformation {
     public boolean isAllowSelfSigned() {
         return allowSelfSigned;
     }
+
     public void setAllowSelfSigned(boolean allowSelfSigned) {
         this.allowSelfSigned = allowSelfSigned;
     }
@@ -86,6 +96,7 @@ public class UploadInformation {
     public boolean isPull() {
         return pull;
     }
+
     public void setPull(boolean pull) {
         this.pull = pull;
     }
@@ -93,6 +104,7 @@ public class UploadInformation {
     public boolean isPush() {
         return push;
     }
+
     public void setPush(boolean push) {
         this.push = push;
     }
@@ -100,6 +112,7 @@ public class UploadInformation {
     public boolean isCached() {
         return cached;
     }
+
     public void setCached(boolean cached) {
         this.cached = cached;
     }

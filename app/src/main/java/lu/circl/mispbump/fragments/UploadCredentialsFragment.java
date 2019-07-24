@@ -18,12 +18,15 @@ import lu.circl.mispbump.customViews.MaterialPasswordView;
 import lu.circl.mispbump.customViews.MaterialPreferenceText;
 import lu.circl.mispbump.models.UploadInformation;
 
+
 public class UploadCredentialsFragment extends Fragment {
 
     private View rootLayout;
     private UploadInformation uploadInformation;
 
-    public UploadCredentialsFragment() {}
+    public UploadCredentialsFragment() {
+    }
+
     public UploadCredentialsFragment(UploadInformation uploadInformation) {
         this.uploadInformation = uploadInformation;
     }

@@ -1,5 +1,6 @@
 package lu.circl.mispbump.customViews;
 
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.text.method.PasswordTransformationMethod;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import lu.circl.mispbump.R;
+
 
 public class MaterialPasswordView extends ConstraintLayout {
 

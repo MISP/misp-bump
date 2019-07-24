@@ -1,5 +1,6 @@
 package lu.circl.mispbump.activities;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -28,6 +29,7 @@ import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.fragments.UploadCredentialsFragment;
 import lu.circl.mispbump.fragments.UploadSettingsFragment;
 import lu.circl.mispbump.models.UploadInformation;
+
 
 public class UploadInfoActivity extends AppCompatActivity {
 
@@ -92,7 +94,8 @@ public class UploadInfoActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void negative() {}
+                    public void negative() {
+                    }
                 });
 
                 return true;

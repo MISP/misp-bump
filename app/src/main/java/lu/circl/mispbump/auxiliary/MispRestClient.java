@@ -1,5 +1,6 @@
 package lu.circl.mispbump.auxiliary;
 
+
 import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
@@ -36,6 +37,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
 
 /**
  * Implementation of the RetroFit2 Misp client.

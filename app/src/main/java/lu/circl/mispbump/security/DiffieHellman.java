@@ -1,5 +1,6 @@
 package lu.circl.mispbump.security;
 
+
 import android.util.Base64;
 
 import java.nio.charset.StandardCharsets;
@@ -21,6 +22,7 @@ import javax.crypto.KeyAgreement;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
 
 /**
  * This class provides the functionality generate a shared secret key.
