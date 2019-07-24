@@ -1,5 +1,6 @@
 package lu.circl.mispbump.activities;
 
+
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.fragments.PreferencesFragment;
+
 
 public class PreferenceActivity extends AppCompatActivity {
 

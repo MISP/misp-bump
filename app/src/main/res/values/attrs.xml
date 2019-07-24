@@ -24,7 +24,7 @@
     <declare-styleable name="UploadAction">
         <attr name="description" format="string"/>
     </declare-styleable>
-    
+
     <declare-styleable name="FixedAspectRatioFrameLayout">
         <attr name="aspectRatioWidth" format="integer"/>
         <attr name="aspectRatioHeight" format="integer"/>

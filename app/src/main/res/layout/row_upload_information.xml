@@ -26,7 +26,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_error_outline" />
+        app:srcCompat="@drawable/ic_error_outline"/>
 
     <TextView
         android:id="@+id/orgName"
@@ -42,7 +42,7 @@
         app:layout_constraintEnd_toStartOf="@+id/date"
         app:layout_constraintStart_toEndOf="@+id/syncStatus"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Organisation A" />
+        tools:text="Organisation A"/>
 
     <TextView
         android:id="@+id/date"
@@ -55,6 +55,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="20.3.2019" />
+        tools:text="20.3.2019"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
