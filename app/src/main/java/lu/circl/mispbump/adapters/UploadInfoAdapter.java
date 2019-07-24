@@ -25,7 +25,6 @@ public class UploadInfoAdapter extends RecyclerView.Adapter<UploadInfoAdapter.Vi
     private Context context;
     private List<UploadInformation> items;
 
-    private OnRecyclerItemClickListener<UploadInformation> onRecyclerItemClickListener;
     private OnRecyclerItemClickListener<Integer> onRecyclerPositionClickListener;
 
 
@@ -64,19 +63,7 @@ public class UploadInfoAdapter extends RecyclerView.Adapter<UploadInfoAdapter.Vi
                 break;
         }
 
-        holder.rootView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onRecyclerItemClickListener.onClick(view, item);
-            }
-        });
-
-        holder.rootView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onRecyclerPositionClickListener.onClick(view, position);
-            }
-        });
+        holder.rootView.setOnClickListener(view -> onRecyclerPositionClickListener.onClick(view, position));
     }
 
     @Override
@@ -90,18 +77,10 @@ public class UploadInfoAdapter extends RecyclerView.Adapter<UploadInfoAdapter.Vi
         notifyDataSetChanged();
     }
 
-
-    // callbacks
-
-    public void setOnRecyclerItemClickListener(OnRecyclerItemClickListener<UploadInformation> onRecyclerItemClickListener) {
-        this.onRecyclerItemClickListener = onRecyclerItemClickListener;
-    }
-
     public void setOnRecyclerPositionClickListener(OnRecyclerItemClickListener<Integer> onRecyclerPositionClickListener) {
         this.onRecyclerPositionClickListener = onRecyclerPositionClickListener;
     }
 
-    // viewHolder
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         View rootView;

@@ -1,12 +1,13 @@
 package lu.circl.mispbump.models;
 
 
+import androidx.annotation.NonNull;
+
 import lu.circl.mispbump.models.restModels.Organisation;
 
 
 /**
  * A Class that holds the information needed synchronize two misp instances.
- * This class can be serialized and passed via QR code.
  */
 public class SyncInformation {
 
@@ -16,9 +17,7 @@ public class SyncInformation {
     public String syncUserAuthkey;
     public String baseUrl;
 
-    public SyncInformation() {
-    }
-
+    @NonNull
     @Override
     public String toString() {
         return "SyncInformation{" +

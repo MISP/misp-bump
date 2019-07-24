@@ -216,26 +216,26 @@ public class UploadActivity extends AppCompatActivity {
 
     private User generateSyncUser(Organisation organisation) {
         User syncUser = new User();
-        syncUser.org_id = organisation.getId();
-        syncUser.role_id = User.ROLE_SYNC_USER;
-        syncUser.email = uploadInformation.getRemote().syncUserEmail;
-        syncUser.password = uploadInformation.getRemote().syncUserPassword;
-        syncUser.authkey = uploadInformation.getRemote().syncUserAuthkey;
-        syncUser.termsaccepted = true;
+        syncUser.setOrg_id(organisation.getId());
+//        syncUser.role_id = User.ROLE_SYNC_USER;
+        syncUser.setEmail(uploadInformation.getRemote().syncUserEmail);
+        syncUser.setPassword(uploadInformation.getRemote().syncUserPassword);
+        syncUser.setAuthkey(uploadInformation.getRemote().syncUserAuthkey);
+        syncUser.setTermsaccepted(true);
 
         return syncUser;
     }
 
     private Server generateSyncServer() {
         Server server = new Server();
-        server.name = uploadInformation.getRemote().organisation.getName() + "'s Sync Server";
-        server.url = uploadInformation.getRemote().baseUrl;
-        server.remote_org_id = uploadInformation.getRemote().organisation.getId();
-        server.authkey = uploadInformation.getLocal().syncUserAuthkey;
-        server.pull = uploadInformation.isPull();
-        server.push = uploadInformation.isPush();
-        server.caching_enabled = uploadInformation.isCached();
-        server.self_signed = uploadInformation.isAllowSelfSigned();
+        server.setName(uploadInformation.getRemote().organisation.getName() + "'s Sync Server");
+        server.setUrl(uploadInformation.getRemote().baseUrl);
+        server.setRemote_org_id(uploadInformation.getRemote().organisation.getId());
+        server.setAuthkey(uploadInformation.getLocal().syncUserAuthkey);
+        server.setPull(uploadInformation.isPull());
+        server.setPush(uploadInformation.isPush());
+        server.setCaching_enabled(uploadInformation.isCached());
+        server.setSelf_signed(uploadInformation.isAllowSelfSigned());
         return server;
     }
 
@@ -302,9 +302,9 @@ public class UploadActivity extends AppCompatActivity {
             Server serverToUpload = generateSyncServer();
 
             for (Server server : servers) {
-                if (server.remote_org_id.equals(serverToUpload.remote_org_id)) {
+                if (server.getRemote_org_id().equals(serverToUpload.getRemote_org_id())) {
                     // server already exists: override id to update instead
-                    serverToUpload.id = server.id;
+                    serverToUpload.setId(server.getId());
                     break;
                 }
             }

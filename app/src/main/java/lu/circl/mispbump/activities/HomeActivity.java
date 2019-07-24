@@ -3,6 +3,7 @@ package lu.circl.mispbump.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.util.Pair;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,9 +22,12 @@ import java.util.List;
 
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.adapters.UploadInfoAdapter;
+import lu.circl.mispbump.auxiliary.MispRestClient;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.interfaces.OnRecyclerItemClickListener;
+import lu.circl.mispbump.models.SyncModel;
 import lu.circl.mispbump.models.UploadInformation;
+import lu.circl.mispbump.models.restModels.Server;
 
 
 public class HomeActivity extends AppCompatActivity {
@@ -62,7 +67,6 @@ public class HomeActivity extends AppCompatActivity {
             return true;
         }
 
-        // invoke superclass to handle unrecognized item (eg. homeAsUp)
         return super.onOptionsItemSelected(item);
     }
 
@@ -80,12 +84,7 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(myToolbar);
 
         FloatingActionButton syncFab = findViewById(R.id.home_fab);
-        syncFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, ExchangeActivity.class));
-            }
-        });
+        syncFab.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, ExchangeActivity.class)));
     }
 
     private void initRecyclerView() {
@@ -97,6 +96,32 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void refreshRecyclerView() {
+
+        Pair<String, String> credentials = preferenceManager.getUserCredentials();
+        MispRestClient mispRestClient = MispRestClient.getInstance(credentials.first, credentials.second);
+
+        mispRestClient.getAllServers(new MispRestClient.AllServersCallback() {
+            @Override
+            public void success(Server[] servers) {
+                SyncModel.createFromServer(mispRestClient, servers[0], new SyncModel.InitializeWithServerObject() {
+                    @Override
+                    public void success(SyncModel syncModel) {
+                        Log.d("DEBUG", syncModel.toString());
+                    }
+
+                    @Override
+                    public void failure(String error) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void failure(String error) {
+
+            }
+        });
+
         uploadInformationList = preferenceManager.getUploadInformationList();
 
         if (uploadInformationList.isEmpty()) {
@@ -111,15 +136,12 @@ public class HomeActivity extends AppCompatActivity {
 
 
     private OnRecyclerItemClickListener<Integer> onRecyclerItemClickListener() {
-        return new OnRecyclerItemClickListener<Integer>() {
-            @Override
-            public void onClick(View v, Integer index) {
-                Intent i = new Intent(HomeActivity.this, UploadInfoActivity.class);
-                i.putExtra(UploadInfoActivity.EXTRA_UPLOAD_INFO_UUID, uploadInformationList.get(index).getUuid());
+        return (v, index) -> {
+            Intent i = new Intent(HomeActivity.this, UploadInfoActivity.class);
+            i.putExtra(UploadInfoActivity.EXTRA_UPLOAD_INFO_UUID, uploadInformationList.get(index).getUuid());
 
-                ActivityOptionsCompat options = ActivityOptionsCompat.makeClipRevealAnimation(v.findViewById(R.id.rootLayout), (int) v.getX(), (int) v.getY(), v.getWidth(), v.getHeight());
-                startActivity(i, options.toBundle());
-            }
+            ActivityOptionsCompat options = ActivityOptionsCompat.makeClipRevealAnimation(v.findViewById(R.id.rootLayout), (int) v.getX(), (int) v.getY(), v.getWidth(), v.getHeight());
+            startActivity(i, options.toBundle());
         };
     }
 }

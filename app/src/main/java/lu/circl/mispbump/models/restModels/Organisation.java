@@ -1,6 +1,9 @@
 package lu.circl.mispbump.models.restModels;
 
 
+import androidx.annotation.NonNull;
+
+
 /**
  * Information gathered from Misp API about a organisation.
  */
@@ -17,25 +20,16 @@ public class Organisation {
     private String description;
     private Boolean local;
     private String uuid;
-    private String[] restricted_to_domain;
+//    private String[] restricted_to_domain;
     private String created_by;
     private Integer user_count;
 
     public Organisation() {
     }
 
-    public Organisation(String name) {
-        this.name = name;
-    }
-
-    public Organisation(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
     public Organisation toSyncOrganisation() {
         Organisation organisation = new Organisation();
-        organisation.local = true;
+        organisation.local = true;  // TODO REMOVE FROME HERE!
         organisation.name = name;
         organisation.uuid = uuid;
         organisation.description = description;
@@ -136,13 +130,13 @@ public class Organisation {
         this.uuid = uuid;
     }
 
-    public String[] getRestricted_to_domain() {
-        return restricted_to_domain;
-    }
+//    public String[] getRestricted_to_domain() {
+//        return restricted_to_domain;
+//    }
 
-    public void setRestricted_to_domain(String[] restricted_to_domain) {
-        this.restricted_to_domain = restricted_to_domain;
-    }
+//    public void setRestricted_to_domain(String[] restricted_to_domain) {
+//        this.restricted_to_domain = restricted_to_domain;
+//    }
 
     public String getCreated_by() {
         return created_by;
@@ -160,6 +154,7 @@ public class Organisation {
         this.user_count = user_count;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Organisation{" +
@@ -174,7 +169,7 @@ public class Organisation {
                 ", description='" + description + '\'' +
                 ", local=" + local +
                 ", uuid='" + uuid + '\'' +
-                ", restricted_to_domain='" + restricted_to_domain + '\'' +
+//                ", restricted_to_domain='" + Arrays.toString(restricted_to_domain) + '\'' +
                 ", created_by='" + created_by + '\'' +
                 ", user_count=" + user_count +
                 '}';

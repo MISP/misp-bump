@@ -152,7 +152,7 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void success(final User user) {
                 preferenceManager.setUserInfo(user);
-                mispRestClient.getOrganisation(user.org_id, new MispRestClient.OrganisationCallback() {
+                mispRestClient.getOrganisation(user.getRole_id(), new MispRestClient.OrganisationCallback() {
                     @Override
                     public void success(Organisation organisation) {
                         fabLoadingDrawable.stop();

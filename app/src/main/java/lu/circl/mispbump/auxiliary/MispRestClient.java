@@ -274,7 +274,7 @@ public class MispRestClient {
             @Override
             public void success(User[] users) {
                 for (User user : users) {
-                    if (user.email.equals(emailAddress)) {
+                    if (user.getEmail().equals(emailAddress)) {
                         callback.success(user);
                         return;
                     }
@@ -474,17 +474,35 @@ public class MispRestClient {
                 if (!response.isSuccessful()) {
                     callback.failure(extractError(response));
                 } else {
-
                     List<MispServer> mispServers = response.body();
                     assert mispServers != null;
 
                     Server[] servers = new Server[mispServers.size()];
 
                     for (int i = 0; i < servers.length; i++) {
-                        servers[i] = mispServers.get(i).server;
+                        servers[i] = mispServers.get(i).getServer();
                     }
-
                     callback.success(servers);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<MispServer>> call, @NonNull Throwable t) {
+                callback.failure(t.getMessage());
+            }
+        });
+    }
+
+    public void getAllServers(final AllRawServersCallback callback) {
+        Call<List<MispServer>> call = mispRestInterface.getAllServers();
+
+        call.enqueue(new Callback<List<MispServer>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<MispServer>> call, @NonNull Response<List<MispServer>> response) {
+                if (!response.isSuccessful()) {
+                    callback.failure(extractError(response));
+                } else {
+                    callback.success(response.body());
                 }
             }
 
@@ -627,6 +645,12 @@ public class MispRestClient {
 
     public interface AllServersCallback {
         void success(Server[] servers);
+
+        void failure(String error);
+    }
+
+    public interface AllRawServersCallback {
+        void success(List<MispServer> mispServers);
 
         void failure(String error);
     }
