@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import lu.circl.mispbump.R;
@@ -41,13 +40,7 @@ public class PreferenceActivity extends AppCompatActivity {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.preference_screen_main, rootKey);
-
-            findPreference("PREF_DELETE_ALL_SYNCS").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    return true;
-                }
-            });
+            findPreference("PREF_DELETE_ALL_SYNCS").setOnPreferenceClickListener(preference -> true);
         }
     }
 }
