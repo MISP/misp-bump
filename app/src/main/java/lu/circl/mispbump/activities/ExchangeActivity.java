@@ -6,7 +6,6 @@ import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -246,14 +245,12 @@ public class ExchangeActivity extends AppCompatActivity {
         View view = findViewById(R.id.fragmentContainer);
 
         if (enabled) {
-            Log.d("DEBUG", "cameraPreview enabled");
             view.animate()
                     .alpha(1f)
                     .setDuration(250)
                     .start();
             cameraFragment.setReadQrEnabled(true);
         } else {
-            Log.d("DEBUG", "cameraPreview disabled");
             view.animate()
                     .alpha(0f)
                     .setDuration(250)

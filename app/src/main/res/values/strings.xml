@@ -50,4 +50,9 @@
     <string name="public_key_received_hint">Received public key</string>
     <string name="sync_info_received_hint">Received sync information</string>
     <string name="sync_information">Sync Information</string>
+    <string name="preference_delete_all_syncs">Delete all synchronisations</string>
+    <string name="preference_delete_all_syncs_summary">This will only delete local data</string>
+    <string name="preference_category_general">General</string>
+    <string name="preference_category_information">App information</string>
+    <string name="preference_github_summary">Visit the Github project</string>
 </resources>
