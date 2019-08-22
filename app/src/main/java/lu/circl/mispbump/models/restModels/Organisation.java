@@ -56,19 +56,19 @@ public class Organisation {
         this.name = name;
     }
 
-    public String getDate_created() {
+    public String getDateCreated() {
         return date_created;
     }
 
-    public void setDate_created(String date_created) {
+    public void setDateCreated(String date_created) {
         this.date_created = date_created;
     }
 
-    public String getDate_modified() {
+    public String getDateModified() {
         return date_modified;
     }
 
-    public void setDate_modified(String date_modified) {
+    public void setDateModified(String date_modified) {
         this.date_modified = date_modified;
     }
 
@@ -128,27 +128,27 @@ public class Organisation {
         this.uuid = uuid;
     }
 
-    public String[] getRestricted_to_domain() {
+    public String[] getRestrictedToDomain() {
         return restricted_to_domain;
     }
 
-    public void setRestricted_to_domain(String[] restricted_to_domain) {
+    public void setRestrictedToDomain(String[] restricted_to_domain) {
         this.restricted_to_domain = restricted_to_domain;
     }
 
-    public String getCreated_by() {
+    public String getCreatedBy() {
         return created_by;
     }
 
-    public void setCreated_by(String created_by) {
+    public void setCreatedBy(String created_by) {
         this.created_by = created_by;
     }
 
-    public Integer getUser_count() {
+    public Integer getUserCount() {
         return user_count;
     }
 
-    public void setUser_count(Integer user_count) {
+    public void setUserCount(Integer user_count) {
         this.user_count = user_count;
     }
 
