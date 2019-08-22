@@ -20,6 +20,7 @@ import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.customViews.ProgressActionView;
 import lu.circl.mispbump.models.SyncInformation;
 import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.Server;
 import lu.circl.mispbump.models.restModels.User;
 
@@ -156,8 +157,14 @@ public class UploadActivity extends AppCompatActivity {
         User syncUser = syncInformation.getRemote().getSyncUser();
 
         syncUser.setOrgId(organisation.getId());
-        syncUser.setRoleId(6);
         syncUser.setTermsAccepted(true);
+
+        Role[] roles = preferenceManager.getRoles();
+        for (Role role : roles) {
+            if (role.isSyncUserRole()) {
+                syncUser.setRoleId(role.getId());
+            }
+        }
 
         return syncUser;
     }

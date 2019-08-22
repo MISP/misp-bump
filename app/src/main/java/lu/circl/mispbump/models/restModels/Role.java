@@ -64,6 +64,13 @@ public class Role {
     @SerializedName("permission_description")
     private String permissionDescription;
 
+
+    public boolean isSyncUserRole() {
+        return permSync && permAuth && permTagger && permTagEditor && permSharingGroup
+                && permDelegate && permSighting && permPublishZmq && permPublishKafka;
+    }
+
+
     public Integer getId() {
         return id;
     }
