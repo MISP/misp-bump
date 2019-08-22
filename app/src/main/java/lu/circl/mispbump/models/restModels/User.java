@@ -58,7 +58,7 @@ public class User {
         this.password = password;
     }
 
-    public Integer getOrg_id() {
+    public Integer getOrgId() {
         return org_id;
     }
 
@@ -90,39 +90,39 @@ public class User {
         this.authkey = authkey;
     }
 
-    public String getInvited_by() {
+    public String getInvitedBy() {
         return invited_by;
     }
 
-    public void setInvited_by(String invited_by) {
+    public void setInvitedBy(String invited_by) {
         this.invited_by = invited_by;
     }
 
-    public Object getGpgkey() {
+    public Object getGpgKey() {
         return gpgkey;
     }
 
-    public void setGpgkey(Object gpgkey) {
+    public void setGpgKey(Object gpgkey) {
         this.gpgkey = gpgkey;
     }
 
-    public String getCertif_public() {
+    public String getCertIfPublic() {
         return certif_public;
     }
 
-    public void setCertif_public(String certif_public) {
+    public void setCertIfPublic(String certif_public) {
         this.certif_public = certif_public;
     }
 
-    public String getNids_sid() {
+    public String getNidsSid() {
         return nids_sid;
     }
 
-    public void setNids_sid(String nids_sid) {
+    public void setNidsSid(String nids_sid) {
         this.nids_sid = nids_sid;
     }
 
-    public Boolean getTermsaccepted() {
+    public Boolean getTermsAccepted() {
         return termsaccepted;
     }
 
@@ -130,11 +130,11 @@ public class User {
         this.termsaccepted = termsaccepted;
     }
 
-    public String getNewsread() {
+    public String getNewsRead() {
         return newsread;
     }
 
-    public void setNewsread(String newsread) {
+    public void setNewsRead(String newsread) {
         this.newsread = newsread;
     }
 
@@ -146,11 +146,11 @@ public class User {
         this.role_id = role_id;
     }
 
-    public String getChange_pw() {
+    public String getChangePw() {
         return change_pw;
     }
 
-    public void setChange_pw(String change_pw) {
+    public void setChangePw(String change_pw) {
         this.change_pw = change_pw;
     }
 
@@ -178,43 +178,43 @@ public class User {
         this.expiration = expiration;
     }
 
-    public String getCurrent_login() {
+    public String getCurrentLogin() {
         return current_login;
     }
 
-    public void setCurrent_login(String current_login) {
+    public void setCurrentLogin(String current_login) {
         this.current_login = current_login;
     }
 
-    public String getLast_login() {
+    public String getLastLogin() {
         return last_login;
     }
 
-    public void setLast_login(String last_login) {
+    public void setLastLogin(String last_login) {
         this.last_login = last_login;
     }
 
-    public Boolean getForce_logout() {
+    public Boolean getForceLogout() {
         return force_logout;
     }
 
-    public void setForce_logout(Boolean force_logout) {
+    public void setForceLogout(Boolean force_logout) {
         this.force_logout = force_logout;
     }
 
-    public Object getDate_created() {
+    public Object getDateCreated() {
         return date_created;
     }
 
-    public void setDate_created(Object date_created) {
+    public void setDateCreated(Object date_created) {
         this.date_created = date_created;
     }
 
-    public String getDate_modified() {
+    public String getDateModified() {
         return date_modified;
     }
 
-    public void setDate_modified(String date_modified) {
+    public void setDateModified(String date_modified) {
         this.date_modified = date_modified;
     }
 

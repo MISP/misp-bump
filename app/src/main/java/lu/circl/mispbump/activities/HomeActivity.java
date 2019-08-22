@@ -137,7 +137,7 @@ public class HomeActivity extends AppCompatActivity {
                 public void success(User user) {
                     preferenceManager.setMyUser(user);
 
-                    client.getOrganisation(user.getOrg_id(), new MispRestClient.OrganisationCallback() {
+                    client.getOrganisation(user.getOrgId(), new MispRestClient.OrganisationCallback() {
                         @Override
                         public void success(Organisation organisation) {
                             preferenceManager.setMyOrganisation(organisation);
