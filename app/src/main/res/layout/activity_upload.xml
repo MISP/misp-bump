@@ -6,7 +6,6 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
     tools:context=".activities.UploadActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -17,78 +16,78 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            android:background="@color/colorPrimary">
-
-            <TextView
-                android:id="@+id/toolbarTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-                android:text="@string/upload"
-                android:layout_gravity="center"/>
-
-        </androidx.appcompat.widget.Toolbar>
+            android:theme="@style/ToolbarTheme"
+            app:popupTheme="@style/PopupTheme"/>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+
+    <LinearLayout
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:animateLayoutChanges="true">
-
-        <lu.circl.mispbump.customViews.UploadAction
-            android:id="@+id/availableAction"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@color/white"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:description="@string/upload_action_available"/>
-
-        <lu.circl.mispbump.customViews.UploadAction
-            android:id="@+id/orgAction"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@color/white"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:description="@string/upload_action_add_org"/>
-
-        <lu.circl.mispbump.customViews.UploadAction
-            android:id="@+id/userAction"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:description="@string/upload_action_add_user"/>
-
-        <lu.circl.mispbump.customViews.UploadAction
-            android:id="@+id/serverAction"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:description="@string/upload_action_add_server"/>
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_check"/>
+        android:orientation="vertical">
+
+        <lu.circl.mispbump.customViews.ProgressActionView
+            android:layout_marginTop="8dp"
+            android:id="@+id/availableProgressAction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:action_title="Instance available"
+            app:action_done_icon="@drawable/ic_check_outline"
+            app:action_error_icon="@drawable/ic_error_outline"
+            app:action_pending_icon="@drawable/ic_pending"/>
+
+        <View
+            android:background="@color/black_10"
+            android:layout_margin="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+
+        <lu.circl.mispbump.customViews.ProgressActionView
+            android:id="@+id/organisationProgressAction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:action_title="Add Organisation"
+            app:action_done_icon="@drawable/ic_check_outline"
+            app:action_error_icon="@drawable/ic_error_outline"
+            app:action_pending_icon="@drawable/ic_pending"/>
+
+        <View
+            android:background="@color/black_10"
+            android:layout_margin="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+
+        <lu.circl.mispbump.customViews.ProgressActionView
+            android:id="@+id/userProgressAction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:action_title="Add Sync User"
+            app:action_done_icon="@drawable/ic_check_outline"
+            app:action_error_icon="@drawable/ic_error_outline"
+            app:action_pending_icon="@drawable/ic_pending"/>
+
+        <View
+            android:background="@color/black_10"
+            android:layout_margin="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+
+        <lu.circl.mispbump.customViews.ProgressActionView
+            android:id="@+id/serverProgressAction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:action_title="Add Sync Server"
+            app:action_done_icon="@drawable/ic_check_outline"
+            app:action_error_icon="@drawable/ic_error_outline"
+            app:action_pending_icon="@drawable/ic_pending"/>
+
+        <View
+            android:background="@color/black_10"
+            android:layout_margin="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+
+    </LinearLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

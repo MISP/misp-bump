@@ -3,6 +3,8 @@ package lu.circl.mispbump.models.restModels;
 
 import androidx.annotation.NonNull;
 
+import lu.circl.mispbump.auxiliary.RandomString;
+
 
 public class User {
 
@@ -28,6 +30,16 @@ public class User {
     private Boolean force_logout;
     private Object date_created;
     private String date_modified;
+
+
+    public User toSyncUser() {
+        User user = new User();
+        user.email = email;
+        user.authkey = new RandomString(40).nextString();
+        user.password = new RandomString(16).nextString();
+
+        return user;
+    }
 
 
     public Integer getId() {
@@ -210,29 +222,28 @@ public class User {
     @NonNull
     @Override
     public String toString() {
-        return "User{" +
-                "id='" + id + '\'' +
-                ", password='" + password + '\'' +
-                ", org_id='" + org_id + '\'' +
-                ", email='" + email + '\'' +
-                ", autoalert=" + autoalert +
-                ", authkey='" + authkey + '\'' +
-                ", invited_by='" + invited_by + '\'' +
-                ", gpgkey=" + gpgkey +
-                ", certif_public='" + certif_public + '\'' +
-                ", nids_sid='" + nids_sid + '\'' +
-                ", termsaccepted=" + termsaccepted +
-                ", newsread='" + newsread + '\'' +
-                ", role_id='" + role_id + '\'' +
-                ", change_pw='" + change_pw + '\'' +
-                ", contactalert=" + contactalert +
-                ", disabled=" + disabled +
-                ", expiration=" + expiration +
-                ", current_login='" + current_login + '\'' +
-                ", last_login='" + last_login + '\'' +
-                ", force_logout=" + force_logout +
-                ", date_created=" + date_created +
-                ", date_modified='" + date_modified + '\'' +
-                '}';
+        return "User: \n" +
+                "\t id = " + id + '\n' +
+                "\t password = " + password + '\n' +
+                "\t org_id = " + org_id + '\n' +
+                "\t email = " + email + '\n' +
+                "\t autoalert = " + autoalert + '\n' +
+                "\t authkey = " + authkey + '\n' +
+                "\t invited_by = " + invited_by + '\n' +
+                "\t gpgkey = " + gpgkey + '\n' +
+                "\t certif_public = " + certif_public + '\n' +
+                "\t nids_sid = " + nids_sid + '\n' +
+                "\t termsaccepted = " + termsaccepted + '\n' +
+                "\t newsread = " + newsread + '\n' +
+                "\t role_id = " + role_id + '\n' +
+                "\t change_pw = " + change_pw + '\n' +
+                "\t contactalert = " + contactalert + '\n' +
+                "\t disabled = " + disabled + '\n' +
+                "\t expiration = " + expiration + '\n' +
+                "\t current_login = " + current_login + '\n' +
+                "\t last_login = " + last_login + '\n' +
+                "\t force_logout = " + force_logout + '\n' +
+                "\t date_created = " + date_created + '\n' +
+                "\t date_modified = " + date_modified;
     }
 }

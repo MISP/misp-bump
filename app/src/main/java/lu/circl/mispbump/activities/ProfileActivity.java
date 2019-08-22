@@ -1,7 +1,6 @@
 package lu.circl.mispbump.activities;
 
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Shader;
 import android.graphics.drawable.AnimatedVectorDrawable;
@@ -120,13 +119,10 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private View.OnClickListener onFabClicked() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fab.setImageDrawable(fabLoadingDrawable);
-                fabLoadingDrawable.start();
-                updateProfile();
-            }
+        return v -> {
+            fab.setImageDrawable(fabLoadingDrawable);
+            fabLoadingDrawable.start();
+            updateProfile();
         };
     }
 
@@ -181,23 +177,15 @@ public class ProfileActivity extends AppCompatActivity {
 
         builder.setTitle("Clear all saved data and logout");
         builder.setMessage("Do you really want to delete all data and logout?");
-        builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+        builder.setNegativeButton("Discard", (dialog, which) -> dialog.cancel());
 
-        builder.setPositiveButton("Delete & Logout", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                preferenceManager.clearAllData();
-                KeyStoreWrapper.deleteAllStoredKeys();
+        builder.setPositiveButton("Delete & Logout", (dialog, which) -> {
+            preferenceManager.clearAllData();
+            KeyStoreWrapper.deleteAllStoredKeys();
 
-                Intent login = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(login);
-                finish();
-            }
+            Intent login = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(login);
+            finish();
         });
 
         builder.create().show();

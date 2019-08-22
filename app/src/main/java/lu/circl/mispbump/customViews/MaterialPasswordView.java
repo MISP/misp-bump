@@ -18,7 +18,6 @@ import lu.circl.mispbump.R;
 public class MaterialPasswordView extends ConstraintLayout {
 
     private TextView titleView, passwordView;
-    private OnCopyClickListener onCopyClickListener;
 
 
     public MaterialPasswordView(Context context, AttributeSet attrs) {
@@ -31,14 +30,6 @@ public class MaterialPasswordView extends ConstraintLayout {
         final String password = a.getString(R.styleable.MaterialPasswordView_password);
         a.recycle();
 
-        ImageButton copyButton = view.findViewById(R.id.copy);
-        copyButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onCopyClickListener.onClick(title, getPassword());
-            }
-        });
-
         titleView = view.findViewById(R.id.material_password_title);
         titleView.setText(title);
 
@@ -47,14 +38,11 @@ public class MaterialPasswordView extends ConstraintLayout {
         passwordView.setText(password);
 
         ImageButton visibleToggle = findViewById(R.id.visibleToggle);
-        visibleToggle.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (passwordView.getTransformationMethod() == null) {
-                    passwordView.setTransformationMethod(new PasswordTransformationMethod());
-                } else {
-                    passwordView.setTransformationMethod(null);
-                }
+        visibleToggle.setOnClickListener(v -> {
+            if (passwordView.getTransformationMethod() == null) {
+                passwordView.setTransformationMethod(new PasswordTransformationMethod());
+            } else {
+                passwordView.setTransformationMethod(null);
             }
         });
     }
@@ -84,13 +72,4 @@ public class MaterialPasswordView extends ConstraintLayout {
         }
     }
 
-
-    public void addOnCopyClickedListener(OnCopyClickListener listener) {
-        onCopyClickListener = listener;
-    }
-
-
-    public interface OnCopyClickListener {
-        void onClick(String title, String password);
-    }
 }

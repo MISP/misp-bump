@@ -18,7 +18,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import lu.circl.mispbump.interfaces.MispRestInterface;
+import lu.circl.mispbump.interfaces.MispService;
 import lu.circl.mispbump.models.restModels.MispOrganisation;
 import lu.circl.mispbump.models.restModels.MispRole;
 import lu.circl.mispbump.models.restModels.MispServer;
@@ -47,7 +47,7 @@ public class MispRestClient {
 
 
     private static MispRestClient instance;
-    private MispRestInterface mispRestInterface;
+    private MispService mispService;
 
     public static MispRestClient getInstance(String url, String authkey) {
         if (instance == null) {
@@ -67,10 +67,15 @@ public class MispRestClient {
                     .client(getCustomClient(true, true, authkey))
                     .build();
 
-            mispRestInterface = retrofit.create(MispRestInterface.class);
+            mispService = retrofit.create(MispService.class);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    public MispService getService() {
+        return mispService;
     }
 
 
@@ -153,7 +158,7 @@ public class MispRestClient {
      * @param callback {@link AvailableCallback}
      */
     public void isAvailable(final AvailableCallback callback) {
-        Call<Version> call = mispRestInterface.pyMispVersion();
+        Call<Version> call = mispService.pyMispVersion();
         call.enqueue(new Callback<Version>() {
             @Override
             public void onResponse(@NonNull Call<Version> call, @NonNull Response<Version> response) {
@@ -177,7 +182,7 @@ public class MispRestClient {
     }
 
     public void getRoles(final AllRolesCallback callback) {
-        Call<List<MispRole>> call = mispRestInterface.getRoles();
+        Call<List<MispRole>> call = mispService.getRoles();
         call.enqueue(new Callback<List<MispRole>>() {
             @Override
             public void onResponse(Call<List<MispRole>> call, Response<List<MispRole>> response) {
@@ -213,7 +218,7 @@ public class MispRestClient {
      * @param callback {@link UserCallback} wrapper to return user directly
      */
     public void getMyUser(final UserCallback callback) {
-        Call<MispUser> call = mispRestInterface.getMyUserInformation();
+        Call<MispUser> call = mispService.getMyUserInformation();
 
         call.enqueue(new Callback<MispUser>() {
             @Override
@@ -245,7 +250,7 @@ public class MispRestClient {
      */
 
     public void getUser(int userId, final UserCallback callback) {
-        Call<MispUser> call = mispRestInterface.getUser(userId);
+        Call<MispUser> call = mispService.getUser(userId);
 
         call.enqueue(new Callback<MispUser>() {
             @Override
@@ -291,7 +296,7 @@ public class MispRestClient {
     }
 
     public void getAllUsers(final AllUsersCallback callback) {
-        Call<List<MispUser>> call = mispRestInterface.getAllUsers();
+        Call<List<MispUser>> call = mispService.getAllUsers();
 
         call.enqueue(new Callback<List<MispUser>>() {
             @Override
@@ -327,7 +332,7 @@ public class MispRestClient {
      * @param callback {@link UserCallback} wrapper to return the created user directly
      */
     public void addUser(User user, final UserCallback callback) {
-        Call<MispUser> call = mispRestInterface.addUser(user);
+        Call<MispUser> call = mispService.addUser(user);
 
         call.enqueue(new Callback<MispUser>() {
             @Override
@@ -357,7 +362,7 @@ public class MispRestClient {
      * @param callback {@link OrganisationCallback} wrapper to return a organisation directly
      */
     public void getOrganisation(int orgId, final OrganisationCallback callback) {
-        Call<MispOrganisation> call = mispRestInterface.getOrganisation(orgId);
+        Call<MispOrganisation> call = mispService.getOrganisation(orgId);
 
         call.enqueue(new Callback<MispOrganisation>() {
             @Override
@@ -402,7 +407,7 @@ public class MispRestClient {
     }
 
     public void getAllOrganisations(final AllOrganisationsCallback callback) {
-        Call<List<MispOrganisation>> call = mispRestInterface.getAllOrganisations();
+        Call<List<MispOrganisation>> call = mispService.getAllOrganisations();
 
         call.enqueue(new Callback<List<MispOrganisation>>() {
             @Override
@@ -438,7 +443,7 @@ public class MispRestClient {
      * @param callback     {@link OrganisationCallback} wrapper to return the created organisation directly
      */
     public void addOrganisation(Organisation organisation, final OrganisationCallback callback) {
-        Call<MispOrganisation> call = mispRestInterface.addOrganisation(organisation);
+        Call<MispOrganisation> call = mispService.addOrganisation(organisation);
 
         call.enqueue(new Callback<MispOrganisation>() {
             @Override
@@ -466,7 +471,7 @@ public class MispRestClient {
      * @param callback {@link OrganisationCallback} wrapper to return a list of servers directly
      */
     public void getAllServers(final AllServersCallback callback) {
-        Call<List<MispServer>> call = mispRestInterface.getAllServers();
+        Call<List<MispServer>> call = mispService.getAllServers();
 
         call.enqueue(new Callback<List<MispServer>>() {
             @Override
@@ -494,7 +499,7 @@ public class MispRestClient {
     }
 
     public void getAllServers(final AllRawServersCallback callback) {
-        Call<List<MispServer>> call = mispRestInterface.getAllServers();
+        Call<List<MispServer>> call = mispService.getAllServers();
 
         call.enqueue(new Callback<List<MispServer>>() {
             @Override
@@ -520,7 +525,7 @@ public class MispRestClient {
      * @param callback {@link ServerCallback} wrapper to return the created server directly
      */
     public void addServer(Server server, final ServerCallback callback) {
-        Call<Server> call = mispRestInterface.addServer(server);
+        Call<Server> call = mispService.addServer(server);
 
         call.enqueue(new Callback<Server>() {
             @Override

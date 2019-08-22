@@ -12,14 +12,14 @@ import lu.circl.mispbump.auxiliary.PreferenceManager;
 /**
  * Starts either the login or home activity.
  */
-public class StartUpActivity extends AppCompatActivity {
+public class LauncherActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (isUserLoggedIn()) {
-            Intent home = new Intent(this, HomeActivity.class);
+            Intent home = new Intent(this, NetworkTestActivity.class);
             startActivity(home);
         } else {
             Intent login = new Intent(this, LoginActivity.class);

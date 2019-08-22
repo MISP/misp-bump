@@ -3,7 +3,6 @@ package lu.circl.mispbump.customViews;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,15 +44,15 @@ public class UploadAction extends ConstraintLayout {
 
         View baseView = LayoutInflater.from(context).inflate(R.layout.view_upload_action, this);
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.UploadAction);
+//        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.UploadAction);
+//
+//        titleView = baseView.findViewById(R.id.title);
+//        titleView.setText(a.getString(R.styleable.UploadAction_description));
 
-        titleView = baseView.findViewById(R.id.title);
-        titleView.setText(a.getString(R.styleable.UploadAction_description));
-
-        a.recycle();
+//        a.recycle();
 
         errorView = baseView.findViewById(R.id.error);
-        stateView = baseView.findViewById(R.id.stateView);
+        stateView = baseView.findViewById(R.id.progressIcon);
         progressBar = baseView.findViewById(R.id.progressBar);
 
         setCurrentUploadState(UploadState.PENDING);

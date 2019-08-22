@@ -10,7 +10,7 @@
     android:animateLayoutChanges="true">
 
     <ImageView
-        android:id="@+id/stateView"
+        android:id="@+id/progressIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_error_outline"
@@ -19,8 +19,8 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <ProgressBar
-        android:visibility="gone"
         android:id="@+id/progressBar"
+        android:visibility="gone"
         android:layout_width="24dp"
         android:layout_height="24dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -33,18 +33,19 @@
         android:layout_marginTop="2dp"
         android:layout_marginEnd="16dp"
         android:textAppearance="@style/AppTheme.TextAppearance.ListTitle"
-        app:layout_constraintEnd_toStartOf="@+id/stateView"
+        app:layout_constraintEnd_toStartOf="@+id/progressIcon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Add Organisation"/>
 
     <TextView
-        android:visibility="gone"
         android:id="@+id/error"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:textAppearance="@style/AppTheme.TextAppearance.ListSubtitle"
+        android:textColor="@color/status_red"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title"
         tools:text="Organisation B added successfully"/>

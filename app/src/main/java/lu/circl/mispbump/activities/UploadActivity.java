@@ -6,21 +6,19 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.util.Pair;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.UUID;
 
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.auxiliary.MispRestClient;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
-import lu.circl.mispbump.customViews.UploadAction;
-import lu.circl.mispbump.models.UploadInformation;
+import lu.circl.mispbump.customViews.ProgressActionView;
+import lu.circl.mispbump.models.SyncInformation;
 import lu.circl.mispbump.models.restModels.Organisation;
 import lu.circl.mispbump.models.restModels.Server;
 import lu.circl.mispbump.models.restModels.User;
@@ -28,13 +26,74 @@ import lu.circl.mispbump.models.restModels.User;
 
 public class UploadActivity extends AppCompatActivity {
 
-    public static String EXTRA_UPLOAD_INFO = "uploadInformation";
+    public static final String EXTRA_SYNC_INFO_UUID = "EXTRA_SYNC_INFO_UUID";
+
+    private View rootLayout;
 
     private PreferenceManager preferenceManager;
-    private UploadInformation uploadInformation;
+    private MispRestClient mispRest;
+    private SyncInformation syncInformation;
 
-    private MispRestClient restClient;
-    private UploadAction availableAction, orgAction, userAction, serverAction;
+    private ProgressActionView availableAction, organisationAction, userAction, serverAction;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_upload);
+
+        rootLayout = findViewById(R.id.rootLayout);
+
+        preferenceManager = PreferenceManager.getInstance(UploadActivity.this);
+
+        Pair<String, String> credentials = preferenceManager.getUserCredentials();
+        mispRest = MispRestClient.getInstance(credentials.first, credentials.second);
+
+        parseExtra();
+        initToolbar();
+        initProgressActionViews();
+        startUpload();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+
+        return false;
+    }
+
+
+    private void parseExtra() {
+        Intent i = getIntent();
+        String syncInfoUuid = i.getStringExtra(EXTRA_SYNC_INFO_UUID);
+        syncInformation = preferenceManager.getSyncInformation(UUID.fromString(syncInfoUuid));
+    }
+
+    private void initToolbar() {
+        Toolbar myToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
+
+        ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+            ab.setDisplayShowTitleEnabled(true);
+        }
+    }
+
+    private void initProgressActionViews() {
+        availableAction = findViewById(R.id.availableProgressAction);
+        organisationAction = findViewById(R.id.organisationProgressAction);
+        userAction = findViewById(R.id.userProgressAction);
+        serverAction = findViewById(R.id.serverProgressAction);
+
+        availableAction.pending();
+        organisationAction.pending();
+        userAction.pending();
+        serverAction.pending();
+    }
+
 
     private MispRestClient.AvailableCallback availableCallback = new MispRestClient.AvailableCallback() {
         @Override
@@ -92,187 +151,64 @@ public class UploadActivity extends AppCompatActivity {
         }
     };
 
-    private FloatingActionButton fab;
-
-    private boolean errorWhileUpload;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_upload);
-
-        preferenceManager = PreferenceManager.getInstance(UploadActivity.this);
-        Pair<String, String> credentials = preferenceManager.getUserCredentials();
-        restClient = MispRestClient.getInstance(credentials.first, credentials.second);
-
-        parseExtra();
-        initViews();
-        startUpload();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        if (item.getItemId() == android.R.id.home) {
-            saveCurrentState();
-            finish();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        saveCurrentState();
-    }
-
-
-    private void parseExtra() {
-        Intent i = getIntent();
-
-        UUID currentUUID = (UUID) i.getSerializableExtra(EXTRA_UPLOAD_INFO);
-
-        for (UploadInformation ui : preferenceManager.getUploadInformationList()) {
-            if (ui.getUuid().compareTo(currentUUID) == 0) {
-                uploadInformation = ui;
-                return;
-            }
-        }
-
-        if (uploadInformation == null) {
-            throw new RuntimeException("Could not find UploadInfo with UUID {" + currentUUID.toString() + "}");
-        }
-    }
-
-    private void initViews() {
-        getWindow().setStatusBarColor(getColor(R.color.colorPrimary));
-
-        fab = findViewById(R.id.fab);
-        fab.hide();
-
-        // toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar ab = getSupportActionBar();
-        assert ab != null;
-
-        ab.setDisplayShowTitleEnabled(false);
-        ab.setDisplayHomeAsUpEnabled(true);
-        ab.setHomeAsUpIndicator(R.drawable.ic_close);
-
-        availableAction = findViewById(R.id.availableAction);
-        orgAction = findViewById(R.id.orgAction);
-        userAction = findViewById(R.id.userAction);
-        serverAction = findViewById(R.id.serverAction);
-    }
-
-    private void saveCurrentState() {
-        if (errorWhileUpload) {
-            uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-        }
-        preferenceManager.addUploadInformation(uploadInformation);
-    }
-
-    private void setUploadActionState(UploadAction uploadAction, UploadAction.UploadState state, @Nullable String error) {
-        uploadAction.setCurrentUploadState(state);
-        uploadAction.setError(error);
-
-        switch (state) {
-            case PENDING:
-                if (fab.isShown()) {
-                    fab.hide();
-                }
-                break;
-            case LOADING:
-                errorWhileUpload = false;
-                if (fab.isShown()) {
-                    fab.hide();
-                }
-                break;
-            case DONE:
-                errorWhileUpload = false;
-                break;
-            case ERROR:
-                uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.FAILURE);
-
-                fab.setImageResource(R.drawable.ic_autorenew);
-                fab.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        setUploadActionState(availableAction, UploadAction.UploadState.LOADING, null);
-                        startUpload();
-                    }
-                });
-                if (!fab.isShown()) {
-                    fab.show();
-                }
-                errorWhileUpload = true;
-                break;
-        }
-    }
-
 
     private User generateSyncUser(Organisation organisation) {
-        User syncUser = new User();
+        User syncUser = syncInformation.getSyncUser();
+
         syncUser.setOrg_id(organisation.getId());
-//        syncUser.role_id = User.ROLE_SYNC_USER;
-        syncUser.setEmail(uploadInformation.getRemote().syncUserEmail);
-        syncUser.setPassword(uploadInformation.getRemote().syncUserPassword);
-        syncUser.setAuthkey(uploadInformation.getRemote().syncUserAuthkey);
+        syncUser.setRole_id(6);
         syncUser.setTermsaccepted(true);
 
         return syncUser;
     }
 
     private Server generateSyncServer() {
-        Server server = new Server();
-        server.setName(uploadInformation.getRemote().organisation.getName() + "'s Sync Server");
-        server.setUrl(uploadInformation.getRemote().baseUrl);
-        server.setRemote_org_id(uploadInformation.getRemote().organisation.getId());
-        server.setAuthkey(uploadInformation.getLocal().syncUserAuthkey);
-        server.setPull(uploadInformation.isPull());
-        server.setPush(uploadInformation.isPush());
-        server.setCaching_enabled(uploadInformation.isCached());
-        server.setSelf_signed(uploadInformation.isAllowSelfSigned());
+        Server server = syncInformation.getSyncServer();
+        server.setName(syncInformation.getRemoteOrganisation().getName() + "'s Sync Server");
+        server.setRemote_org_id(syncInformation.getRemoteOrganisation().getId());
+        server.setAuthkey(syncInformation.getLocal().getSyncUser().getAuthkey());
+        server.setPull(syncInformation.getSyncServer().getPull());
+        server.setPush(syncInformation.getSyncServer().getPush());
+        server.setCaching_enabled(syncInformation.getSyncServer().getCaching_enabled());
+        server.setSelf_signed(syncInformation.getSyncServer().getCaching_enabled());
         return server;
     }
 
 
-    /**
-     * Start upload to misp instance.
-     */
     private void startUpload() {
-        availableAction.setCurrentUploadState(UploadAction.UploadState.LOADING);
-        restClient.isAvailable(availableCallback);
+        availableAction.start();
+        mispRest.isAvailable(availableCallback);
     }
 
     private void mispAvailable(boolean available, String error) {
         if (available) {
-            setUploadActionState(availableAction, UploadAction.UploadState.DONE, null);
-            restClient.addOrganisation(uploadInformation.getRemote().organisation, organisationCallback);
+            availableAction.done();
+            organisationAction.start();
+
+            mispRest.addOrganisation(syncInformation.getRemoteOrganisation(), organisationCallback);
         } else {
-            setUploadActionState(availableAction, UploadAction.UploadState.ERROR, error);
+            availableAction.error(error);
         }
     }
 
     private void organisationAdded(Organisation organisation) {
         if (organisation != null) {
-            setUploadActionState(orgAction, UploadAction.UploadState.DONE, null);
-            uploadInformation.getRemote().organisation.setId(organisation.getId());
-            restClient.addUser(generateSyncUser(organisation), userCallback);
+            organisationAction.done();
+            userAction.start();
+
+            syncInformation.getRemoteOrganisation().setId(organisation.getId());
+            mispRest.addUser(generateSyncUser(organisation), userCallback);
         } else {
-            // search by UUID because the error does not give the actual ID
-            restClient.getOrganisation(uploadInformation.getRemote().organisation.getUuid(), new MispRestClient.OrganisationCallback() {
+            mispRest.getOrganisation(syncInformation.getRemoteOrganisation().getUuid(), new MispRestClient.OrganisationCallback() {
                 @Override
                 public void success(Organisation organisation) {
                     organisationAdded(organisation);
+                    organisationAction.done("Organisation already on MISP instance");
                 }
 
                 @Override
                 public void failure(String error) {
-                    setUploadActionState(orgAction, UploadAction.UploadState.ERROR, error);
+                    organisationAction.error(error);
                 }
             });
         }
@@ -280,18 +216,21 @@ public class UploadActivity extends AppCompatActivity {
 
     private void userAdded(User user) {
         if (user != null) {
-            setUploadActionState(userAction, UploadAction.UploadState.DONE, null);
-            restClient.getAllServers(allServersCallback);
+            userAction.done();
+            serverAction.start();
+
+            mispRest.getAllServers(allServersCallback);
         } else {
-            restClient.getUser(uploadInformation.getRemote().syncUserEmail, new MispRestClient.UserCallback() {
+            mispRest.getUser(syncInformation.getLocal().getSyncUser().getEmail(), new MispRestClient.UserCallback() {
                 @Override
                 public void success(User user) {
+                    userAction.done("User already on MISP instance");
                     userAdded(user);
                 }
 
                 @Override
                 public void failure(String error) {
-                    setUploadActionState(userAction, UploadAction.UploadState.ERROR, error);
+                    userAction.error(error);
                 }
             });
         }
@@ -309,28 +248,16 @@ public class UploadActivity extends AppCompatActivity {
                 }
             }
 
-            restClient.addServer(serverToUpload, serverCallback);
+            mispRest.addServer(serverToUpload, serverCallback);
         } else {
-            setUploadActionState(serverAction, UploadAction.UploadState.ERROR, "Could not retrieve server information");
+            serverAction.error("Unknown error while creating the Sync Server");
         }
     }
 
     private void serverAdded(Server server) {
         if (server != null) {
-            setUploadActionState(serverAction, UploadAction.UploadState.DONE, null);
-            uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.COMPLETE);
-            saveCurrentState();
-
-            fab.setImageResource(R.drawable.ic_check);
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
-                }
-            });
-            fab.show();
-        } else {
-            setUploadActionState(serverAction, UploadAction.UploadState.ERROR, "Could not add server");
+            serverAction.done();
+            preferenceManager.addSyncInformation(syncInformation);
         }
     }
 }

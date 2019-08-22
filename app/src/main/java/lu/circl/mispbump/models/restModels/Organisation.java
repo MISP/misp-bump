@@ -3,6 +3,8 @@ package lu.circl.mispbump.models.restModels;
 
 import androidx.annotation.NonNull;
 
+import java.util.Arrays;
+
 
 /**
  * Information gathered from Misp API about a organisation.
@@ -20,22 +22,18 @@ public class Organisation {
     private String description;
     private Boolean local;
     private String uuid;
-//    private String[] restricted_to_domain;
+    private String[] restricted_to_domain;
     private String created_by;
     private Integer user_count;
 
-    public Organisation() {
-    }
 
     public Organisation toSyncOrganisation() {
         Organisation organisation = new Organisation();
-        organisation.local = true;  // TODO REMOVE FROME HERE!
         organisation.name = name;
         organisation.uuid = uuid;
         organisation.description = description;
         organisation.nationality = nationality;
         organisation.sector = sector;
-        organisation.type = "Sync organisation";
         organisation.contacts = contacts;
 
         return organisation;
@@ -130,13 +128,13 @@ public class Organisation {
         this.uuid = uuid;
     }
 
-//    public String[] getRestricted_to_domain() {
-//        return restricted_to_domain;
-//    }
+    public String[] getRestricted_to_domain() {
+        return restricted_to_domain;
+    }
 
-//    public void setRestricted_to_domain(String[] restricted_to_domain) {
-//        this.restricted_to_domain = restricted_to_domain;
-//    }
+    public void setRestricted_to_domain(String[] restricted_to_domain) {
+        this.restricted_to_domain = restricted_to_domain;
+    }
 
     public String getCreated_by() {
         return created_by;
@@ -157,21 +155,20 @@ public class Organisation {
     @NonNull
     @Override
     public String toString() {
-        return "Organisation{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", date_created='" + date_created + '\'' +
-                ", date_modified='" + date_modified + '\'' +
-                ", type='" + type + '\'' +
-                ", nationality='" + nationality + '\'' +
-                ", sector='" + sector + '\'' +
-                ", contacts='" + contacts + '\'' +
-                ", description='" + description + '\'' +
-                ", local=" + local +
-                ", uuid='" + uuid + '\'' +
-//                ", restricted_to_domain='" + Arrays.toString(restricted_to_domain) + '\'' +
-                ", created_by='" + created_by + '\'' +
-                ", user_count=" + user_count +
-                '}';
+        return "Organisation: \n" +
+                "\t id = " + id + "\n" +
+                "\t name = " + name + '\n' +
+                "\t date_created = " + date_created + '\n' +
+                "\t date_modified = " + date_modified + '\n' +
+                "\t type = " + type + '\n' +
+                "\t nationality = " + nationality + '\n' +
+                "\t sector = " + sector + '\n' +
+                "\t contacts = " + contacts + '\n' +
+                "\t description = " + description + '\n' +
+                "\t local = " + local + '\n' +
+                "\t uuid = " + uuid + '\n' +
+                "\t restricted_to_domain = " + Arrays.toString(restricted_to_domain) + '\n' +
+                "\t created_by = " + created_by + '\n' +
+                "\t user_count = " + user_count;
     }
 }

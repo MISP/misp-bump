@@ -22,16 +22,14 @@ import com.google.gson.JsonSyntaxException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.List;
 
 import lu.circl.mispbump.R;
-import lu.circl.mispbump.auxiliary.DialogManager;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.auxiliary.QrCodeGenerator;
-import lu.circl.mispbump.auxiliary.RandomString;
 import lu.circl.mispbump.fragments.CameraFragment;
+import lu.circl.mispbump.models.ExchangeInformation;
 import lu.circl.mispbump.models.SyncInformation;
-import lu.circl.mispbump.models.UploadInformation;
+import lu.circl.mispbump.models.restModels.Server;
 import lu.circl.mispbump.security.DiffieHellman;
 
 
@@ -40,7 +38,6 @@ public class ExchangeActivity extends AppCompatActivity {
     private PreferenceManager preferenceManager;
     private QrCodeGenerator qrCodeGenerator;
     private DiffieHellman diffieHellman;
-    private UploadInformation uploadInformation;
 
     private CameraFragment cameraFragment;
 
@@ -49,6 +46,8 @@ public class ExchangeActivity extends AppCompatActivity {
     private TextView scanFeedbackText, qrContentInfo;
     private ImageView qrCode;
     private ImageButton prevButton, nextButton;
+
+    private SyncInformation syncInformation;
 
     private Bitmap publicKeyQr, dataQr;
 
@@ -67,8 +66,9 @@ public class ExchangeActivity extends AppCompatActivity {
         initViews();
         initCamera();
 
-        uploadInformation = new UploadInformation();
         publicKeyQr = generatePublicKeyBitmap();
+
+        syncInformation = new SyncInformation();
 
         setSyncState(SyncState.KEY_EXCHANGE);
     }
@@ -105,24 +105,23 @@ public class ExchangeActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
+    private ExchangeInformation generateSyncExchangeInformation() {
+        ExchangeInformation exchangeInformation = new ExchangeInformation();
+        exchangeInformation.setOrganisation(preferenceManager.getUserOrganisation().toSyncOrganisation());
+        exchangeInformation.setSyncUser(preferenceManager.getUserInfo().toSyncUser());
+        exchangeInformation.setServer(new Server(preferenceManager.getUserCredentials().first));
+        return exchangeInformation;
+    }
+
 
     private Bitmap generatePublicKeyBitmap() {
         return qrCodeGenerator.generateQrCode(DiffieHellman.publicKeyToString(diffieHellman.getPublicKey()));
     }
 
     private Bitmap generateLocalSyncInfoBitmap() {
-        uploadInformation.setLocal(generateLocalSyncInfo());
-        return qrCodeGenerator.generateQrCode(diffieHellman.encrypt(new Gson().toJson(uploadInformation.getLocal())));
-    }
-
-    private SyncInformation generateLocalSyncInfo() {
-        SyncInformation syncInformation = new SyncInformation();
-        syncInformation.organisation = preferenceManager.getUserOrganisation().toSyncOrganisation();
-        syncInformation.syncUserAuthkey = new RandomString(40).nextString();
-        syncInformation.baseUrl = preferenceManager.getUserCredentials().first;
-        syncInformation.syncUserPassword = new RandomString(16).nextString();
-        syncInformation.syncUserEmail = preferenceManager.getUserInfo().getEmail();
-        return syncInformation;
+        ExchangeInformation exchangeInformation = generateSyncExchangeInformation();
+        syncInformation.setLocal(exchangeInformation);
+        return qrCodeGenerator.generateQrCode(diffieHellman.encrypt(new Gson().toJson(exchangeInformation)));
     }
 
 
@@ -275,34 +274,9 @@ public class ExchangeActivity extends AppCompatActivity {
                     break;
                 case DATA_EXCHANGE:
                     try {
-                        final SyncInformation remoteSyncInfo = new Gson().fromJson(diffieHellman.decrypt(qrData), SyncInformation.class);
-
-                        final List<UploadInformation> uploadInformationList = preferenceManager.getUploadInformationList();
-
-                        for (final UploadInformation ui : uploadInformationList) {
-                            if (ui.getRemote().organisation.getUuid().equals(remoteSyncInfo.organisation.getUuid())) {
-                                DialogManager.syncAlreadyExistsDialog(ui.getRemote(), remoteSyncInfo, ExchangeActivity.this, new DialogManager.IDialogFeedback() {
-                                    @Override
-                                    public void positive() {
-                                        // update remote info only
-                                        uploadInformation.setUuid(ui.getUuid());
-                                        uploadInformation.setDate();
-                                    }
-
-                                    @Override
-                                    public void negative() {
-                                        // replace credentials too
-                                        uploadInformationList.remove(ui);
-                                        preferenceManager.setUploadInformationList(uploadInformationList);
-                                    }
-                                });
-
-                                break;
-                            }
-                        }
-
-                        uploadInformation.setRemote(remoteSyncInfo);
-                        preferenceManager.addUploadInformation(uploadInformation);
+                        ExchangeInformation remoteSyncInfo = new Gson().fromJson(diffieHellman.decrypt(qrData), ExchangeInformation.class);
+                        syncInformation.populateRemoteExchangeInformation(remoteSyncInfo);
+                        preferenceManager.addSyncInformation(syncInformation);
                         setSyncState(SyncState.DATA_EXCHANGE_DONE);
                     } catch (JsonSyntaxException e) {
                         if (currentReadQrStatus == ReadQrStatus.PENDING) {
@@ -340,10 +314,8 @@ public class ExchangeActivity extends AppCompatActivity {
                     setSyncState(SyncState.DATA_EXCHANGE);
                     break;
                 case DATA_EXCHANGE_DONE:
-                    uploadInformation.setCurrentSyncStatus(UploadInformation.SyncStatus.PENDING);
-                    preferenceManager.addUploadInformation(uploadInformation);
-                    Intent i = new Intent(ExchangeActivity.this, UploadInfoActivity.class);
-                    i.putExtra(UploadInfoActivity.EXTRA_UPLOAD_INFO_UUID, uploadInformation.getUuid());
+                    Intent i = new Intent(ExchangeActivity.this, SyncInfoDetailActivity.class);
+                    i.putExtra(SyncInfoDetailActivity.EXTRA_SYNC_INFO_UUID, syncInformation.getUuid());
                     startActivity(i);
                     finish();
                     break;

@@ -12,7 +12,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityOptionsCompat;
-import androidx.core.util.Pair;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,21 +20,18 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.List;
 
 import lu.circl.mispbump.R;
-import lu.circl.mispbump.adapters.UploadInfoAdapter;
-import lu.circl.mispbump.auxiliary.MispRestClient;
+import lu.circl.mispbump.adapters.SyncInfoAdapter;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.interfaces.OnRecyclerItemClickListener;
-import lu.circl.mispbump.models.SyncModel;
-import lu.circl.mispbump.models.UploadInformation;
-import lu.circl.mispbump.models.restModels.Server;
+import lu.circl.mispbump.models.SyncInformation;
 
 
 public class HomeActivity extends AppCompatActivity {
 
-    private List<UploadInformation> uploadInformationList;
+    private List<SyncInformation> syncInformationList;
     private PreferenceManager preferenceManager;
     private RecyclerView recyclerView;
-    private UploadInfoAdapter uploadInfoAdapter;
+    private SyncInfoAdapter syncInfoAdapter;
     private TextView emptyRecyclerView;
 
     @Override
@@ -90,55 +86,33 @@ public class HomeActivity extends AppCompatActivity {
     private void initRecyclerView() {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
-        uploadInfoAdapter = new UploadInfoAdapter(HomeActivity.this);
-        uploadInfoAdapter.setOnRecyclerPositionClickListener(onRecyclerItemClickListener());
-        recyclerView.setAdapter(uploadInfoAdapter);
+        syncInfoAdapter = new SyncInfoAdapter();
+        syncInfoAdapter.setOnRecyclerPositionClickListener(onRecyclerItemClickListener());
+        recyclerView.setAdapter(syncInfoAdapter);
     }
 
     private void refreshRecyclerView() {
+        syncInformationList = preferenceManager.getSyncInformationList();
 
-        Pair<String, String> credentials = preferenceManager.getUserCredentials();
-        MispRestClient mispRestClient = MispRestClient.getInstance(credentials.first, credentials.second);
-
-        mispRestClient.getAllServers(new MispRestClient.AllServersCallback() {
-            @Override
-            public void success(Server[] servers) {
-                SyncModel.createFromServer(mispRestClient, servers[0], new SyncModel.InitializeWithServerObject() {
-                    @Override
-                    public void success(SyncModel syncModel) {
-                        Log.d("DEBUG", syncModel.toString());
-                    }
-
-                    @Override
-                    public void failure(String error) {
-
-                    }
-                });
-            }
-
-            @Override
-            public void failure(String error) {
-
-            }
-        });
-
-        uploadInformationList = preferenceManager.getUploadInformationList();
-
-        if (uploadInformationList.isEmpty()) {
+        if (syncInformationList.isEmpty()) {
             emptyRecyclerView.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
             emptyRecyclerView.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
-            uploadInfoAdapter.setItems(uploadInformationList);
+            syncInfoAdapter.setItems(syncInformationList);
+
+            for (SyncInformation si : syncInformationList) {
+                Log.d("DEBUG", si.toString());
+            }
         }
     }
 
 
     private OnRecyclerItemClickListener<Integer> onRecyclerItemClickListener() {
         return (v, index) -> {
-            Intent i = new Intent(HomeActivity.this, UploadInfoActivity.class);
-            i.putExtra(UploadInfoActivity.EXTRA_UPLOAD_INFO_UUID, uploadInformationList.get(index).getUuid());
+            Intent i = new Intent(HomeActivity.this, SyncInfoDetailActivity.class);
+            i.putExtra(SyncInfoDetailActivity.EXTRA_SYNC_INFO_UUID, syncInformationList.get(index).getUuid());
 
             ActivityOptionsCompat options = ActivityOptionsCompat.makeClipRevealAnimation(v.findViewById(R.id.rootLayout), (int) v.getX(), (int) v.getY(), v.getWidth(), v.getHeight());
             startActivity(i, options.toBundle());

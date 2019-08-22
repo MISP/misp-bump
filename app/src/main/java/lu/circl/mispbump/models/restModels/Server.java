@@ -11,23 +11,28 @@ public class Server {
     private String url;
     private String authkey;
     private Integer org_id;
-    private Boolean push;
-    private Boolean pull;
+    private Boolean push = false;
+    private Boolean pull = false;
     private Object lastpulledid;
     private Object lastpushedid;
     private Object organization;
     private Integer remote_org_id;
-    private Boolean publish_without_email;
-    private Boolean unpublish_event;
-    private Boolean self_signed;
+    private Boolean publish_without_email = false;
+    private Boolean unpublish_event = false;
+    private Boolean self_signed = false;
     private String pull_rules;
     private String push_rules;
     private Object cert_file;
     private Object client_cert_file;
     private Boolean internal;
     private Boolean skip_proxy;
-    private Boolean caching_enabled;
+    private Boolean caching_enabled = false;
     private Boolean cache_timestamp;
+
+
+    public Server(String url) {
+        this.url = url;
+    }
 
 
     public Integer getId() {
@@ -209,29 +214,28 @@ public class Server {
     @NonNull
     @Override
     public String toString() {
-        return "Server{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", url='" + url + '\'' +
-                ", authkey='" + authkey + '\'' +
-                ", org_id=" + org_id +
-                ", push=" + push +
-                ", pull=" + pull +
-                ", lastpulledid=" + lastpulledid +
-                ", lastpushedid=" + lastpushedid +
-                ", organization=" + organization +
-                ", remote_org_id=" + remote_org_id +
-                ", publish_without_email=" + publish_without_email +
-                ", unpublish_event=" + unpublish_event +
-                ", self_signed=" + self_signed +
-                ", pull_rules='" + pull_rules + '\'' +
-                ", push_rules='" + push_rules + '\'' +
-                ", cert_file=" + cert_file +
-                ", client_cert_file=" + client_cert_file +
-                ", internal=" + internal +
-                ", skip_proxy=" + skip_proxy +
-                ", caching_enabled=" + caching_enabled +
-                ", cache_timestamp=" + cache_timestamp +
-                '}';
+        return "Server: \n" +
+                "\t id = " + id + '\n' +
+                "\t name = " + name + '\n' +
+                "\t url = " + url + '\n' +
+                "\t authkey = " + authkey + '\n' +
+                "\t org_id = " + org_id + '\n' +
+                "\t push = " + push + '\n' +
+                "\t pull = " + pull + '\n' +
+                "\t lastpulledid = " + lastpulledid + '\n' +
+                "\t lastpushedid = " + lastpushedid + '\n' +
+                "\t organization = " + organization + '\n' +
+                "\t remote_org_id = " + remote_org_id + '\n' +
+                "\t publish_without_email = " + publish_without_email + '\n' +
+                "\t unpublish_event = " + unpublish_event + '\n' +
+                "\t self_signed = " + self_signed + '\n' +
+                "\t pull_rules = " + pull_rules + '\n' +
+                "\t push_rules = " + push_rules + '\n' +
+                "\t cert_file = " + cert_file + '\n' +
+                "\t client_cert_file = " + client_cert_file + '\n' +
+                "\t internal = " + internal + '\n' +
+                "\t skip_proxy = " + skip_proxy + '\n' +
+                "\t caching_enabled = " + caching_enabled + '\n' +
+                "\t cache_timestamp = " + cache_timestamp;
     }
 }

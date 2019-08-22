@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ExpandableCardView">
+        // general
+        <attr name="card_corner_radius" format="dimension"/>
+
+        // header
+        <attr name="card_title" format="string"/>
+        <attr name="card_icon" format="reference"/>
+        <attr name="card_header_background_color" format="color"/>
+        <attr name="card_header_foreground_color" format="color"/>
+
+        // content
+        <attr name="card_content_padding" format="dimension"/>
+        <attr name="card_content_background_color" format="color"/>
+    </declare-styleable>
+</resources>
