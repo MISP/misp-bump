@@ -3,7 +3,6 @@ package lu.circl.mispbump.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +11,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.util.Pair;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,9 +21,13 @@ import java.util.List;
 
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.adapters.SyncInfoAdapter;
+import lu.circl.mispbump.auxiliary.MispRestClient;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.interfaces.OnRecyclerItemClickListener;
 import lu.circl.mispbump.models.SyncInformation;
+import lu.circl.mispbump.models.restModels.Organisation;
+import lu.circl.mispbump.models.restModels.Role;
+import lu.circl.mispbump.models.restModels.User;
 
 
 public class HomeActivity extends AppCompatActivity {
@@ -43,6 +47,7 @@ public class HomeActivity extends AppCompatActivity {
 
         initViews();
         initRecyclerView();
+        checkRequiredInformationAvailable();
     }
 
     @Override
@@ -100,11 +105,55 @@ public class HomeActivity extends AppCompatActivity {
         } else {
             emptyRecyclerView.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
-            syncInfoAdapter.setItems(syncInformationList);
 
-            for (SyncInformation si : syncInformationList) {
-                Log.d("DEBUG", si.toString());
-            }
+            // TODO Update from server if available
+
+            syncInfoAdapter.setItems(syncInformationList);
+        }
+    }
+
+    private void checkRequiredInformationAvailable() {
+        if (preferenceManager.getRoles() == null || preferenceManager.getUserInfo() == null || preferenceManager.getUserOrganisation() == null) {
+
+            Pair<String, String> credentials = preferenceManager.getUserCredentials();
+            MispRestClient client = MispRestClient.getInstance(credentials.first, credentials.second);
+
+            // get roles
+            client.getRoles(new MispRestClient.AllRolesCallback() {
+                @Override
+                public void success(Role[] roles) {
+                    preferenceManager.setRoles(roles);
+                }
+
+                @Override
+                public void failure(String error) {
+
+                }
+            });
+
+            // get user and organisation
+            client.getMyUser(new MispRestClient.UserCallback() {
+                @Override
+                public void success(User user) {
+                    preferenceManager.setMyUser(user);
+
+                    client.getOrganisation(user.getOrg_id(), new MispRestClient.OrganisationCallback() {
+                        @Override
+                        public void success(Organisation organisation) {
+                            preferenceManager.setMyOrganisation(organisation);
+                        }
+                        @Override
+                        public void failure(String error) {
+
+                        }
+                    });
+                }
+
+                @Override
+                public void failure(String error) {
+
+                }
+            });
         }
     }
 

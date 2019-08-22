@@ -155,9 +155,9 @@ public class UploadActivity extends AppCompatActivity {
     private User generateSyncUser(Organisation organisation) {
         User syncUser = syncInformation.getRemote().getSyncUser();
 
-        syncUser.setOrg_id(organisation.getId());
-        syncUser.setRole_id(6);
-        syncUser.setTermsaccepted(true);
+        syncUser.setOrgId(organisation.getId());
+        syncUser.setRoleId(6);
+        syncUser.setTermsAccepted(true);
 
         return syncUser;
     }

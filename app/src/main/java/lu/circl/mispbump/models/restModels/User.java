@@ -62,7 +62,7 @@ public class User {
         return org_id;
     }
 
-    public void setOrg_id(Integer org_id) {
+    public void setOrgId(Integer org_id) {
         this.org_id = org_id;
     }
 
@@ -126,7 +126,7 @@ public class User {
         return termsaccepted;
     }
 
-    public void setTermsaccepted(Boolean termsaccepted) {
+    public void setTermsAccepted(Boolean termsaccepted) {
         this.termsaccepted = termsaccepted;
     }
 
@@ -138,11 +138,11 @@ public class User {
         this.newsread = newsread;
     }
 
-    public Integer getRole_id() {
+    public Integer getRoleId() {
         return role_id;
     }
 
-    public void setRole_id(Integer role_id) {
+    public void setRoleId(Integer role_id) {
         this.role_id = role_id;
     }
 

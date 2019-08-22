@@ -83,10 +83,10 @@ public class PreferenceManager {
     public Role[] getRoles() {
         Type type = new TypeToken<Role[]>() {
         }.getType();
-        String rolesString = preferences.getString(MISP_ROLES, "");
 
-        assert rolesString != null;
-        if (rolesString.isEmpty()) {
+        String rolesString = preferences.getString(MISP_ROLES, null);
+
+        if (rolesString == null) {
             return null;
         } else {
             return new Gson().fromJson(rolesString, type);
@@ -99,7 +99,7 @@ public class PreferenceManager {
      *
      * @param user {@link User}
      */
-    public void setUserInfo(User user) {
+    public void setMyUser(User user) {
         try {
             SharedPreferences.Editor editor = preferences.edit();
             KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.USER_INFO_ALIAS);
@@ -138,7 +138,7 @@ public class PreferenceManager {
      *
      * @param organisation Object representation of json organisation information
      */
-    public void setUserOrgInfo(Organisation organisation) {
+    public void setMyOrganisation(Organisation organisation) {
         try {
             String orgStr = new Gson().toJson(organisation);
             KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.USER_ORGANISATION_INFO_ALIAS);

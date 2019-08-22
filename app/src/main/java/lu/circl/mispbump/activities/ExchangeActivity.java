@@ -69,6 +69,7 @@ public class ExchangeActivity extends AppCompatActivity {
         publicKeyQr = generatePublicKeyBitmap();
 
         syncInformation = new SyncInformation();
+        syncInformation.setLocal(generateSyncExchangeInformation());
 
         setSyncState(SyncState.KEY_EXCHANGE);
     }
@@ -119,9 +120,7 @@ public class ExchangeActivity extends AppCompatActivity {
     }
 
     private Bitmap generateLocalSyncInfoBitmap() {
-        ExchangeInformation exchangeInformation = generateSyncExchangeInformation();
-        syncInformation.setLocal(exchangeInformation);
-        return qrCodeGenerator.generateQrCode(diffieHellman.encrypt(new Gson().toJson(exchangeInformation)));
+        return qrCodeGenerator.generateQrCode(diffieHellman.encrypt(new Gson().toJson(syncInformation.getLocal())));
     }
 
 
@@ -274,8 +273,7 @@ public class ExchangeActivity extends AppCompatActivity {
                     break;
                 case DATA_EXCHANGE:
                     try {
-                        ExchangeInformation remoteSyncInfo = new Gson().fromJson(diffieHellman.decrypt(qrData), ExchangeInformation.class);
-                        syncInformation.setRemote(remoteSyncInfo);
+                        syncInformation.setRemote(new Gson().fromJson(diffieHellman.decrypt(qrData), ExchangeInformation.class));
                         preferenceManager.addSyncInformation(syncInformation);
                         setSyncState(SyncState.DATA_EXCHANGE_DONE);
                     } catch (JsonSyntaxException e) {

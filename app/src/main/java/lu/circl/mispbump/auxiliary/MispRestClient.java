@@ -5,15 +5,12 @@ import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
 
-import java.io.IOException;
 import java.net.NoRouteToHostException;
 import java.security.cert.CertificateException;
 import java.util.List;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -28,7 +25,6 @@ import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.Server;
 import lu.circl.mispbump.models.restModels.User;
 import lu.circl.mispbump.models.restModels.Version;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -95,12 +91,12 @@ public class MispRestClient {
                         new X509TrustManager() {
                             @SuppressLint("TrustAllX509TrustManager")
                             @Override
-                            public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                            public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
                             }
 
                             @SuppressLint("TrustAllX509TrustManager")
                             @Override
-                            public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                            public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
                             }
 
                             @Override
@@ -118,12 +114,7 @@ public class MispRestClient {
                 final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
                 builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
-                builder.hostnameVerifier(new HostnameVerifier() {
-                    @Override
-                    public boolean verify(String hostname, SSLSession session) {
-                        return true;
-                    }
-                });
+                builder.hostnameVerifier((hostname, session) -> true);
             }
 
             if (logging) {
@@ -132,16 +123,13 @@ public class MispRestClient {
                 builder.addInterceptor(interceptor);
             }
 
-            // create authorization interceptor
-            builder.addInterceptor(new Interceptor() {
-                @Override
-                public okhttp3.Response intercept(Chain chain) throws IOException {
-                    Request.Builder ongoing = chain.request().newBuilder();
-                    ongoing.addHeader("Accept", "application/json");
-                    ongoing.addHeader("Content-Type", "application/json");
-                    ongoing.addHeader("Authorization", authkey);
-                    return chain.proceed(ongoing.build());
-                }
+            // create interceptor
+            builder.addInterceptor(chain -> {
+                Request.Builder ongoing = chain.request().newBuilder();
+                ongoing.addHeader("Accept", "application/json");
+                ongoing.addHeader("Content-Type", "application/json");
+                ongoing.addHeader("Authorization", authkey);
+                return chain.proceed(ongoing.build());
             });
 
             return builder.build();
@@ -185,7 +173,7 @@ public class MispRestClient {
         Call<List<MispRole>> call = mispService.getRoles();
         call.enqueue(new Callback<List<MispRole>>() {
             @Override
-            public void onResponse(Call<List<MispRole>> call, Response<List<MispRole>> response) {
+            public void onResponse(@NonNull Call<List<MispRole>> call, @NonNull Response<List<MispRole>> response) {
 
                 if (!response.isSuccessful()) {
                     callback.failure(extractError(response));
@@ -205,7 +193,7 @@ public class MispRestClient {
             }
 
             @Override
-            public void onFailure(Call<List<MispRole>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<MispRole>> call, @NonNull Throwable t) {
                 callback.failure(extractError(t));
             }
         });
@@ -248,7 +236,6 @@ public class MispRestClient {
      * @param userId   user identifier
      * @param callback {@link UserCallback} wrapper to return user directly
      */
-
     public void getUser(int userId, final UserCallback callback) {
         Call<MispUser> call = mispService.getUser(userId);
 
@@ -611,7 +598,6 @@ public class MispRestClient {
     }
 
     // interfaces
-
     public interface AvailableCallback {
         void available();
 
