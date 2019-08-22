@@ -44,9 +44,9 @@ public class NetworkTestActivity extends AppCompatActivity {
         List<SyncInformation> syncInformationList = preferenceManager.getSyncInformationList();
 
         for (SyncInformation syncInfo : syncInformationList) {
-            String authkey = syncInfo.getSyncServer().getAuthkey();
+            String authkey = syncInfo.getRemote().getServer().getAuthkey();
             String localUUID = syncInfo.getLocal().getOrganisation().getUuid();
-            String foreignUUID = syncInfo.getRemoteOrganisation().getUuid();
+            String foreignUUID = syncInfo.getRemote().getOrganisation().getUuid();
 
 
         }

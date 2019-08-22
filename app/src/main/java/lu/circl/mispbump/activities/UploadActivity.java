@@ -153,7 +153,7 @@ public class UploadActivity extends AppCompatActivity {
 
 
     private User generateSyncUser(Organisation organisation) {
-        User syncUser = syncInformation.getSyncUser();
+        User syncUser = syncInformation.getRemote().getSyncUser();
 
         syncUser.setOrg_id(organisation.getId());
         syncUser.setRole_id(6);
@@ -163,14 +163,14 @@ public class UploadActivity extends AppCompatActivity {
     }
 
     private Server generateSyncServer() {
-        Server server = syncInformation.getSyncServer();
-        server.setName(syncInformation.getRemoteOrganisation().getName() + "'s Sync Server");
-        server.setRemote_org_id(syncInformation.getRemoteOrganisation().getId());
+        Server server = syncInformation.getRemote().getServer();
+        server.setName(syncInformation.getRemote().getOrganisation().getName() + "'s Sync Server");
+        server.setRemoteOrgId(syncInformation.getRemote().getOrganisation().getId());
         server.setAuthkey(syncInformation.getLocal().getSyncUser().getAuthkey());
-        server.setPull(syncInformation.getSyncServer().getPull());
-        server.setPush(syncInformation.getSyncServer().getPush());
-        server.setCaching_enabled(syncInformation.getSyncServer().getCaching_enabled());
-        server.setSelf_signed(syncInformation.getSyncServer().getCaching_enabled());
+        server.setPull(syncInformation.getRemote().getServer().getPull());
+        server.setPush(syncInformation.getRemote().getServer().getPush());
+        server.setCachingEnabled(syncInformation.getRemote().getServer().getCachingEnabled());
+        server.setSelfSigned(syncInformation.getRemote().getServer().getCachingEnabled());
         return server;
     }
 
@@ -185,7 +185,7 @@ public class UploadActivity extends AppCompatActivity {
             availableAction.done();
             organisationAction.start();
 
-            mispRest.addOrganisation(syncInformation.getRemoteOrganisation(), organisationCallback);
+            mispRest.addOrganisation(syncInformation.getRemote().getOrganisation(), organisationCallback);
         } else {
             availableAction.error(error);
         }
@@ -196,10 +196,10 @@ public class UploadActivity extends AppCompatActivity {
             organisationAction.done();
             userAction.start();
 
-            syncInformation.getRemoteOrganisation().setId(organisation.getId());
+            syncInformation.getRemote().getOrganisation().setId(organisation.getId());
             mispRest.addUser(generateSyncUser(organisation), userCallback);
         } else {
-            mispRest.getOrganisation(syncInformation.getRemoteOrganisation().getUuid(), new MispRestClient.OrganisationCallback() {
+            mispRest.getOrganisation(syncInformation.getRemote().getOrganisation().getUuid(), new MispRestClient.OrganisationCallback() {
                 @Override
                 public void success(Organisation organisation) {
                     organisationAdded(organisation);
@@ -241,7 +241,7 @@ public class UploadActivity extends AppCompatActivity {
             Server serverToUpload = generateSyncServer();
 
             for (Server server : servers) {
-                if (server.getRemote_org_id().equals(serverToUpload.getRemote_org_id())) {
+                if (server.getRemoteOrgId().equals(serverToUpload.getRemoteOrgId())) {
                     // server already exists: override id to update instead
                     serverToUpload.setId(server.getId());
                     break;

@@ -42,7 +42,7 @@ public class SyncInfoAdapter extends RecyclerView.Adapter<SyncInfoAdapter.ViewHo
         holder.dateMonth.setText(monthFormatter.format(item.getSyncDate()));
         holder.dateDay.setText(dayFormatter.format(item.getSyncDate()));
 
-        holder.orgName.setText(item.getRemoteOrganisation().getName());
+        holder.orgName.setText(item.getRemote().getOrganisation().getName());
 
 //        switch (item.getCurrentSyncStatus()) {
 //            case COMPLETE:

@@ -67,11 +67,11 @@ public class Server {
         this.authkey = authkey;
     }
 
-    public Integer getOrg_id() {
+    public Integer getOrgId() {
         return org_id;
     }
 
-    public void setOrg_id(Integer org_id) {
+    public void setOrgId(Integer org_id) {
         this.org_id = org_id;
     }
 
@@ -91,19 +91,19 @@ public class Server {
         this.pull = pull;
     }
 
-    public Object getLastpulledid() {
+    public Object getLastpulledId() {
         return lastpulledid;
     }
 
-    public void setLastpulledid(Object lastpulledid) {
+    public void setLastpulledId(Object lastpulledid) {
         this.lastpulledid = lastpulledid;
     }
 
-    public Object getLastpushedid() {
+    public Object getLastpushedId() {
         return lastpushedid;
     }
 
-    public void setLastpushedid(Object lastpushedid) {
+    public void setLastpushedId(Object lastpushedid) {
         this.lastpushedid = lastpushedid;
     }
 
@@ -115,67 +115,67 @@ public class Server {
         this.organization = organization;
     }
 
-    public Integer getRemote_org_id() {
+    public Integer getRemoteOrgId() {
         return remote_org_id;
     }
 
-    public void setRemote_org_id(Integer remote_org_id) {
+    public void setRemoteOrgId(Integer remote_org_id) {
         this.remote_org_id = remote_org_id;
     }
 
-    public Boolean getPublish_without_email() {
+    public Boolean getPublishWithoutEmail() {
         return publish_without_email;
     }
 
-    public void setPublish_without_email(Boolean publish_without_email) {
+    public void setPublishWithoutEmail(Boolean publish_without_email) {
         this.publish_without_email = publish_without_email;
     }
 
-    public Boolean getUnpublish_event() {
+    public Boolean getUnpublishEvent() {
         return unpublish_event;
     }
 
-    public void setUnpublish_event(Boolean unpublish_event) {
+    public void setUnpublishEvent(Boolean unpublish_event) {
         this.unpublish_event = unpublish_event;
     }
 
-    public Boolean getSelf_signed() {
+    public Boolean getSelfSigned() {
         return self_signed;
     }
 
-    public void setSelf_signed(Boolean self_signed) {
+    public void setSelfSigned(Boolean self_signed) {
         this.self_signed = self_signed;
     }
 
-    public String getPull_rules() {
+    public String getPullRules() {
         return pull_rules;
     }
 
-    public void setPull_rules(String pull_rules) {
+    public void setPullRules(String pull_rules) {
         this.pull_rules = pull_rules;
     }
 
-    public String getPush_rules() {
+    public String getPushRules() {
         return push_rules;
     }
 
-    public void setPush_rules(String push_rules) {
+    public void setPushRules(String push_rules) {
         this.push_rules = push_rules;
     }
 
-    public Object getCert_file() {
+    public Object getCertFile() {
         return cert_file;
     }
 
-    public void setCert_file(Object cert_file) {
+    public void setCertFile(Object cert_file) {
         this.cert_file = cert_file;
     }
 
-    public Object getClient_cert_file() {
+    public Object getClientCertFile() {
         return client_cert_file;
     }
 
-    public void setClient_cert_file(Object client_cert_file) {
+    public void setClientCertFile(Object client_cert_file) {
         this.client_cert_file = client_cert_file;
     }
 
@@ -187,27 +187,27 @@ public class Server {
         this.internal = internal;
     }
 
-    public Boolean getSkip_proxy() {
+    public Boolean getSkipProxy() {
         return skip_proxy;
     }
 
-    public void setSkip_proxy(Boolean skip_proxy) {
+    public void setSkipProxy(Boolean skip_proxy) {
         this.skip_proxy = skip_proxy;
     }
 
-    public Boolean getCaching_enabled() {
+    public Boolean getCachingEnabled() {
         return caching_enabled;
     }
 
-    public void setCaching_enabled(Boolean caching_enabled) {
+    public void setCachingEnabled(Boolean caching_enabled) {
         this.caching_enabled = caching_enabled;
     }
 
-    public Boolean getCache_timestamp() {
+    public Boolean getCacheTimestamp() {
         return cache_timestamp;
     }
 
-    public void setCache_timestamp(Boolean cache_timestamp) {
+    public void setCacheTimestamp(Boolean cache_timestamp) {
         this.cache_timestamp = cache_timestamp;
     }
 

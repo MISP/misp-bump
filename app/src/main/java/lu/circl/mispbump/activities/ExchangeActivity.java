@@ -275,7 +275,7 @@ public class ExchangeActivity extends AppCompatActivity {
                 case DATA_EXCHANGE:
                     try {
                         ExchangeInformation remoteSyncInfo = new Gson().fromJson(diffieHellman.decrypt(qrData), ExchangeInformation.class);
-                        syncInformation.populateRemoteExchangeInformation(remoteSyncInfo);
+                        syncInformation.setRemote(remoteSyncInfo);
                         preferenceManager.addSyncInformation(syncInformation);
                         setSyncState(SyncState.DATA_EXCHANGE_DONE);
                     } catch (JsonSyntaxException e) {
