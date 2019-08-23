@@ -144,7 +144,7 @@ public class HomeActivity extends AppCompatActivity {
 
                 @Override
                 public void failure(String error) {
-
+                    Snackbar.make(recyclerView, error, Snackbar.LENGTH_LONG).show();
                 }
             });
 
@@ -161,14 +161,14 @@ public class HomeActivity extends AppCompatActivity {
                         }
                         @Override
                         public void failure(String error) {
-
+                            Snackbar.make(recyclerView, error, Snackbar.LENGTH_LONG).show();
                         }
                     });
                 }
 
                 @Override
                 public void failure(String error) {
-
+                    Snackbar.make(recyclerView, error, Snackbar.LENGTH_LONG).show();
                 }
             });
         }

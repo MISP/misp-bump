@@ -51,7 +51,7 @@ public class PreferenceActivity extends AppCompatActivity {
 
     public static class PreferencesFragment extends PreferenceFragmentCompat {
 
-        Preference.OnPreferenceClickListener onDeleteAllSyncsListener;
+        private Preference.OnPreferenceClickListener onDeleteAllSyncsListener;
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
