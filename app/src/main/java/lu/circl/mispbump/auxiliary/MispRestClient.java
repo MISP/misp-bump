@@ -92,11 +92,13 @@ public class MispRestClient {
                             @SuppressLint("TrustAllX509TrustManager")
                             @Override
                             public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                                // nothing to do
                             }
 
                             @SuppressLint("TrustAllX509TrustManager")
                             @Override
                             public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                                // nothing to do
                             }
 
                             @Override
