@@ -1,7 +1,6 @@
 package lu.circl.mispbump.activities;
 
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Shader;
 import android.graphics.drawable.AnimatedVectorDrawable;
@@ -45,6 +44,12 @@ public class ProfileActivity extends AppCompatActivity {
     private FloatingActionButton fab;
     private AnimatedVectorDrawable fabLoadingDrawable;
 
+    private View.OnClickListener onFabClicked = view -> {
+        fab.setImageDrawable(fabLoadingDrawable);
+        fabLoadingDrawable.start();
+        updateProfileInformation();
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,53 +59,10 @@ public class ProfileActivity extends AppCompatActivity {
         Pair<String, String> credentials = preferenceManager.getUserCredentials();
         mispRestClient = MispRestClient.getInstance(credentials.first, credentials.second);
 
-        init();
+        initToolbar();
+        initViews();
+
         populateInformationViews();
-    }
-
-    private void init() {
-        rootLayout = findViewById(R.id.rootLayout);
-
-        ImageView headerBg = findViewById(R.id.headerBg);
-        headerBg.setImageDrawable(new TileDrawable(getRandomHeader(), Shader.TileMode.REPEAT));
-
-        // populate Toolbar (Actionbar)
-        Toolbar myToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(myToolbar);
-
-        ActionBar ab = getSupportActionBar();
-        if (ab != null) {
-            ab.setDisplayHomeAsUpEnabled(true);
-            ab.setDisplayShowTitleEnabled(true);
-        }
-
-        fab = findViewById(R.id.fab);
-        fab.setOnClickListener(onFabClicked());
-
-        fabLoadingDrawable = (AnimatedVectorDrawable) getDrawable(R.drawable.animated_sync);
-    }
-
-    private void populateInformationViews() {
-        Organisation organisation = preferenceManager.getUserOrganisation();
-
-        TextView name = findViewById(R.id.orgName);
-        name.setText(organisation.getName());
-
-        final MaterialPreferenceText uuid = findViewById(R.id.uuid);
-        uuid.setSubtitle(organisation.getUuid());
-
-        MaterialPreferenceText nationality = findViewById(R.id.nationality);
-        nationality.setSubtitle(organisation.getNationality());
-
-        MaterialPreferenceText sector = findViewById(R.id.sector);
-        if (organisation.getSector() == null) {
-            sector.setVisibility(View.GONE);
-        } else {
-            sector.setSubtitle(organisation.getSector());
-        }
-
-        MaterialPreferenceText description = findViewById(R.id.description);
-        description.setSubtitle(organisation.getDescription());
     }
 
     @Override
@@ -119,23 +81,51 @@ public class ProfileActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private View.OnClickListener onFabClicked() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fab.setImageDrawable(fabLoadingDrawable);
-                fabLoadingDrawable.start();
-                updateProfile();
-            }
-        };
+
+    private void initToolbar() {
+        Toolbar myToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
+
+        ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+            ab.setDisplayShowTitleEnabled(true);
+        }
     }
 
-    private Drawable getRandomHeader() {
-        int[] ids = {R.drawable.ic_bank_note, R.drawable.ic_polka_dots, R.drawable.ic_wiggle, R.drawable.ic_circuit_board};
-        return getDrawable(ids[new Random().nextInt(ids.length)]);
+    private void initViews() {
+        rootLayout = findViewById(R.id.rootLayout);
+
+        ImageView headerBg = findViewById(R.id.headerBg);
+        headerBg.setImageDrawable(new TileDrawable(getRandomHeader(), Shader.TileMode.REPEAT));
+
+        fab = findViewById(R.id.fab);
+        fab.setOnClickListener(onFabClicked);
+
+        fabLoadingDrawable = (AnimatedVectorDrawable) getDrawable(R.drawable.animated_sync);
     }
 
-    public void updateProfile() {
+    private void populateInformationViews() {
+        Organisation organisation = preferenceManager.getUserOrganisation();
+
+        TextView name = findViewById(R.id.orgName);
+        name.setText(organisation.getName());
+
+        final MaterialPreferenceText uuid = findViewById(R.id.uuid);
+        uuid.setSubtitle(organisation.getUuid());
+
+        MaterialPreferenceText nationality = findViewById(R.id.nationality);
+        nationality.setSubtitle(organisation.getNationality());
+
+        MaterialPreferenceText sector = findViewById(R.id.sector);
+        sector.setSubtitle(organisation.getSector());
+
+        MaterialPreferenceText description = findViewById(R.id.description);
+        description.setSubtitle(organisation.getDescription());
+    }
+
+
+    public void updateProfileInformation() {
         mispRestClient.getRoles(new MispRestClient.AllRolesCallback() {
             @Override
             public void success(Role[] roles) {
@@ -151,12 +141,12 @@ public class ProfileActivity extends AppCompatActivity {
         mispRestClient.getMyUser(new MispRestClient.UserCallback() {
             @Override
             public void success(final User user) {
-                preferenceManager.setUserInfo(user);
-                mispRestClient.getOrganisation(user.org_id, new MispRestClient.OrganisationCallback() {
+                preferenceManager.setMyUser(user);
+                mispRestClient.getOrganisation(user.getRoleId(), new MispRestClient.OrganisationCallback() {
                     @Override
                     public void success(Organisation organisation) {
                         fabLoadingDrawable.stop();
-                        preferenceManager.setUserOrgInfo(organisation);
+                        preferenceManager.setMyOrganisation(organisation);
                         Snackbar.make(rootLayout, "Successfully update profile", Snackbar.LENGTH_SHORT).show();
                     }
 
@@ -181,25 +171,23 @@ public class ProfileActivity extends AppCompatActivity {
 
         builder.setTitle("Clear all saved data and logout");
         builder.setMessage("Do you really want to delete all data and logout?");
-        builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+        builder.setNegativeButton("Discard", (dialog, which) -> dialog.cancel());
 
-        builder.setPositiveButton("Delete & Logout", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                preferenceManager.clearAllData();
-                KeyStoreWrapper.deleteAllStoredKeys();
+        builder.setPositiveButton("Delete & Logout", (dialog, which) -> {
+            preferenceManager.clearAllData();
+            KeyStoreWrapper.deleteAllStoredKeys();
 
-                Intent login = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(login);
-                finish();
-            }
+            Intent login = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(login);
+            finish();
         });
 
         builder.create().show();
+    }
+
+
+    private Drawable getRandomHeader() {
+        int[] ids = {R.drawable.ic_bank_note, R.drawable.ic_polka_dots, R.drawable.ic_wiggle, R.drawable.ic_circuit_board};
+        return getDrawable(ids[new Random().nextInt(ids.length)]);
     }
 }

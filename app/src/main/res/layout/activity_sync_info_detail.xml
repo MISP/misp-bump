@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.SyncInfoDetailActivity"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:theme="@style/ToolbarTheme"
+            app:popupTheme="@style/PopupTheme" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <lu.circl.expandablecardview.ExpandableCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:card_header_background_color="@color/colorPrimary"
+                app:card_header_foreground_color="@color/white"
+                app:card_icon="@drawable/ic_info_outline"
+                app:card_title="Information">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <lu.circl.mispbump.customViews.MaterialPreferenceText
+                        android:id="@+id/name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:title="Name"
+                        app:subtitle="No name" />
+
+                    <lu.circl.mispbump.customViews.MaterialPreferenceText
+                        android:id="@+id/uuid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/name"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:title="UUID"
+                        app:subtitle="No UUID" />
+
+                    <lu.circl.mispbump.customViews.MaterialPreferenceText
+                        android:id="@+id/sector"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/uuid"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:title="Sector"
+                        app:subtitle="No sector" />
+
+                    <lu.circl.mispbump.customViews.MaterialPreferenceText
+                        android:id="@+id/description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/uuid"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:title="@string/description"
+                        app:subtitle="No description" />
+                </LinearLayout>
+
+            </lu.circl.expandablecardview.ExpandableCardView>
+
+
+            <lu.circl.expandablecardview.ExpandableCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:card_header_background_color="@color/colorPrimary"
+                app:card_header_foreground_color="@color/white"
+                app:card_icon="@drawable/ic_settings"
+                app:card_title="@string/settings">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <CheckBox
+                        android:id="@+id/checkbox_self_signed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/settings_self_signed_title"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_push"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/settings_push_title"
+                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/checkbox_self_signed" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_pull"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/settings_pull_title"
+                        app:layout_constraintStart_toEndOf="@+id/checkbox_push"
+                        app:layout_constraintTop_toBottomOf="@id/checkbox_self_signed" />
+
+                    <CheckBox
+                        android:id="@+id/checkbox_cache"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:text="@string/settings_cache_title"
+                        app:layout_constraintTop_toBottomOf="@id/checkbox_push"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </lu.circl.expandablecardview.ExpandableCardView>
+
+
+            <lu.circl.expandablecardview.ExpandableCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:card_header_background_color="@color/colorPrimary"
+                app:card_header_foreground_color="@color/white"
+                app:card_icon="@drawable/ic_verified_user"
+                app:card_title="@string/credentials">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <lu.circl.mispbump.customViews.MaterialPreferenceText
+                        android:id="@+id/email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:title="Email"
+                        app:subtitle="Keine Ahnung" />
+
+                    <lu.circl.mispbump.customViews.MaterialPasswordView
+                        android:id="@+id/password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="Password"
+                        app:password="Weiß ich leider auch nicht" />
+
+                    <lu.circl.mispbump.customViews.MaterialPasswordView
+                        android:id="@+id/authkey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="Authkey"
+                        app:password="Den erst recht nicht ..." />
+
+                </LinearLayout>
+
+            </lu.circl.expandablecardview.ExpandableCardView>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="86dp"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_gravity="bottom|end"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false">
+
+<!--        <FrameLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:background="@color/black_50"/>-->
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_keyboard_arrow_down"
+            android:tint="@color/white"
+            android:layout_margin="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <LinearLayout
+            android:id="@+id/layout_upload"
+            android:visibility="visible"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:padding="8dp"
+            android:clipToPadding="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/fab_main">
+
+            <TextView
+                android:text="Upload to MISP instance"
+                android:textColor="@color/white"
+                android:padding="8dp"
+                android:background="@drawable/tooltip_background"
+                android:backgroundTint="@color/black_70"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_upload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_cloud_upload"
+                app:fabSize="mini"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:visibility="visible"
+            android:id="@+id/layout_download"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:padding="8dp"
+            android:clipToPadding="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/layout_upload">
+
+            <TextView
+                android:text="Download changes from MISP instance"
+                android:textColor="@color/white"
+                android:padding="8dp"
+                android:background="@drawable/tooltip_background"
+                android:backgroundTint="@color/black_70"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_download"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_cloud_download"
+                app:fabSize="mini"/>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

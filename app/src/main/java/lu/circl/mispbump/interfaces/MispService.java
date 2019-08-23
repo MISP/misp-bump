@@ -21,7 +21,7 @@ import retrofit2.http.Path;
 /**
  * RetroFit2 interface for communication with misp instances
  */
-public interface MispRestInterface {
+public interface MispService {
 
     // settings routes
 

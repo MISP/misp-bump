@@ -131,9 +131,9 @@ public class LoginActivity extends AppCompatActivity {
                             mispRestClient.getMyUser(new MispRestClient.UserCallback() {
                                 @Override
                                 public void success(final User user) {
-                                    preferenceManager.setUserInfo(user);
+                                    preferenceManager.setMyUser(user);
                                     for (Role role : roles) {
-                                        if (role.getId().equals(user.role_id)) {
+                                        if (role.getId().equals(user.getRoleId())) {
                                             if (!role.getPermAdmin()) {
                                                 progressBar.setVisibility(View.GONE);
                                                 Snackbar.make(constraintLayout, "No admin is associated with this authkey.", Snackbar.LENGTH_LONG).show();
@@ -142,10 +142,10 @@ public class LoginActivity extends AppCompatActivity {
                                         }
                                     }
 
-                                    mispRestClient.getOrganisation(user.org_id, new MispRestClient.OrganisationCallback() {
+                                    mispRestClient.getOrganisation(user.getRoleId(), new MispRestClient.OrganisationCallback() {
                                         @Override
                                         public void success(Organisation organisation) {
-                                            preferenceManager.setUserOrgInfo(organisation);
+                                            preferenceManager.setMyOrganisation(organisation);
                                             preferenceManager.setUserCredentials(url, authkey);
 
                                             progressBar.setVisibility(View.GONE);

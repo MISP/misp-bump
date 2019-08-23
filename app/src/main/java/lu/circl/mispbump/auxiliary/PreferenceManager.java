@@ -21,7 +21,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import lu.circl.mispbump.models.UploadInformation;
+import lu.circl.mispbump.models.SyncInformation;
 import lu.circl.mispbump.models.restModels.Organisation;
 import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.User;
@@ -36,7 +36,7 @@ public class PreferenceManager {
     private static final String USER_INFOS = "user_infos";
     private static final String USER_ORG_INFOS = "user_org_infos";
 
-    private static final String UPLOAD_INFO = "upload_info";
+    private static final String SYNC_INFO = "sync_info";
 
     private static final String MISP_ROLES = "misp_roles";
 
@@ -83,10 +83,10 @@ public class PreferenceManager {
     public Role[] getRoles() {
         Type type = new TypeToken<Role[]>() {
         }.getType();
-        String rolesString = preferences.getString(MISP_ROLES, "");
 
-        assert rolesString != null;
-        if (rolesString.isEmpty()) {
+        String rolesString = preferences.getString(MISP_ROLES, null);
+
+        if (rolesString == null) {
             return null;
         } else {
             return new Gson().fromJson(rolesString, type);
@@ -99,23 +99,13 @@ public class PreferenceManager {
      *
      * @param user {@link User}
      */
-    public void setUserInfo(User user) {
+    public void setMyUser(User user) {
         try {
-            String userStr = new Gson().toJson(user);
-            KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.USER_INFO_ALIAS);
-            String encryptedUserInfo = keyStoreWrapper.encrypt(userStr);
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(USER_INFOS, encryptedUserInfo);
+            KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.USER_INFO_ALIAS);
+            editor.putString(USER_INFOS, keyStoreWrapper.encrypt(new Gson().toJson(user)));
             editor.apply();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
+        } catch (BadPaddingException | InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException | NoSuchPaddingException e) {
             e.printStackTrace();
         }
     }
@@ -135,17 +125,7 @@ public class PreferenceManager {
             KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.USER_INFO_ALIAS);
             String decrypted = keyStoreWrapper.decrypt(preferences.getString(USER_INFOS, ""));
             return new Gson().fromJson(decrypted, User.class);
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
+        } catch (BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchAlgorithmException | IllegalBlockSizeException | NoSuchPaddingException e) {
             e.printStackTrace();
         }
 
@@ -158,7 +138,7 @@ public class PreferenceManager {
      *
      * @param organisation Object representation of json organisation information
      */
-    public void setUserOrgInfo(Organisation organisation) {
+    public void setMyOrganisation(Organisation organisation) {
         try {
             String orgStr = new Gson().toJson(organisation);
             KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.USER_ORGANISATION_INFO_ALIAS);
@@ -243,58 +223,57 @@ public class PreferenceManager {
     }
 
 
-    private List<UploadInformation> cachedUploadInformationList;
+    private List<SyncInformation> cachedSyncInformationList;
 
-    private void loadUploadInformationList() {
-        KeyStoreWrapper ksw = new KeyStoreWrapper(KeyStoreWrapper.UPLOAD_INFORMATION_ALIAS);
-        String storedUploadInfoString = preferences.getString(UPLOAD_INFO, null);
+    private void loadSyncInformationList() {
+        KeyStoreWrapper ksw = new KeyStoreWrapper(KeyStoreWrapper.SYNC_INFORMATION_ALIAS);
+        String storedSyncInfoString = preferences.getString(SYNC_INFO, null);
 
-        Type type = new TypeToken<List<UploadInformation>>() {
-        }.getType();
+        Type type = new TypeToken<List<SyncInformation>>() {}.getType();
 
-        if (storedUploadInfoString == null || storedUploadInfoString.isEmpty()) {
-            cachedUploadInformationList = new ArrayList<>();
+        if (storedSyncInfoString == null || storedSyncInfoString.isEmpty()) {
+            cachedSyncInformationList = new ArrayList<>();
         } else {
             try {
-                storedUploadInfoString = ksw.decrypt(storedUploadInfoString);
-                cachedUploadInformationList = new Gson().fromJson(storedUploadInfoString, type);
+                storedSyncInfoString = ksw.decrypt(storedSyncInfoString);
+                cachedSyncInformationList = new Gson().fromJson(storedSyncInfoString, type);
             } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchPaddingException | NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void saveUploadInformationList() {
+    private void saveSyncInformationList() {
         try {
-            KeyStoreWrapper ksw = new KeyStoreWrapper(KeyStoreWrapper.UPLOAD_INFORMATION_ALIAS);
-            String cipherText = ksw.encrypt(new Gson().toJson(cachedUploadInformationList));
+            KeyStoreWrapper ksw = new KeyStoreWrapper(KeyStoreWrapper.SYNC_INFORMATION_ALIAS);
+            String cipherText = ksw.encrypt(new Gson().toJson(cachedSyncInformationList));
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(UPLOAD_INFO, cipherText);
+            editor.putString(SYNC_INFO, cipherText);
             editor.apply();
         } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
             e.printStackTrace();
         }
     }
 
-    public List<UploadInformation> getUploadInformationList() {
-        if (cachedUploadInformationList == null) {
-            loadUploadInformationList();
+    public List<SyncInformation> getSyncInformationList() {
+        if (cachedSyncInformationList == null) {
+            loadSyncInformationList();
         }
 
-        return cachedUploadInformationList;
+        return cachedSyncInformationList;
     }
 
-    public void setUploadInformationList(List<UploadInformation> uploadInformationList) {
-        cachedUploadInformationList = uploadInformationList;
-        saveUploadInformationList();
+    public void setSyncInformationList(List<SyncInformation> uploadInformationList) {
+        cachedSyncInformationList = uploadInformationList;
+        saveSyncInformationList();
     }
 
-    public UploadInformation getUploadInformation(UUID uuid) {
-        if (cachedUploadInformationList == null) {
-            loadUploadInformationList();
+    public SyncInformation getSyncInformation(UUID uuid) {
+        if (cachedSyncInformationList == null) {
+            loadSyncInformationList();
         }
 
-        for (UploadInformation ui : cachedUploadInformationList) {
+        for (SyncInformation ui : cachedSyncInformationList) {
             if (ui.getUuid().compareTo(uuid) == 0) {
                 return ui;
             }
@@ -303,51 +282,50 @@ public class PreferenceManager {
         return null;
     }
 
-    public void addUploadInformation(UploadInformation uploadInformation) {
-        if (cachedUploadInformationList == null) {
-            loadUploadInformationList();
+    public void addSyncInformation(SyncInformation syncInformation) {
+        if (cachedSyncInformationList == null) {
+            loadSyncInformationList();
         }
 
         // update if exists
-        for (int i = 0; i < cachedUploadInformationList.size(); i++) {
-            if (cachedUploadInformationList.get(i).getUuid().compareTo(uploadInformation.getUuid()) == 0) {
-                cachedUploadInformationList.set(i, uploadInformation);
-                saveUploadInformationList();
+        for (int i = 0; i < cachedSyncInformationList.size(); i++) {
+            if (cachedSyncInformationList.get(i).getUuid().compareTo(syncInformation.getUuid()) == 0) {
+                cachedSyncInformationList.set(i, syncInformation);
+                saveSyncInformationList();
                 return;
             }
         }
 
-        // else: add
-        cachedUploadInformationList.add(uploadInformation);
-        saveUploadInformationList();
+        cachedSyncInformationList.add(syncInformation);
+        saveSyncInformationList();
     }
 
     public void removeUploadInformation(UUID uuid) {
-        if (cachedUploadInformationList == null) {
-            loadUploadInformationList();
+        if (cachedSyncInformationList == null) {
+            loadSyncInformationList();
         }
 
-        for (UploadInformation ui : cachedUploadInformationList) {
+        for (SyncInformation ui : cachedSyncInformationList) {
             if (ui.getUuid().compareTo(uuid) == 0) {
                 // if is last element, then clear everything including IV and key in KeyStore
-                if (cachedUploadInformationList.size() == 1) {
+                if (cachedSyncInformationList.size() == 1) {
                     clearUploadInformation();
                 } else {
-                    cachedUploadInformationList.remove(ui);
-                    saveUploadInformationList();
+                    cachedSyncInformationList.remove(ui);
+                    saveSyncInformationList();
                 }
             }
         }
     }
 
     public void clearUploadInformation() {
-        cachedUploadInformationList.clear();
+        cachedSyncInformationList.clear();
 
-        KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.UPLOAD_INFORMATION_ALIAS);
+        KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.SYNC_INFORMATION_ALIAS);
         keyStoreWrapper.deleteStoredKey();
 
         SharedPreferences.Editor editor = preferences.edit();
-        editor.remove(UPLOAD_INFO);
+        editor.remove(SYNC_INFO);
         editor.apply();
     }
 

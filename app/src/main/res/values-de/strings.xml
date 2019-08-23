@@ -49,4 +49,5 @@
     <string name="preference_category_general">Allgemein</string>
     <string name="preference_github_summary">Besuchen Sie das Github Projekt</string>
     <string name="preference_category_information">App Informationen</string>
+    <string name="sync_details_activity_label">Synchronisations Details</string>
 </resources>

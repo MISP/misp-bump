@@ -12,7 +12,7 @@ import lu.circl.mispbump.auxiliary.PreferenceManager;
 /**
  * Starts either the login or home activity.
  */
-public class StartUpActivity extends AppCompatActivity {
+public class LauncherActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
