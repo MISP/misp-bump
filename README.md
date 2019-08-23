@@ -1,4 +1,7 @@
 # MISPbump
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c078b7377f3b4ebfb775ac7a7f777a03)](https://app.codacy.com/app/felixpk/misp-bump?utm_source=github.com&utm_medium=referral&utm_content=MISP/misp-bump&utm_campaign=Badge_Grade_Dashboard)
+
 Simple and secure synchronisation of MISP instances
 
 # What is MISPbump?
