@@ -19,7 +19,7 @@ public class LauncherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         if (isUserLoggedIn()) {
-            Intent home = new Intent(this, NetworkTestActivity.class);
+            Intent home = new Intent(this, HomeActivity.class);
             startActivity(home);
         } else {
             Intent login = new Intent(this, LoginActivity.class);

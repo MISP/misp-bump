@@ -64,6 +64,10 @@ public class SyncInfoAdapter extends RecyclerView.Adapter<SyncInfoAdapter.ViewHo
 
     @Override
     public int getItemCount() {
+        if (items == null) {
+            return 0;
+        }
+
         return items.size();
     }
 

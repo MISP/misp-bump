@@ -215,7 +215,7 @@ public class MispRestClient {
                     callback.failure(extractError(response));
                 } else {
                     if (response.body() != null) {
-                        callback.success(response.body().user);
+                        callback.success(response.body().getUser());
                     } else {
                         callback.failure("response body was null");
                     }
@@ -246,7 +246,7 @@ public class MispRestClient {
                     callback.failure(extractError(response));
                 } else {
                     if (response.body() != null) {
-                        callback.success(response.body().user);
+                        callback.success(response.body().getUser());
                     } else {
                         callback.failure("response body was null");
                     }
@@ -282,6 +282,27 @@ public class MispRestClient {
         });
     }
 
+    public void getAllUsers(final AllMispUsersCallback callback) {
+        Call<List<MispUser>> call = mispService.getAllUsers();
+
+        call.enqueue(new Callback<List<MispUser>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<MispUser>> call, @NonNull Response<List<MispUser>> response) {
+                if (!response.isSuccessful()) {
+                    callback.failure("Failed onResponse");
+                    return;
+                }
+
+                callback.success(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<MispUser>> call, @NonNull Throwable t) {
+                callback.failure(extractError(t));
+            }
+        });
+    }
+
     public void getAllUsers(final AllUsersCallback callback) {
         Call<List<MispUser>> call = mispService.getAllUsers();
 
@@ -299,7 +320,7 @@ public class MispRestClient {
                 User[] users = new User[mispUsers.size()];
 
                 for (int i = 0; i < users.length; i++) {
-                    users[i] = mispUsers.get(i).user;
+                    users[i] = mispUsers.get(i).getUser();
                 }
 
                 callback.success(users);
@@ -328,7 +349,7 @@ public class MispRestClient {
                     callback.failure(extractError(response));
                 } else {
                     assert response.body() != null;
-                    callback.success(response.body().user);
+                    callback.success(response.body().getUser());
                 }
             }
 
@@ -612,6 +633,12 @@ public class MispRestClient {
 
     public interface AllUsersCallback {
         void success(User[] users);
+
+        void failure(String error);
+    }
+
+    public interface AllMispUsersCallback {
+        void success(List<MispUser> users);
 
         void failure(String error);
     }

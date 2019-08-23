@@ -4,7 +4,6 @@ package lu.circl.mispbump.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -29,8 +28,6 @@ public class UploadActivity extends AppCompatActivity {
 
     public static final String EXTRA_SYNC_INFO_UUID = "EXTRA_SYNC_INFO_UUID";
 
-    private View rootLayout;
-
     private PreferenceManager preferenceManager;
     private MispRestClient mispRest;
     private SyncInformation syncInformation;
@@ -41,8 +38,6 @@ public class UploadActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
-
-        rootLayout = findViewById(R.id.rootLayout);
 
         preferenceManager = PreferenceManager.getInstance(UploadActivity.this);
 
@@ -173,7 +168,7 @@ public class UploadActivity extends AppCompatActivity {
         Server server = syncInformation.getRemote().getServer();
         server.setName(syncInformation.getRemote().getOrganisation().getName() + "'s Sync Server");
         server.setRemoteOrgId(syncInformation.getRemote().getOrganisation().getId());
-        server.setAuthkey(syncInformation.getLocal().getSyncUser().getAuthkey());
+        server.setAuthkey(syncInformation.getRemote().getSyncUser().getAuthkey());
         server.setPull(syncInformation.getRemote().getServer().getPull());
         server.setPush(syncInformation.getRemote().getServer().getPush());
         server.setCachingEnabled(syncInformation.getRemote().getServer().getCachingEnabled());
@@ -231,8 +226,8 @@ public class UploadActivity extends AppCompatActivity {
             mispRest.getUser(syncInformation.getLocal().getSyncUser().getEmail(), new MispRestClient.UserCallback() {
                 @Override
                 public void success(User user) {
-                    userAction.done("User already on MISP instance");
                     userAdded(user);
+                    userAction.done("User already on MISP instance");
                 }
 
                 @Override
@@ -265,6 +260,8 @@ public class UploadActivity extends AppCompatActivity {
         if (server != null) {
             serverAction.done();
             preferenceManager.addSyncInformation(syncInformation);
+        } else {
+            serverAction.error("Could not create Sync Server");
         }
     }
 }
