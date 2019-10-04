@@ -56,4 +56,7 @@
     <string name="preference_category_information">App information</string>
     <string name="preference_github_summary">Visit the Github project</string>
     <string name="sync_details_activity_label">Synchronisation details</string>
+    <string name="information">Information</string>
+    <string name="upload_changes">Upload Changes</string>
+    <string name="download_changes">Download Changes</string>
 </resources>

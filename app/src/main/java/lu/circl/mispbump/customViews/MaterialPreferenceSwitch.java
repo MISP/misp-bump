@@ -17,16 +17,15 @@ import lu.circl.mispbump.R;
 
 public class MaterialPreferenceSwitch extends ConstraintLayout {
 
-    private View rootView;
-
     private TextView titleView, subTitleView;
     private Switch switchView;
+    private CompoundButton.OnCheckedChangeListener onCheckedChangeListener;
 
     public MaterialPreferenceSwitch(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         View view = LayoutInflater.from(context).inflate(R.layout.material_preference_switch, this);
-        rootView = view.findViewById(R.id.rootLayout);
+        View rootView = view.findViewById(R.id.rootLayout);
 
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.MaterialPreferenceSwitch);
         String title = a.getString(R.styleable.MaterialPreferenceSwitch_title);
@@ -42,22 +41,29 @@ public class MaterialPreferenceSwitch extends ConstraintLayout {
 
         switchView = view.findViewById(R.id.material_preference_switch);
 
-        rootView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (switchView.isEnabled()) {
-                    switchView.setChecked(!switchView.isChecked());
-                }
+        rootView.setOnClickListener(v -> {
+            if (switchView.isEnabled()) {
+                switchView.setChecked(!switchView.isChecked());
             }
         });
 
-        switchView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
+        switchView.setOnCheckedChangeListener((buttonView, isChecked) -> {
+
+            if (onCheckedChangeListener != null) {
+                onCheckedChangeListener.onCheckedChanged(buttonView, isChecked);
+            }
+
+            if (isChecked) {
+                if (!onText.isEmpty()) {
                     subTitleView.setText(onText);
                 } else {
+                    subTitleView.setVisibility(GONE);
+                }
+            } else {
+                if (!offText.isEmpty()) {
                     subTitleView.setText(offText);
+                } else {
+                    subTitleView.setVisibility(GONE);
                 }
             }
         });
@@ -73,6 +79,10 @@ public class MaterialPreferenceSwitch extends ConstraintLayout {
 
     public boolean isChecked() {
         return switchView.isChecked();
+    }
+
+    public void setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener onCheckedChangeListener) {
+        this.onCheckedChangeListener = onCheckedChangeListener;
     }
 
 }

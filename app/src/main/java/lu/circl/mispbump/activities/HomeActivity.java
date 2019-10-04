@@ -111,7 +111,7 @@ public class HomeActivity extends AppCompatActivity {
     private void initRecyclerView() {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
-        syncInfoAdapter = new SyncInfoAdapter();
+        syncInfoAdapter = new SyncInfoAdapter(HomeActivity.this);
         syncInfoAdapter.setOnRecyclerPositionClickListener(onRecyclerItemClickListener());
         recyclerView.setAdapter(syncInfoAdapter);
     }

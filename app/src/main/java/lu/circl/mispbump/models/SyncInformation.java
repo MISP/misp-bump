@@ -21,6 +21,8 @@ public class SyncInformation {
     private ExchangeInformation remote;
     private ExchangeInformation local;
 
+    private boolean syncedWithRemote;
+
 
     public SyncInformation() {
         uuid = UUID.randomUUID();
@@ -60,6 +62,12 @@ public class SyncInformation {
         return df.format(date);
     }
 
+    public void setSyncedWithRemote(boolean syncedWithRemote) {
+        this.syncedWithRemote = syncedWithRemote;
+    }
+    public boolean isSyncedWithRemote() {
+        return syncedWithRemote;
+    }
 
     public ExchangeInformation getRemote() {
         return remote;

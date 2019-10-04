@@ -1,6 +1,8 @@
 package lu.circl.mispbump.adapters;
 
 
+import android.content.Context;
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.widget.ImageViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
@@ -21,8 +24,14 @@ import lu.circl.mispbump.models.SyncInformation;
 
 public class SyncInfoAdapter extends RecyclerView.Adapter<SyncInfoAdapter.ViewHolder> {
 
+    private Context context;
     private List<SyncInformation> items;
     private OnRecyclerItemClickListener<Integer> onRecyclerPositionClickListener;
+
+
+    public SyncInfoAdapter(Context context) {
+        this.context = context;
+    }
 
 
     @NonNull
@@ -43,6 +52,14 @@ public class SyncInfoAdapter extends RecyclerView.Adapter<SyncInfoAdapter.ViewHo
         holder.dateDay.setText(dayFormatter.format(item.getSyncDate()));
 
         holder.orgName.setText(item.getRemote().getOrganisation().getName());
+
+        if (item.isSyncedWithRemote()) {
+            ImageViewCompat.setImageTintList(holder.syncStatus, ColorStateList.valueOf(context.getColor(R.color.status_green)));
+            holder.syncStatus.setImageResource(R.drawable.ic_check_outline);
+        } else {
+            ImageViewCompat.setImageTintList(holder.syncStatus, ColorStateList.valueOf(context.getColor(R.color.status_amber)));
+            holder.syncStatus.setImageResource(R.drawable.ic_error_outline);
+        }
 
 //        switch (item.getCurrentSyncStatus()) {
 //            case COMPLETE:

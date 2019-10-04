@@ -26,7 +26,7 @@ public class LauncherActivity extends AppCompatActivity {
             startActivity(login);
         }
 
-        // closes the activity to prevent going back to this (empty) activity
+        // close activity to prevent going back
         finish();
     }
 

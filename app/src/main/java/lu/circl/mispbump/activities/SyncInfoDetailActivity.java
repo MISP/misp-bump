@@ -1,19 +1,16 @@
 package lu.circl.mispbump.activities;
 
 
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroupOverlay;
-import android.widget.CheckBox;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -25,6 +22,7 @@ import java.util.UUID;
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.customViews.MaterialPasswordView;
+import lu.circl.mispbump.customViews.MaterialPreferenceSwitch;
 import lu.circl.mispbump.customViews.MaterialPreferenceText;
 import lu.circl.mispbump.models.SyncInformation;
 
@@ -37,12 +35,13 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
     private SyncInformation syncInformation;
 
     private boolean fabMenuExpanded;
+    private boolean dataLocallyChanged;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sync_info_detail);
+        setContentView(R.layout.activity_sync_info_detail_v2);
 
         preferenceManager = PreferenceManager.getInstance(SyncInfoDetailActivity.this);
         syncInformation = preferenceManager.getSyncInformation(getExtraUuid());
@@ -59,6 +58,11 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
+        if (dataLocallyChanged) {
+            syncInformation.setSyncedWithRemote(false);
+        }
+
         preferenceManager.addSyncInformation(syncInformation);
     }
 
@@ -85,25 +89,121 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
         LinearLayout uploadLayout = findViewById(R.id.layout_upload);
         LinearLayout downloadLayout = findViewById(R.id.layout_download);
 
+        TextView uploadText = findViewById(R.id.fab_upload_text);
+        TextView downloadText = findViewById(R.id.fab_download_text);
+
+        View menuBackground = findViewById(R.id.menu_background);
+
         uploadLayout.setVisibility(View.GONE);
         downloadLayout.setVisibility(View.GONE);
 
-        fab.setOnClickListener(view -> {
-            if (fabMenuExpanded) {
-                uploadLayout.setVisibility(View.GONE);
-                downloadLayout.setVisibility(View.GONE);
+        int animationSpeed = 200;
 
-                fabMenuExpanded = false;
-            } else {
+        ValueAnimator openAnimation = ValueAnimator.ofFloat(0f, 1f);
+        openAnimation.setDuration(animationSpeed);
+        openAnimation.setInterpolator(new DecelerateInterpolator());
+        openAnimation.addUpdateListener(updateAnimation -> {
+            float x = (float) updateAnimation.getAnimatedValue();
+
+            fabUpload.setAlpha(x);
+            fabUpload.setTranslationY((1 - x) * 50);
+            uploadText.setAlpha(x);
+            uploadText.setTranslationX((1 - x) * -200);
+
+            fabDownload.setAlpha(x);
+            fabDownload.setTranslationY((1 - x) * 50);
+            downloadText.setAlpha(x);
+            downloadText.setTranslationX((1 - x) * -200);
+
+            menuBackground.setAlpha(x * 0.9f);
+        });
+        openAnimation.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
                 uploadLayout.setVisibility(View.VISIBLE);
                 downloadLayout.setVisibility(View.VISIBLE);
+            }
+            @Override
+            public void onAnimationEnd(Animator animator) {
+            }
+            @Override
+            public void onAnimationCancel(Animator animator) {
 
-                fabMenuExpanded = true;
+            }
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
             }
         });
 
-        fabUpload.setOnClickListener(view -> {
+        ValueAnimator closeAnimation = ValueAnimator.ofFloat(1f, 0f);
+        closeAnimation.setDuration(animationSpeed);
+        closeAnimation.setInterpolator(new DecelerateInterpolator());
+        closeAnimation.addUpdateListener(updateAnimation -> {
+            float x = (float) updateAnimation.getAnimatedValue();
 
+            fabUpload.setAlpha(x);
+            fabUpload.setTranslationY((1 - x) * 50);
+            uploadText.setAlpha(x);
+            uploadText.setTranslationX((1 - x) * -200);
+
+            fabDownload.setAlpha(x);
+            fabDownload.setTranslationY((1 - x) * 50);
+            downloadText.setAlpha(x);
+            downloadText.setTranslationX((1 - x) * -200);
+
+            menuBackground.setAlpha(x * 0.9f);
+        });
+        closeAnimation.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+                uploadLayout.setVisibility(View.VISIBLE);
+                downloadLayout.setVisibility(View.VISIBLE);
+
+            }
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                uploadLayout.setVisibility(View.GONE);
+                downloadLayout.setVisibility(View.GONE);
+            }
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+
+        AnimatedVectorDrawable open = (AnimatedVectorDrawable) getDrawable(R.drawable.animated_arrow_cloud_down);
+        AnimatedVectorDrawable close = (AnimatedVectorDrawable) getDrawable(R.drawable.animated_arrow_down_cloud);
+
+        View.OnClickListener expandCollapseClick = view -> {
+            if (fabMenuExpanded) {
+                menuBackground.setClickable(false);
+
+                fab.setImageDrawable(close);
+                close.start();
+
+                closeAnimation.start();
+                fabMenuExpanded = false;
+            } else {
+                menuBackground.setClickable(true);
+
+                fab.setImageDrawable(open);
+                open.start();
+
+                openAnimation.start();
+                fabMenuExpanded = true;
+            }
+        };
+
+        menuBackground.setOnClickListener(expandCollapseClick);
+        menuBackground.setClickable(false);
+        fab.setOnClickListener(expandCollapseClick);
+
+        fabUpload.setOnClickListener(view -> {
             preferenceManager.addSyncInformation(syncInformation);
 
             Intent upload = new Intent(SyncInfoDetailActivity.this, UploadActivity.class);
@@ -134,24 +234,61 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
 
         // settings
 
-        CheckBox allowSelfSigned = findViewById(R.id.checkbox_self_signed);
+        MaterialPreferenceSwitch allowSelfSigned = findViewById(R.id.switch_allow_self_signed);
         allowSelfSigned.setChecked(syncInformation.getRemote().getServer().getSelfSigned());
-        allowSelfSigned.setOnCheckedChangeListener((compoundButton, b) -> {
+        allowSelfSigned.setOnCheckedChangeListener((cb, b) -> {
             syncInformation.getRemote().getServer().setSelfSigned(b);
-
+            dataLocallyChanged = true;
         });
 
-        CheckBox push = findViewById(R.id.checkbox_push);
-        push.setChecked(syncInformation.getRemote().getServer().getPush());
-        push.setOnCheckedChangeListener((compoundButton, b) -> syncInformation.getRemote().getServer().setPush(b));
+        MaterialPreferenceSwitch allowPush = findViewById(R.id.switch_allow_push);
+        allowPush.setChecked(syncInformation.getRemote().getServer().getPush());
+        allowPush.setOnCheckedChangeListener((cb, b) -> {
+            syncInformation.getRemote().getServer().setPush(b);
+            dataLocallyChanged = true;
+        });
 
-        CheckBox pull = findViewById(R.id.checkbox_pull);
-        pull.setChecked(syncInformation.getRemote().getServer().getPull());
-        pull.setOnCheckedChangeListener((compundButton, b) -> syncInformation.getRemote().getServer().setPull(b));
+        MaterialPreferenceSwitch allowPull = findViewById(R.id.switch_allow_pull);
+        allowPull.setChecked(syncInformation.getRemote().getServer().getPull());
+        allowPull.setOnCheckedChangeListener((cb, b) -> {
+            syncInformation.getRemote().getServer().setPull(b);
+            dataLocallyChanged = true;
+        });
 
-        CheckBox cache = findViewById(R.id.checkbox_cache);
-        cache.setChecked(syncInformation.getRemote().getServer().getCachingEnabled());
-        cache.setOnCheckedChangeListener((compoundButton, b) -> syncInformation.getRemote().getServer().setCachingEnabled(b));
+        MaterialPreferenceSwitch allowCache = findViewById(R.id.switch_allow_cache);
+        allowCache.setChecked(syncInformation.getRemote().getServer().getCachingEnabled());
+        allowCache.setOnCheckedChangeListener((cb, b) -> {
+            syncInformation.getRemote().getServer().setCachingEnabled(b);
+            dataLocallyChanged = true;
+        });
+
+//        CheckBox allowSelfSigned = findViewById(R.id.checkbox_self_signed);
+//        allowSelfSigned.setChecked(syncInformation.getRemote().getServer().getSelfSigned());
+//        allowSelfSigned.setOnCheckedChangeListener((compoundButton, b) -> {
+//            syncInformation.getRemote().getServer().setSelfSigned(b);
+//            dataLocallyChanged = true;
+//        });
+
+//        CheckBox push = findViewById(R.id.checkbox_push);
+//        push.setChecked(syncInformation.getRemote().getServer().getPush());
+//        push.setOnCheckedChangeListener((compoundButton, b) -> {
+//            syncInformation.getRemote().getServer().setPush(b);
+//            dataLocallyChanged = true;
+//        });
+//
+//        CheckBox pull = findViewById(R.id.checkbox_pull);
+//        pull.setChecked(syncInformation.getRemote().getServer().getPull());
+//        pull.setOnCheckedChangeListener((compundButton, b) -> {
+//            syncInformation.getRemote().getServer().setPull(b);
+//            dataLocallyChanged = true;
+//        });
+//
+//        CheckBox cache = findViewById(R.id.checkbox_cache);
+//        cache.setChecked(syncInformation.getRemote().getServer().getCachingEnabled());
+//        cache.setOnCheckedChangeListener((compoundButton, b) -> {
+//            syncInformation.getRemote().getServer().setCachingEnabled(b);
+//            dataLocallyChanged = true;
+//        });
 
         // credentials
 
@@ -163,28 +300,5 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
 
         MaterialPasswordView authkey = findViewById(R.id.authkey);
         authkey.setPassword(syncInformation.getLocal().getSyncUser().getAuthkey());
-    }
-
-
-    public static void applyDim(@NonNull ViewGroup parent, float dimAmount) {
-//      ViewGroup root = (ViewGroup) getWindow().getDecorView().getRootView();
-        Drawable dim = new ColorDrawable(Color.BLACK);
-        dim.setBounds(0, 0, parent.getWidth(), parent.getHeight());
-
-        ValueAnimator valueAnimator = ValueAnimator.ofFloat(dimAmount);
-
-        valueAnimator.addUpdateListener(valueAnim -> {
-            float value = (float) valueAnim.getAnimatedValue();
-            dim.setAlpha((int) (255 * value));
-            ViewGroupOverlay overlay = parent.getOverlay();
-            overlay.add(dim);
-        });
-
-        valueAnimator.start();
-    }
-
-    public static void clearDim(@NonNull ViewGroup parent) {
-        ViewGroupOverlay overlay = parent.getOverlay();
-        overlay.clear();
     }
 }

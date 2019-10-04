@@ -189,10 +189,8 @@ public class LoginActivity extends AppCompatActivity {
     };
 
     /**
-     * TODO: Check if url is valid.
-     *
      * @param url url to check
-     * @return true or false
+     * @return true if valid else false
      */
     private boolean isValidUrl(String url) {
         Uri uri = Uri.parse(url);
@@ -205,12 +203,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * TODO: Check if automation key is valid.
-     *
      * @param automationKey the key to check
-     * @return true or false
+     * @return true if not empty else false
      */
     private boolean isValidAutomationKey(String automationKey) {
-        return !automationKey.equals("");
+        return !automationKey.isEmpty();
     }
 }

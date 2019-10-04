@@ -50,4 +50,7 @@
     <string name="preference_github_summary">Besuchen Sie das Github Projekt</string>
     <string name="preference_category_information">App Informationen</string>
     <string name="sync_details_activity_label">Synchronisations Details</string>
+    <string name="information">Informationen</string>
+    <string name="upload_changes">Änderungen hochladen</string>
+    <string name="download_changes">Änderungen herunterladen</string>
 </resources>
