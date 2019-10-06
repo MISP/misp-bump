@@ -7,54 +7,65 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
-    android:foreground="?attr/selectableItemBackgroundBorderless"
-    android:layout_marginBottom="1dp"
-    android:padding="8dp">
+    android:foreground="?attr/selectableItemBackgroundBorderless">
 
-    <ImageView
-        android:id="@+id/syncStatus"
-        android:transitionName="icon"
-        android:transformPivotX="12dp"
-        android:transformPivotY="12dp"
+    <TextView
+        android:id="@+id/date_month"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:tint="@color/status_red"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_margin="16dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_error_outline" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="14sp"
+        tools:text="Aug"/>
+
+    <TextView
+        android:id="@+id/date_day"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="16dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/date_month"
+        app:layout_constraintStart_toStartOf="@id/date_month"
+        app:layout_constraintEnd_toEndOf="@id/date_month"
+        tools:text="16"/>
 
     <TextView
         android:id="@+id/orgName"
         android:transitionName="title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
         android:textAppearance="@style/AppTheme.TextAppearance.ListTitle"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/date"
-        app:layout_constraintStart_toEndOf="@+id/syncStatus"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Organisation A" />
+        app:layout_constraintStart_toEndOf="@id/date_month"
+        tools:text="Organisation A"/>
 
-    <TextView
-        android:id="@+id/date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <ImageView
+        android:id="@+id/syncStatus"
+        android:src="@drawable/ic_check_outline"
+        android:tint="@color/status_green"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_margin="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="20.3.2019" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:background="@color/black_10"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toEndOf="@id/date_month"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

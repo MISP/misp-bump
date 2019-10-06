@@ -1,0 +1,27 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:name="vector"
+            android:width="24dp"
+            android:height="24dp"
+            android:viewportWidth="24"
+            android:viewportHeight="24">
+            <path
+                android:name="down"
+                android:pathData="M 8.12 9.29 L 12 13.17 L 15.88 9.29 C 16.27 8.9 16.9 8.9 17.29 9.29 C 17.68 9.68 17.68 10.31 17.29 10.7 L 12.7 15.29 C 12.31 15.68 11.68 15.68 11.29 15.29 L 6.7 10.7 C 6.31 10.31 6.31 9.68 6.7 9.29 C 7.09 8.91 7.73 8.9 8.12 9.29 Z"
+                android:fillColor="#FF000000" />
+        </vector>
+    </aapt:attr>
+    <target android:name="down">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="pathData"
+                android:duration="250"
+                android:valueFrom="M 8.12 9.29 L 12 13.17 L 15.88 9.29 C 16.27 8.9 16.9 8.9 17.29 9.29 C 17.68 9.68 17.68 10.31 17.29 10.7 L 12.7 15.29 C 12.31 15.68 11.68 15.68 11.29 15.29 L 6.7 10.7 C 6.31 10.31 6.31 9.68 6.7 9.29 C 7.09 8.91 7.73 8.9 8.12 9.29 Z"
+                android:valueTo="M 8.12 14.71 L 12 10.83 L 15.88 14.71 C 16.27 15.1 16.9 15.1 17.29 14.71 C 17.68 14.32 17.68 13.69 17.29 13.3 L 12.7 8.71 C 12.31 8.32 11.68 8.32 11.29 8.71 L 6.7 13.3 C 6.31 13.69 6.31 14.32 6.7 14.71 C 7.09 15.09 7.73 15.1 8.12 14.71 Z"
+                android:valueType="pathType"
+                android:interpolator="@android:anim/accelerate_decelerate_interpolator" />
+        </aapt:attr>
+    </target>
+</animated-vector>

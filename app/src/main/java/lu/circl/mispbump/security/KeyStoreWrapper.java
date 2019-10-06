@@ -1,5 +1,6 @@
 package lu.circl.mispbump.security;
 
+
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
@@ -25,12 +26,13 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
+
 public class KeyStoreWrapper {
 
     public static final String USER_INFO_ALIAS = "ALIAS_USER_INFO";
     public static final String USER_ORGANISATION_INFO_ALIAS = "ALIAS_USER_ORGANISATION_INFO";
     public static final String USER_CREDENTIALS_ALIAS = "ALIAS_USER_CREDENTIALS";
-    public static final String UPLOAD_INFORMATION_ALIAS = "ALIAS_UPLOAD_INFORMATION";
+    public static final String SYNC_INFORMATION_ALIAS = "ALIAS_UPLOAD_INFORMATION";
 
     private static final String KEYSTORE_PROVIDER = "AndroidKeyStore";
     private static final String CIPHER_ALGORITHM = "AES/GCM/NoPadding";

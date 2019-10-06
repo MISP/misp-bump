@@ -1,30 +1,59 @@
 package lu.circl.mispbump.models.restModels;
 
-import java.util.List;
-import com.google.gson.annotations.Expose;
+
+import androidx.annotation.NonNull;
+
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+
 
 public class MispServer {
 
-    public MispServer() {}
+    @SerializedName("Server")
+    private Server server;
 
-    public MispServer(Server server, Organisation organisation, Organisation remoteOrganisation) {
+    @SerializedName("Organisation")
+    private Organisation organisation;
+
+    @SerializedName("RemoteOrg")
+    private Organisation remoteOrganisation;
+
+    @SerializedName("User")
+    private List<User> user;
+
+
+    public Server getServer() {
+        return server;
+    }
+    public void setServer(Server server) {
         this.server = server;
-        this.organisation = organisation;
-        this.remoteOrg = remoteOrganisation;
     }
 
-    @SerializedName("Server")
-    @Expose
-    public Server server;
-    @SerializedName("Organisation")
-    @Expose
-    public Organisation organisation;
-    @SerializedName("RemoteOrg")
-    @Expose
-    public Organisation remoteOrg;
-    @SerializedName("User")
-    @Expose
-    public List<User> user;
+    public Organisation getOrganisation() {
+        return organisation;
+    }
+    public void setOrganisation(Organisation organisation) {
+        this.organisation = organisation;
+    }
 
+    public Organisation getRemoteOrganisation() {
+        return remoteOrganisation;
+    }
+    public void setRemoteOrganisation(Organisation remoteOrganisation) {
+        this.remoteOrganisation = remoteOrganisation;
+    }
+
+    public List<User> getUser() {
+        return user;
+    }
+    public void setUser(List<User> user) {
+        this.user = user;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return server.toString() + "\n" + organisation.toString() + "\n" + remoteOrganisation.toString();
+    }
 }

@@ -1,5 +1,6 @@
 package lu.circl.mispbump.fragments;
 
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -61,6 +62,7 @@ import java.util.concurrent.TimeUnit;
 
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.customViews.AutoFitTextureView;
+
 
 public class CameraFragment extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback {
 

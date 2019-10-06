@@ -1,6 +1,8 @@
 package lu.circl.mispbump.models.restModels;
 
+
 import com.google.gson.annotations.SerializedName;
+
 
 public class Role {
     @SerializedName("id")
@@ -61,6 +63,13 @@ public class Role {
     private String permission;
     @SerializedName("permission_description")
     private String permissionDescription;
+
+
+    public boolean isSyncUserRole() {
+        return permSync && permAuth && permTagger && permTagEditor && permSharingGroup
+                && permDelegate && permSighting && permPublishZmq && permPublishKafka;
+    }
+
 
     public Integer getId() {
         return id;

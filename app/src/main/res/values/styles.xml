@@ -1,4 +1,5 @@
 <resources>
+
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -22,12 +23,12 @@
 
     <style name="AppTheme.TextAppearance"/>
 
-    <style name="AppTheme.TextAppearance.ListTitle" >
+    <style name="AppTheme.TextAppearance.ListTitle">
         <item name="android:textColor">#de000000</item>
         <item name="android:textSize">16dp</item>
     </style>
 
-    <style name="AppTheme.TextAppearance.ListSubtitle" >
+    <style name="AppTheme.TextAppearance.ListSubtitle">
         <item name="android:textColor">#99000000</item>
         <item name="android:textSize">14dp</item>
     </style>

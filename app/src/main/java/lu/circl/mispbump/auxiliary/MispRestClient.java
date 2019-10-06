@@ -1,23 +1,21 @@
 package lu.circl.mispbump.auxiliary;
 
+
 import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
 
-import java.io.IOException;
 import java.net.NoRouteToHostException;
 import java.security.cert.CertificateException;
 import java.util.List;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import lu.circl.mispbump.interfaces.MispRestInterface;
+import lu.circl.mispbump.interfaces.MispService;
 import lu.circl.mispbump.models.restModels.MispOrganisation;
 import lu.circl.mispbump.models.restModels.MispRole;
 import lu.circl.mispbump.models.restModels.MispServer;
@@ -27,7 +25,6 @@ import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.Server;
 import lu.circl.mispbump.models.restModels.User;
 import lu.circl.mispbump.models.restModels.Version;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -37,6 +34,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+
 /**
  * Implementation of the RetroFit2 Misp client.
  * In order to conveniently use this api some wrapper interfaces are implemented to return the requested API endpoint as java object.
@@ -45,7 +43,7 @@ public class MispRestClient {
 
 
     private static MispRestClient instance;
-    private MispRestInterface mispRestInterface;
+    private MispService mispService;
 
     public static MispRestClient getInstance(String url, String authkey) {
         if (instance == null) {
@@ -65,10 +63,15 @@ public class MispRestClient {
                     .client(getCustomClient(true, true, authkey))
                     .build();
 
-            mispRestInterface = retrofit.create(MispRestInterface.class);
+            mispService = retrofit.create(MispService.class);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    public MispService getService() {
+        return mispService;
     }
 
 
@@ -88,12 +91,14 @@ public class MispRestClient {
                         new X509TrustManager() {
                             @SuppressLint("TrustAllX509TrustManager")
                             @Override
-                            public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                            public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                                // nothing to do
                             }
 
                             @SuppressLint("TrustAllX509TrustManager")
                             @Override
-                            public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                            public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                                // nothing to do
                             }
 
                             @Override
@@ -111,12 +116,7 @@ public class MispRestClient {
                 final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
                 builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
-                builder.hostnameVerifier(new HostnameVerifier() {
-                    @Override
-                    public boolean verify(String hostname, SSLSession session) {
-                        return true;
-                    }
-                });
+                builder.hostnameVerifier((hostname, session) -> true);
             }
 
             if (logging) {
@@ -125,16 +125,13 @@ public class MispRestClient {
                 builder.addInterceptor(interceptor);
             }
 
-            // create authorization interceptor
-            builder.addInterceptor(new Interceptor() {
-                @Override
-                public okhttp3.Response intercept(Chain chain) throws IOException {
-                    Request.Builder ongoing = chain.request().newBuilder();
-                    ongoing.addHeader("Accept", "application/json");
-                    ongoing.addHeader("Content-Type", "application/json");
-                    ongoing.addHeader("Authorization", authkey);
-                    return chain.proceed(ongoing.build());
-                }
+            // create interceptor
+            builder.addInterceptor(chain -> {
+                Request.Builder ongoing = chain.request().newBuilder();
+                ongoing.addHeader("Accept", "application/json");
+                ongoing.addHeader("Content-Type", "application/json");
+                ongoing.addHeader("Authorization", authkey);
+                return chain.proceed(ongoing.build());
             });
 
             return builder.build();
@@ -151,7 +148,7 @@ public class MispRestClient {
      * @param callback {@link AvailableCallback}
      */
     public void isAvailable(final AvailableCallback callback) {
-        Call<Version> call = mispRestInterface.pyMispVersion();
+        Call<Version> call = mispService.pyMispVersion();
         call.enqueue(new Callback<Version>() {
             @Override
             public void onResponse(@NonNull Call<Version> call, @NonNull Response<Version> response) {
@@ -175,10 +172,10 @@ public class MispRestClient {
     }
 
     public void getRoles(final AllRolesCallback callback) {
-        Call<List<MispRole>> call = mispRestInterface.getRoles();
+        Call<List<MispRole>> call = mispService.getRoles();
         call.enqueue(new Callback<List<MispRole>>() {
             @Override
-            public void onResponse(Call<List<MispRole>> call, Response<List<MispRole>> response) {
+            public void onResponse(@NonNull Call<List<MispRole>> call, @NonNull Response<List<MispRole>> response) {
 
                 if (!response.isSuccessful()) {
                     callback.failure(extractError(response));
@@ -198,7 +195,7 @@ public class MispRestClient {
             }
 
             @Override
-            public void onFailure(Call<List<MispRole>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<MispRole>> call, @NonNull Throwable t) {
                 callback.failure(extractError(t));
             }
         });
@@ -211,7 +208,7 @@ public class MispRestClient {
      * @param callback {@link UserCallback} wrapper to return user directly
      */
     public void getMyUser(final UserCallback callback) {
-        Call<MispUser> call = mispRestInterface.getMyUserInformation();
+        Call<MispUser> call = mispService.getMyUserInformation();
 
         call.enqueue(new Callback<MispUser>() {
             @Override
@@ -220,7 +217,7 @@ public class MispRestClient {
                     callback.failure(extractError(response));
                 } else {
                     if (response.body() != null) {
-                        callback.success(response.body().user);
+                        callback.success(response.body().getUser());
                     } else {
                         callback.failure("response body was null");
                     }
@@ -241,9 +238,8 @@ public class MispRestClient {
      * @param userId   user identifier
      * @param callback {@link UserCallback} wrapper to return user directly
      */
-
     public void getUser(int userId, final UserCallback callback) {
-        Call<MispUser> call = mispRestInterface.getUser(userId);
+        Call<MispUser> call = mispService.getUser(userId);
 
         call.enqueue(new Callback<MispUser>() {
             @Override
@@ -252,7 +248,7 @@ public class MispRestClient {
                     callback.failure(extractError(response));
                 } else {
                     if (response.body() != null) {
-                        callback.success(response.body().user);
+                        callback.success(response.body().getUser());
                     } else {
                         callback.failure("response body was null");
                     }
@@ -272,7 +268,7 @@ public class MispRestClient {
             @Override
             public void success(User[] users) {
                 for (User user : users) {
-                    if (user.email.equals(emailAddress)) {
+                    if (user.getEmail().equals(emailAddress)) {
                         callback.success(user);
                         return;
                     }
@@ -288,8 +284,29 @@ public class MispRestClient {
         });
     }
 
+    public void getAllUsers(final AllMispUsersCallback callback) {
+        Call<List<MispUser>> call = mispService.getAllUsers();
+
+        call.enqueue(new Callback<List<MispUser>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<MispUser>> call, @NonNull Response<List<MispUser>> response) {
+                if (!response.isSuccessful()) {
+                    callback.failure("Failed onResponse");
+                    return;
+                }
+
+                callback.success(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<MispUser>> call, @NonNull Throwable t) {
+                callback.failure(extractError(t));
+            }
+        });
+    }
+
     public void getAllUsers(final AllUsersCallback callback) {
-        Call<List<MispUser>> call = mispRestInterface.getAllUsers();
+        Call<List<MispUser>> call = mispService.getAllUsers();
 
         call.enqueue(new Callback<List<MispUser>>() {
             @Override
@@ -305,7 +322,7 @@ public class MispRestClient {
                 User[] users = new User[mispUsers.size()];
 
                 for (int i = 0; i < users.length; i++) {
-                    users[i] = mispUsers.get(i).user;
+                    users[i] = mispUsers.get(i).getUser();
                 }
 
                 callback.success(users);
@@ -325,7 +342,7 @@ public class MispRestClient {
      * @param callback {@link UserCallback} wrapper to return the created user directly
      */
     public void addUser(User user, final UserCallback callback) {
-        Call<MispUser> call = mispRestInterface.addUser(user);
+        Call<MispUser> call = mispService.addUser(user);
 
         call.enqueue(new Callback<MispUser>() {
             @Override
@@ -334,7 +351,7 @@ public class MispRestClient {
                     callback.failure(extractError(response));
                 } else {
                     assert response.body() != null;
-                    callback.success(response.body().user);
+                    callback.success(response.body().getUser());
                 }
             }
 
@@ -355,7 +372,7 @@ public class MispRestClient {
      * @param callback {@link OrganisationCallback} wrapper to return a organisation directly
      */
     public void getOrganisation(int orgId, final OrganisationCallback callback) {
-        Call<MispOrganisation> call = mispRestInterface.getOrganisation(orgId);
+        Call<MispOrganisation> call = mispService.getOrganisation(orgId);
 
         call.enqueue(new Callback<MispOrganisation>() {
             @Override
@@ -400,7 +417,7 @@ public class MispRestClient {
     }
 
     public void getAllOrganisations(final AllOrganisationsCallback callback) {
-        Call<List<MispOrganisation>> call = mispRestInterface.getAllOrganisations();
+        Call<List<MispOrganisation>> call = mispService.getAllOrganisations();
 
         call.enqueue(new Callback<List<MispOrganisation>>() {
             @Override
@@ -436,7 +453,7 @@ public class MispRestClient {
      * @param callback     {@link OrganisationCallback} wrapper to return the created organisation directly
      */
     public void addOrganisation(Organisation organisation, final OrganisationCallback callback) {
-        Call<MispOrganisation> call = mispRestInterface.addOrganisation(organisation);
+        Call<MispOrganisation> call = mispService.addOrganisation(organisation);
 
         call.enqueue(new Callback<MispOrganisation>() {
             @Override
@@ -464,7 +481,7 @@ public class MispRestClient {
      * @param callback {@link OrganisationCallback} wrapper to return a list of servers directly
      */
     public void getAllServers(final AllServersCallback callback) {
-        Call<List<MispServer>> call = mispRestInterface.getAllServers();
+        Call<List<MispServer>> call = mispService.getAllServers();
 
         call.enqueue(new Callback<List<MispServer>>() {
             @Override
@@ -472,17 +489,35 @@ public class MispRestClient {
                 if (!response.isSuccessful()) {
                     callback.failure(extractError(response));
                 } else {
-
                     List<MispServer> mispServers = response.body();
                     assert mispServers != null;
 
                     Server[] servers = new Server[mispServers.size()];
 
                     for (int i = 0; i < servers.length; i++) {
-                        servers[i] = mispServers.get(i).server;
+                        servers[i] = mispServers.get(i).getServer();
                     }
-
                     callback.success(servers);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<MispServer>> call, @NonNull Throwable t) {
+                callback.failure(t.getMessage());
+            }
+        });
+    }
+
+    public void getAllServers(final AllRawServersCallback callback) {
+        Call<List<MispServer>> call = mispService.getAllServers();
+
+        call.enqueue(new Callback<List<MispServer>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<MispServer>> call, @NonNull Response<List<MispServer>> response) {
+                if (!response.isSuccessful()) {
+                    callback.failure(extractError(response));
+                } else {
+                    callback.success(response.body());
                 }
             }
 
@@ -500,7 +535,7 @@ public class MispRestClient {
      * @param callback {@link ServerCallback} wrapper to return the created server directly
      */
     public void addServer(Server server, final ServerCallback callback) {
-        Call<Server> call = mispRestInterface.addServer(server);
+        Call<Server> call = mispService.addServer(server);
 
         call.enqueue(new Callback<Server>() {
             @Override
@@ -586,7 +621,6 @@ public class MispRestClient {
     }
 
     // interfaces
-
     public interface AvailableCallback {
         void available();
 
@@ -601,6 +635,12 @@ public class MispRestClient {
 
     public interface AllUsersCallback {
         void success(User[] users);
+
+        void failure(String error);
+    }
+
+    public interface AllMispUsersCallback {
+        void success(List<MispUser> users);
 
         void failure(String error);
     }
@@ -625,6 +665,12 @@ public class MispRestClient {
 
     public interface AllServersCallback {
         void success(Server[] servers);
+
+        void failure(String error);
+    }
+
+    public interface AllRawServersCallback {
+        void success(List<MispServer> mispServers);
 
         void failure(String error);
     }

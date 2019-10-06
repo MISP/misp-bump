@@ -44,4 +44,13 @@
     <string name="public_key_received_hint">Öffentlicher Schlüssel empfangen</string>
     <string name="sync_info_received_hint">Synchronisations-Informationen empfangen</string>
     <string name="sync_information">Synchronisations-Informationen</string>
+    <string name="preference_delete_all_syncs">Alle Synchronisierungen löschen</string>
+    <string name="preference_delete_all_syncs_summary">Die Synchronisierungen werden nur lokal gelöscht</string>
+    <string name="preference_category_general">Allgemein</string>
+    <string name="preference_github_summary">Besuchen Sie das Github Projekt</string>
+    <string name="preference_category_information">App Informationen</string>
+    <string name="sync_details_activity_label">Synchronisations Details</string>
+    <string name="information">Informationen</string>
+    <string name="upload_changes">Änderungen hochladen</string>
+    <string name="download_changes">Änderungen herunterladen</string>
 </resources>

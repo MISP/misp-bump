@@ -21,10 +21,13 @@
         <attr name="password"/>
     </declare-styleable>
 
-    <declare-styleable name="UploadAction">
-        <attr name="description" format="string"/>
+    <declare-styleable name="ProgressActionView">
+        <attr name="action_title" format="string"/>
+        <attr name="action_pending_icon" format="reference"/>
+        <attr name="action_done_icon" format="reference"/>
+        <attr name="action_error_icon" format="reference"/>
     </declare-styleable>
-    
+
     <declare-styleable name="FixedAspectRatioFrameLayout">
         <attr name="aspectRatioWidth" format="integer"/>
         <attr name="aspectRatioHeight" format="integer"/>

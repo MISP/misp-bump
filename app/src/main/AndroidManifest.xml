@@ -3,9 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="lu.circl.mispbump">
 
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:allowBackup="false"
         android:hardwareAccelerated="true"
@@ -15,7 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activities.StartUpActivity">
+        <activity android:name=".activities.UploadActivity" />
+        <activity android:name=".activities.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -35,16 +33,13 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Translucent" />
         <activity
-            android:name=".activities.UploadInfoActivity"
+            android:name=".activities.SyncInfoDetailActivity"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName=".activities.HomeActivity" />
-        <activity
-            android:name=".activities.UploadActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="Upload"
+            android:label="@string/sync_details_activity_label"
             android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.PreferenceActivity"
+            android:label="@string/settings"
             android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.ProfileActivity"
@@ -52,5 +47,8 @@
             android:parentActivityName=".activities.HomeActivity"
             android:theme="@style/AppTheme.Translucent" />
     </application>
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

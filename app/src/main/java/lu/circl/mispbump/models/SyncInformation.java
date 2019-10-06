@@ -1,29 +1,96 @@
 package lu.circl.mispbump.models;
 
-import lu.circl.mispbump.models.restModels.Organisation;
+
+import androidx.annotation.NonNull;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.UUID;
+
 
 /**
- * A Class that holds the information needed synchronize two misp instances.
- * This class can be serialized and passed via QR code.
+ * Class that holds the information needed synchronize two misp instances.
  */
 public class SyncInformation {
 
-    public Organisation organisation;
-    public String syncUserEmail;
-    public String syncUserPassword;
-    public String syncUserAuthkey;
-    public String baseUrl;
+    private UUID uuid;
+    private Date date, lastModified;
 
-    public SyncInformation() {}
+    private ExchangeInformation remote;
+    private ExchangeInformation local;
 
+    private boolean syncedWithRemote;
+
+
+    public SyncInformation() {
+        uuid = UUID.randomUUID();
+        setSyncDate();
+    }
+
+
+    public UUID getUuid() {
+        return uuid;
+    }
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public Date getLastModified() {
+        return lastModified;
+    }
+    public void setLastModified() {
+        setLastModified(Calendar.getInstance().getTime());
+    }
+    public void setLastModified(Date date) {
+        lastModified = date;
+    }
+
+    public void setSyncDate() {
+        setSyncDate(Calendar.getInstance().getTime());
+    }
+    public void setSyncDate(Date date) {
+        this.date = date;
+        this.lastModified = date;
+    }
+    public Date getSyncDate() {
+        return date;
+    }
+    private String getSyncDateString() {
+        SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        return df.format(date);
+    }
+
+    public void setSyncedWithRemote(boolean syncedWithRemote) {
+        this.syncedWithRemote = syncedWithRemote;
+    }
+    public boolean isSyncedWithRemote() {
+        return syncedWithRemote;
+    }
+
+    public ExchangeInformation getRemote() {
+        return remote;
+    }
+    public void setRemote(ExchangeInformation remote) {
+        this.remote = remote;
+    }
+
+    public ExchangeInformation getLocal() {
+        return local;
+    }
+    public void setLocal(ExchangeInformation local) {
+        this.local = local;
+    }
+
+
+    @NonNull
     @Override
     public String toString() {
-        return "SyncInformation{" +
-                "organisation=" + organisation +
-                ", syncUserEmail='" + syncUserEmail + '\'' +
-                ", syncUserPassword='" + syncUserPassword + '\'' +
-                ", syncUserAuthkey='" + syncUserAuthkey + '\'' +
-                ", baseUrl='" + baseUrl + '\'' +
-                '}';
+        return "Sync Information: \n" +
+                "UUID = " + uuid + "\n" +
+                "Sync Date = " + getSyncDateString() + "\n" +
+                remote.toString() +
+                local.toString();
     }
 }

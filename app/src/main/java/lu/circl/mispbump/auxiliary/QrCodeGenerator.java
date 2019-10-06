@@ -1,5 +1,6 @@
 package lu.circl.mispbump.auxiliary;
 
+
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Point;
@@ -12,6 +13,7 @@ import com.google.zxing.common.BitMatrix;
 
 import java.util.HashMap;
 import java.util.Map;
+
 
 public class QrCodeGenerator {
 
@@ -32,7 +34,7 @@ public class QrCodeGenerator {
             size = displaySize.y;
         }
 
-        size = (int)(size * 0.8);
+        size = (int) (size * 0.8);
 
         try {
             MultiFormatWriter multiFormatWriter = new MultiFormatWriter();

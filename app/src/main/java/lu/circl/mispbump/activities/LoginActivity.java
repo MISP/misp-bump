@@ -1,9 +1,9 @@
 package lu.circl.mispbump.activities;
 
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +27,7 @@ import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.models.restModels.Organisation;
 import lu.circl.mispbump.models.restModels.Role;
 import lu.circl.mispbump.models.restModels.User;
+
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -130,9 +131,9 @@ public class LoginActivity extends AppCompatActivity {
                             mispRestClient.getMyUser(new MispRestClient.UserCallback() {
                                 @Override
                                 public void success(final User user) {
-                                    preferenceManager.setUserInfo(user);
+                                    preferenceManager.setMyUser(user);
                                     for (Role role : roles) {
-                                        if (role.getId().equals(user.role_id)) {
+                                        if (role.getId().equals(user.getRoleId())) {
                                             if (!role.getPermAdmin()) {
                                                 progressBar.setVisibility(View.GONE);
                                                 Snackbar.make(constraintLayout, "No admin is associated with this authkey.", Snackbar.LENGTH_LONG).show();
@@ -141,10 +142,10 @@ public class LoginActivity extends AppCompatActivity {
                                         }
                                     }
 
-                                    mispRestClient.getOrganisation(user.org_id, new MispRestClient.OrganisationCallback() {
+                                    mispRestClient.getOrganisation(user.getRoleId(), new MispRestClient.OrganisationCallback() {
                                         @Override
                                         public void success(Organisation organisation) {
-                                            preferenceManager.setUserOrgInfo(organisation);
+                                            preferenceManager.setMyOrganisation(organisation);
                                             preferenceManager.setUserCredentials(url, authkey);
 
                                             progressBar.setVisibility(View.GONE);
@@ -188,10 +189,8 @@ public class LoginActivity extends AppCompatActivity {
     };
 
     /**
-     * TODO: Check if url is valid.
-     *
      * @param url url to check
-     * @return true or false
+     * @return true if valid else false
      */
     private boolean isValidUrl(String url) {
         Uri uri = Uri.parse(url);
@@ -204,12 +203,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * TODO: Check if automation key is valid.
-     *
      * @param automationKey the key to check
-     * @return true or false
+     * @return true if not empty else false
      */
     private boolean isValidAutomationKey(String automationKey) {
-        return !TextUtils.isEmpty(automationKey);
+        return !automationKey.isEmpty();
     }
 }

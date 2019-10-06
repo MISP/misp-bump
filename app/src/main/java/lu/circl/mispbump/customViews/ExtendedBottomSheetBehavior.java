@@ -1,5 +1,6 @@
 package lu.circl.mispbump.customViews;
 
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -9,7 +10,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import java.util.ConcurrentModificationException;
 
 /**
  * Can disable touch input on bottom sheet.
