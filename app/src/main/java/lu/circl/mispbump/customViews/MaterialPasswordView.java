@@ -3,6 +3,7 @@ package lu.circl.mispbump.customViews;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.text.method.PasswordTransformationMethod;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -38,11 +39,19 @@ public class MaterialPasswordView extends ConstraintLayout {
         passwordView.setText(password);
 
         ImageButton visibleToggle = findViewById(R.id.visibleToggle);
+
+        AnimatedVectorDrawable lookAway = (AnimatedVectorDrawable) context.getDrawable(R.drawable.animated_eye_to_up);
+        AnimatedVectorDrawable lookCenter = (AnimatedVectorDrawable) context.getDrawable(R.drawable.animated_eye_to_center);
+
         visibleToggle.setOnClickListener(v -> {
             if (passwordView.getTransformationMethod() == null) {
                 passwordView.setTransformationMethod(new PasswordTransformationMethod());
+                visibleToggle.setImageDrawable(lookCenter);
+                lookCenter.start();
             } else {
                 passwordView.setTransformationMethod(null);
+                visibleToggle.setImageDrawable(lookAway);
+                lookAway.start();
             }
         });
     }

@@ -262,34 +262,6 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
             dataLocallyChanged = true;
         });
 
-//        CheckBox allowSelfSigned = findViewById(R.id.checkbox_self_signed);
-//        allowSelfSigned.setChecked(syncInformation.getRemote().getServer().getSelfSigned());
-//        allowSelfSigned.setOnCheckedChangeListener((compoundButton, b) -> {
-//            syncInformation.getRemote().getServer().setSelfSigned(b);
-//            dataLocallyChanged = true;
-//        });
-
-//        CheckBox push = findViewById(R.id.checkbox_push);
-//        push.setChecked(syncInformation.getRemote().getServer().getPush());
-//        push.setOnCheckedChangeListener((compoundButton, b) -> {
-//            syncInformation.getRemote().getServer().setPush(b);
-//            dataLocallyChanged = true;
-//        });
-//
-//        CheckBox pull = findViewById(R.id.checkbox_pull);
-//        pull.setChecked(syncInformation.getRemote().getServer().getPull());
-//        pull.setOnCheckedChangeListener((compundButton, b) -> {
-//            syncInformation.getRemote().getServer().setPull(b);
-//            dataLocallyChanged = true;
-//        });
-//
-//        CheckBox cache = findViewById(R.id.checkbox_cache);
-//        cache.setChecked(syncInformation.getRemote().getServer().getCachingEnabled());
-//        cache.setOnCheckedChangeListener((compoundButton, b) -> {
-//            syncInformation.getRemote().getServer().setCachingEnabled(b);
-//            dataLocallyChanged = true;
-//        });
-
         // credentials
 
         MaterialPreferenceText email = findViewById(R.id.email);
