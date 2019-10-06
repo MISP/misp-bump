@@ -40,10 +40,10 @@ public class PreferenceActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         PreferencesFragment preferencesFragment = new PreferencesFragment();
-        preferencesFragment.onDeleteAllSyncsListener = preference -> {
-            preferenceManager.clearUploadInformation();
-            return true;
-        };
+//        preferencesFragment.onDeleteAllSyncsListener = preference -> {
+//            preferenceManager.clearUploadInformation();
+//            return true;
+//        };
 
         fragmentTransaction.add(R.id.fragmentContainer, preferencesFragment, PreferencesFragment.class.getSimpleName());
         fragmentTransaction.commit();
@@ -57,9 +57,9 @@ public class PreferenceActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.preference_screen_main, rootKey);
 
-            Preference deleteAllSyncInfo = findPreference("PREF_DELETE_ALL_SYNCS");
-            assert deleteAllSyncInfo != null;
-            deleteAllSyncInfo.setOnPreferenceClickListener(onDeleteAllSyncsListener);
+//            Preference deleteAllSyncInfo = findPreference("PREF_DELETE_ALL_SYNCS");
+//            assert deleteAllSyncInfo != null;
+//            deleteAllSyncInfo.setOnPreferenceClickListener(onDeleteAllSyncsListener);
         }
     }
 }
