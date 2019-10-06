@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.UUID;
 
@@ -205,14 +206,14 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
 
         fabUpload.setOnClickListener(view -> {
             preferenceManager.addSyncInformation(syncInformation);
-
             Intent upload = new Intent(SyncInfoDetailActivity.this, UploadActivity.class);
             upload.putExtra(UploadActivity.EXTRA_SYNC_INFO_UUID, syncInformation.getUuid().toString());
             startActivity(upload);
         });
 
         fabDownload.setOnClickListener(view -> {
-
+            // TODO download content from MISP instance
+            Snackbar.make(view, "Not implemented yet", Snackbar.LENGTH_LONG).show();
         });
     }
 

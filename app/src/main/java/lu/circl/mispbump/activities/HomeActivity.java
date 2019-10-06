@@ -267,6 +267,7 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void failure(String error) {
+                Snackbar.make(swipeRefreshLayout, error, Snackbar.LENGTH_SHORT).show();
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
