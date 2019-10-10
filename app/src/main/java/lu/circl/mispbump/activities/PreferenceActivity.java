@@ -63,7 +63,7 @@ public class PreferenceActivity extends AppCompatActivity {
             SwitchPreference fetchOnlyLocalSyncs = new SwitchPreference(context);
             fetchOnlyLocalSyncs.setTitle("Display local syncs only");
             fetchOnlyLocalSyncs.setSummaryOn("Only those syncs that were made with MISPbump are displayed.");
-            fetchOnlyLocalSyncs.setSummaryOff("Existing syncs from your MISP instance are fetched, too.");
+            fetchOnlyLocalSyncs.setSummaryOff("Existing syncs from your MISP instance are fetched (experimental)");
             fetchOnlyLocalSyncs.setChecked(preferenceManager.getShowLocalSyncsOnly());
             fetchOnlyLocalSyncs.setOnPreferenceChangeListener((preference, newValue) -> {
                 preferenceManager.setShowLocalSyncsOnly((boolean) newValue);

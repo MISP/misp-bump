@@ -14,7 +14,6 @@ import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.util.Pair;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -40,8 +39,6 @@ public class HomeActivity extends AppCompatActivity {
 
     private PreferenceManager preferenceManager;
     private MispRestClient restClient;
-
-    private SwipeRefreshLayout swipeRefreshLayout;
 
     private List<SyncInformation> syncInformationList;
     private RecyclerView recyclerView;
@@ -88,6 +85,10 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         refreshRecyclerView();
+
+        if (!preferenceManager.getShowLocalSyncsOnly()) {
+            fetchRemoteSyncs();
+        }
     }
 
 
@@ -99,13 +100,6 @@ public class HomeActivity extends AppCompatActivity {
 
         FloatingActionButton syncFab = findViewById(R.id.home_fab);
         syncFab.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, ExchangeActivity.class)));
-
-        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            onSwipeRefresh();
-
-            syncInfoAdapter.setItems(syncInformationList);
-        });
     }
 
     private void initRecyclerView() {
@@ -174,12 +168,7 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void onSwipeRefresh() {
-        if (preferenceManager.getShowLocalSyncsOnly()) {
-            swipeRefreshLayout.setRefreshing(false);
-            return;
-        }
-
+    private void fetchRemoteSyncs() {
         restClient.getAllServers(new MispRestClient.AllRawServersCallback() {
             @Override
             public void success(List<MispServer> mispServers) {
@@ -252,7 +241,6 @@ public class HomeActivity extends AppCompatActivity {
                                     }
                                     @Override
                                     public void failure(String error) {
-                                        swipeRefreshLayout.setRefreshing(false);
                                         Snackbar.make(recyclerView, error, Snackbar.LENGTH_LONG).show();
                                     }
                                 });
@@ -260,20 +248,16 @@ public class HomeActivity extends AppCompatActivity {
 
                             @Override
                             public void failure(String error) {
-                                swipeRefreshLayout.setRefreshing(false);
                                 Snackbar.make(recyclerView, error, Snackbar.LENGTH_LONG).show();
                             }
                         });
                     }
                 }
-
-                swipeRefreshLayout.setRefreshing(false);
             }
 
             @Override
             public void failure(String error) {
-                Snackbar.make(swipeRefreshLayout, error, Snackbar.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
+                Snackbar.make(recyclerView, error, Snackbar.LENGTH_SHORT).show();
             }
         });
     }
