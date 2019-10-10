@@ -37,11 +37,15 @@ public class PreferenceManager {
     private static final String USER_ORG_INFOS = "user_org_infos";
 
     private static final String SYNC_INFO = "sync_info";
-
     private static final String MISP_ROLES = "misp_roles";
+
+    private static final String SHOW_MISPBUMP_SYNCS_ONLY = "show_mispbump_syncs_only";
 
     private SharedPreferences preferences;
     private static PreferenceManager instance;
+
+    private List<SyncInformation> cachedSyncInformationList;
+
 
     private PreferenceManager(Context context) {
         preferences = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
@@ -146,15 +150,7 @@ public class PreferenceManager {
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString(USER_ORG_INFOS, encrypted);
             editor.apply();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();
         }
 
@@ -175,17 +171,7 @@ public class PreferenceManager {
             KeyStoreWrapper keyStoreWrapper = new KeyStoreWrapper(KeyStoreWrapper.USER_ORGANISATION_INFO_ALIAS);
             String decrypted = keyStoreWrapper.decrypt(preferences.getString(USER_ORG_INFOS, ""));
             return new Gson().fromJson(decrypted, Organisation.class);
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();
         }
 
@@ -222,8 +208,6 @@ public class PreferenceManager {
         return null;
     }
 
-
-    private List<SyncInformation> cachedSyncInformationList;
 
     private void loadSyncInformationList() {
         KeyStoreWrapper ksw = new KeyStoreWrapper(KeyStoreWrapper.SYNC_INFORMATION_ALIAS);
@@ -282,6 +266,11 @@ public class PreferenceManager {
         return null;
     }
 
+    /**
+     * Add or update a {@link SyncInformation} to local storage
+     *
+     * @param syncInformation to be added
+     */
     public void addSyncInformation(SyncInformation syncInformation) {
         if (cachedSyncInformationList == null) {
             loadSyncInformationList();
@@ -330,11 +319,20 @@ public class PreferenceManager {
     }
 
 
+    public boolean getShowLocalSyncsOnly() {
+        return preferences.getBoolean(SHOW_MISPBUMP_SYNCS_ONLY, true);
+    }
+
+    public void setShowLocalSyncsOnly(boolean showLocalSyncsOnly) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(SHOW_MISPBUMP_SYNCS_ONLY, showLocalSyncsOnly);
+        editor.apply();
+    }
+
+
     public void clearAllData() {
         SharedPreferences.Editor editor = preferences.edit();
 
-//        clearServerUrl();
-//        clearAutomationKey();
         clearUploadInformation();
 
         editor.clear();

@@ -38,15 +38,15 @@ import lu.circl.mispbump.models.restModels.User;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private List<SyncInformation> syncInformationList;
     private PreferenceManager preferenceManager;
     private MispRestClient restClient;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
+
+    private List<SyncInformation> syncInformationList;
     private RecyclerView recyclerView;
     private SyncInfoAdapter syncInfoAdapter;
     private TextView emptyRecyclerView;
-
-    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     @Override
@@ -102,7 +102,7 @@ public class HomeActivity extends AppCompatActivity {
 
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            checkUnimportedSyncs();
+            onSwipeRefresh();
 
             syncInfoAdapter.setItems(syncInformationList);
         });
@@ -174,7 +174,12 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void checkUnimportedSyncs() {
+    private void onSwipeRefresh() {
+        if (preferenceManager.getShowLocalSyncsOnly()) {
+            swipeRefreshLayout.setRefreshing(false);
+            return;
+        }
+
         restClient.getAllServers(new MispRestClient.AllRawServersCallback() {
             @Override
             public void success(List<MispServer> mispServers) {

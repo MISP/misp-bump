@@ -1,15 +1,19 @@
 package lu.circl.mispbump.activities;
 
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceScreen;
+import androidx.preference.SwitchPreference;
 
 import lu.circl.mispbump.R;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
@@ -17,19 +21,11 @@ import lu.circl.mispbump.auxiliary.PreferenceManager;
 
 public class PreferenceActivity extends AppCompatActivity {
 
-    private PreferenceManager preferenceManager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preference);
 
-        preferenceManager = PreferenceManager.getInstance(PreferenceActivity.this);
-
-        initializeViews();
-    }
-
-    private void initializeViews() {
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
 
@@ -37,29 +33,66 @@ public class PreferenceActivity extends AppCompatActivity {
         assert ab != null;
         ab.setDisplayHomeAsUpEnabled(true);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        PreferencesFragment preferencesFragment = new PreferencesFragment();
-//        preferencesFragment.onDeleteAllSyncsListener = preference -> {
-//            preferenceManager.clearUploadInformation();
-//            return true;
-//        };
-
-        fragmentTransaction.add(R.id.fragmentContainer, preferencesFragment, PreferencesFragment.class.getSimpleName());
-        fragmentTransaction.commit();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragmentContainer, new PreferencesFragment(PreferenceActivity.this))
+                .commit();
     }
 
     public static class PreferencesFragment extends PreferenceFragmentCompat {
 
-        private Preference.OnPreferenceClickListener onDeleteAllSyncsListener;
+        private Context context;
+        private PreferenceManager preferenceManager;
+
+        PreferencesFragment(Context context) {
+            this.context = context;
+            preferenceManager = PreferenceManager.getInstance(context);
+        }
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            setPreferencesFromResource(R.xml.preference_screen_main, rootKey);
+            PreferenceScreen preferenceScreen = getPreferenceManager().createPreferenceScreen(context);
+            setPreferenceScreen(preferenceScreen);
 
-//            Preference deleteAllSyncInfo = findPreference("PREF_DELETE_ALL_SYNCS");
-//            assert deleteAllSyncInfo != null;
-//            deleteAllSyncInfo.setOnPreferenceClickListener(onDeleteAllSyncsListener);
+            // General
+
+            PreferenceCategory generalCategory = new PreferenceCategory(context);
+            generalCategory.setTitle("General");
+            getPreferenceScreen().addPreference(generalCategory);
+
+            SwitchPreference fetchOnlyLocalSyncs = new SwitchPreference(context);
+            fetchOnlyLocalSyncs.setTitle("Display local syncs only");
+            fetchOnlyLocalSyncs.setSummaryOn("Only those syncs that were made with MISPbump are displayed.");
+            fetchOnlyLocalSyncs.setSummaryOff("Existing syncs from your MISP instance are fetched, too.");
+            fetchOnlyLocalSyncs.setChecked(preferenceManager.getShowLocalSyncsOnly());
+            fetchOnlyLocalSyncs.setOnPreferenceChangeListener((preference, newValue) -> {
+                preferenceManager.setShowLocalSyncsOnly((boolean) newValue);
+                return true;
+            });
+
+            generalCategory.addPreference(fetchOnlyLocalSyncs);
+
+            // App Information
+
+            PreferenceCategory appInfoCategory = new PreferenceCategory(context);
+            appInfoCategory.setTitle("App Information");
+            getPreferenceScreen().addPreference(appInfoCategory);
+
+            Preference githubPreference = new Preference(context);
+            githubPreference.setIcon(context.getDrawable(R.drawable.ic_github));
+            githubPreference.setTitle("Github");
+            githubPreference.setSummary("Visit the Github project");
+            Intent viewOnGithub = new Intent(Intent.ACTION_VIEW);
+            viewOnGithub.setData(Uri.parse("https://github.com/MISP/misp-bump"));
+            githubPreference.setIntent(viewOnGithub);
+
+            Preference versionPreference = new Preference(context);
+            versionPreference.setIcon(context.getDrawable(R.drawable.ic_info_outline_dark));
+            versionPreference.setTitle("Version");
+            versionPreference.setSummary("1.0");
+
+            appInfoCategory.addPreference(githubPreference);
+            appInfoCategory.addPreference(versionPreference);
         }
     }
 }
