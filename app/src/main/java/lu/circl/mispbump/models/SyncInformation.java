@@ -21,7 +21,7 @@ public class SyncInformation {
     private ExchangeInformation remote;
     private ExchangeInformation local;
 
-    private boolean syncedWithRemote;
+    private boolean hasUnpublishedChanges;
 
 
     public SyncInformation() {
@@ -62,11 +62,11 @@ public class SyncInformation {
         return df.format(date);
     }
 
-    public void setSyncedWithRemote(boolean syncedWithRemote) {
-        this.syncedWithRemote = syncedWithRemote;
+    public void setHasUnpublishedChanges(boolean hasUnpublishedChanges) {
+        this.hasUnpublishedChanges = hasUnpublishedChanges;
     }
-    public boolean isSyncedWithRemote() {
-        return syncedWithRemote;
+    public boolean getHasUnpublishedChanges() {
+        return hasUnpublishedChanges;
     }
 
     public ExchangeInformation getRemote() {

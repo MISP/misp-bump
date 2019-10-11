@@ -172,7 +172,7 @@ public class UploadActivity extends AppCompatActivity {
         server.setPull(syncInformation.getRemote().getServer().getPull());
         server.setPush(syncInformation.getRemote().getServer().getPush());
         server.setCachingEnabled(syncInformation.getRemote().getServer().getCachingEnabled());
-        server.setSelfSigned(syncInformation.getRemote().getServer().getCachingEnabled());
+        server.setSelfSigned(syncInformation.getRemote().getServer().getSelfSigned());
         return server;
     }
 
@@ -259,6 +259,7 @@ public class UploadActivity extends AppCompatActivity {
     private void serverAdded(Server server) {
         if (server != null) {
             serverAction.done();
+            syncInformation.setHasUnpublishedChanges(false);
             preferenceManager.addSyncInformation(syncInformation);
         } else {
             serverAction.error("Could not create Sync Server");

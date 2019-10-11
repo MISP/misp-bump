@@ -53,7 +53,7 @@ public class SyncInfoAdapter extends RecyclerView.Adapter<SyncInfoAdapter.ViewHo
 
         holder.orgName.setText(item.getRemote().getOrganisation().getName());
 
-        if (item.isSyncedWithRemote()) {
+        if (item.getHasUnpublishedChanges()) {
             ImageViewCompat.setImageTintList(holder.syncStatus, ColorStateList.valueOf(context.getColor(R.color.status_green)));
             holder.syncStatus.setImageResource(R.drawable.ic_check_outline);
         } else {

@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.UUID;
 
@@ -36,8 +35,17 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
     private SyncInformation syncInformation;
 
     private boolean fabMenuExpanded;
-    private boolean dataLocallyChanged;
 
+    private View.OnClickListener onUploadClicked = v -> {
+        preferenceManager.addSyncInformation(syncInformation);
+        Intent upload = new Intent(SyncInfoDetailActivity.this, UploadActivity.class);
+        upload.putExtra(UploadActivity.EXTRA_SYNC_INFO_UUID, syncInformation.getUuid().toString());
+        startActivity(upload);
+    };
+
+    private View.OnClickListener onDownloadClicked = v -> {
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +67,6 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
-        if (dataLocallyChanged) {
-            syncInformation.setSyncedWithRemote(false);
-        }
-
         preferenceManager.addSyncInformation(syncInformation);
     }
 
@@ -185,6 +188,7 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
                 menuBackground.setClickable(false);
 
                 fab.setImageDrawable(close);
+                assert close != null;
                 close.start();
 
                 closeAnimation.start();
@@ -193,6 +197,7 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
                 menuBackground.setClickable(true);
 
                 fab.setImageDrawable(open);
+                assert open != null;
                 open.start();
 
                 openAnimation.start();
@@ -204,17 +209,8 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
         menuBackground.setClickable(false);
         fab.setOnClickListener(expandCollapseClick);
 
-        fabUpload.setOnClickListener(view -> {
-            preferenceManager.addSyncInformation(syncInformation);
-            Intent upload = new Intent(SyncInfoDetailActivity.this, UploadActivity.class);
-            upload.putExtra(UploadActivity.EXTRA_SYNC_INFO_UUID, syncInformation.getUuid().toString());
-            startActivity(upload);
-        });
-
-        fabDownload.setOnClickListener(view -> {
-            // TODO download content from MISP instance
-            Snackbar.make(view, "Not implemented yet", Snackbar.LENGTH_LONG).show();
-        });
+        fabUpload.setOnClickListener(onUploadClicked);
+        fabDownload.setOnClickListener(onDownloadClicked);
     }
 
     private void populateContent() {
@@ -239,28 +235,28 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
         allowSelfSigned.setChecked(syncInformation.getRemote().getServer().getSelfSigned());
         allowSelfSigned.setOnCheckedChangeListener((cb, b) -> {
             syncInformation.getRemote().getServer().setSelfSigned(b);
-            dataLocallyChanged = true;
+            syncInformation.setHasUnpublishedChanges(true);
         });
 
         MaterialPreferenceSwitch allowPush = findViewById(R.id.switch_allow_push);
         allowPush.setChecked(syncInformation.getRemote().getServer().getPush());
         allowPush.setOnCheckedChangeListener((cb, b) -> {
             syncInformation.getRemote().getServer().setPush(b);
-            dataLocallyChanged = true;
+            syncInformation.setHasUnpublishedChanges(true);
         });
 
         MaterialPreferenceSwitch allowPull = findViewById(R.id.switch_allow_pull);
         allowPull.setChecked(syncInformation.getRemote().getServer().getPull());
         allowPull.setOnCheckedChangeListener((cb, b) -> {
             syncInformation.getRemote().getServer().setPull(b);
-            dataLocallyChanged = true;
+            syncInformation.setHasUnpublishedChanges(true);
         });
 
         MaterialPreferenceSwitch allowCache = findViewById(R.id.switch_allow_cache);
         allowCache.setChecked(syncInformation.getRemote().getServer().getCachingEnabled());
         allowCache.setOnCheckedChangeListener((cb, b) -> {
             syncInformation.getRemote().getServer().setCachingEnabled(b);
-            dataLocallyChanged = true;
+            syncInformation.setHasUnpublishedChanges(true);
         });
 
         // credentials

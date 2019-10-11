@@ -6,6 +6,7 @@ import android.graphics.Shader;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -122,6 +123,11 @@ public class ProfileActivity extends AppCompatActivity {
 
         MaterialPreferenceText description = findViewById(R.id.description);
         description.setSubtitle(organisation.getDescription());
+
+        Role[] roles = preferenceManager.getRoles();
+        for (Role role : roles) {
+            Log.d("ROLES", role.toString());
+        }
     }
 
 
