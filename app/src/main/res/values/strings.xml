@@ -12,8 +12,6 @@
     <string name="qr_code">QR code</string>
     <string name="sync">Synchronization</string>
     <string name="no_syncs_hint">You have not synced any MISP instances yet</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="activity_exchange_scan_partner_qr_hint">Scan your partners QR code</string>
     <string name="activity_exchange_continue_if_scanned">Continue if your partner also scanned this QR code</string>
     <string name="button_continue">next</string>

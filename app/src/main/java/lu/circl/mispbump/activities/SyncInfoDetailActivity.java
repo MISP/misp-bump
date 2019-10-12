@@ -1,15 +1,9 @@
 package lu.circl.mispbump.activities;
 
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.content.Intent;
-import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,8 +28,6 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
     private PreferenceManager preferenceManager;
     private SyncInformation syncInformation;
 
-    private boolean fabMenuExpanded;
-
     private View.OnClickListener onUploadClicked = v -> {
         preferenceManager.addSyncInformation(syncInformation);
         Intent upload = new Intent(SyncInfoDetailActivity.this, UploadActivity.class);
@@ -43,14 +35,11 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
         startActivity(upload);
     };
 
-    private View.OnClickListener onDownloadClicked = v -> {
-
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sync_info_detail_v2);
+        setContentView(R.layout.activity_sync_info_detail);
 
         preferenceManager = PreferenceManager.getInstance(SyncInfoDetailActivity.this);
         syncInformation = preferenceManager.getSyncInformation(getExtraUuid());
@@ -60,7 +49,7 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
         }
 
         initToolbar();
-        initFabMenu();
+        initViews();
         populateContent();
     }
 
@@ -85,132 +74,9 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
     }
 
-    private void initFabMenu() {
-        FloatingActionButton fab = findViewById(R.id.fab_main);
-        FloatingActionButton fabUpload = findViewById(R.id.fab_upload);
-        FloatingActionButton fabDownload = findViewById(R.id.fab_download);
-
-        LinearLayout uploadLayout = findViewById(R.id.layout_upload);
-        LinearLayout downloadLayout = findViewById(R.id.layout_download);
-
-        TextView uploadText = findViewById(R.id.fab_upload_text);
-        TextView downloadText = findViewById(R.id.fab_download_text);
-
-        View menuBackground = findViewById(R.id.menu_background);
-
-        uploadLayout.setVisibility(View.GONE);
-        downloadLayout.setVisibility(View.GONE);
-
-        int animationSpeed = 200;
-
-        ValueAnimator openAnimation = ValueAnimator.ofFloat(0f, 1f);
-        openAnimation.setDuration(animationSpeed);
-        openAnimation.setInterpolator(new DecelerateInterpolator());
-        openAnimation.addUpdateListener(updateAnimation -> {
-            float x = (float) updateAnimation.getAnimatedValue();
-
-            fabUpload.setAlpha(x);
-            fabUpload.setTranslationY((1 - x) * 50);
-            uploadText.setAlpha(x);
-            uploadText.setTranslationX((1 - x) * -200);
-
-            fabDownload.setAlpha(x);
-            fabDownload.setTranslationY((1 - x) * 50);
-            downloadText.setAlpha(x);
-            downloadText.setTranslationX((1 - x) * -200);
-
-            menuBackground.setAlpha(x * 0.9f);
-        });
-        openAnimation.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
-                uploadLayout.setVisibility(View.VISIBLE);
-                downloadLayout.setVisibility(View.VISIBLE);
-            }
-            @Override
-            public void onAnimationEnd(Animator animator) {
-            }
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        });
-
-        ValueAnimator closeAnimation = ValueAnimator.ofFloat(1f, 0f);
-        closeAnimation.setDuration(animationSpeed);
-        closeAnimation.setInterpolator(new DecelerateInterpolator());
-        closeAnimation.addUpdateListener(updateAnimation -> {
-            float x = (float) updateAnimation.getAnimatedValue();
-
-            fabUpload.setAlpha(x);
-            fabUpload.setTranslationY((1 - x) * 50);
-            uploadText.setAlpha(x);
-            uploadText.setTranslationX((1 - x) * -200);
-
-            fabDownload.setAlpha(x);
-            fabDownload.setTranslationY((1 - x) * 50);
-            downloadText.setAlpha(x);
-            downloadText.setTranslationX((1 - x) * -200);
-
-            menuBackground.setAlpha(x * 0.9f);
-        });
-        closeAnimation.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
-                uploadLayout.setVisibility(View.VISIBLE);
-                downloadLayout.setVisibility(View.VISIBLE);
-
-            }
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                uploadLayout.setVisibility(View.GONE);
-                downloadLayout.setVisibility(View.GONE);
-            }
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        });
-
-        AnimatedVectorDrawable open = (AnimatedVectorDrawable) getDrawable(R.drawable.animated_arrow_cloud_down);
-        AnimatedVectorDrawable close = (AnimatedVectorDrawable) getDrawable(R.drawable.animated_arrow_down_cloud);
-
-        View.OnClickListener expandCollapseClick = view -> {
-            if (fabMenuExpanded) {
-                menuBackground.setClickable(false);
-
-                fab.setImageDrawable(close);
-                assert close != null;
-                close.start();
-
-                closeAnimation.start();
-                fabMenuExpanded = false;
-            } else {
-                menuBackground.setClickable(true);
-
-                fab.setImageDrawable(open);
-                assert open != null;
-                open.start();
-
-                openAnimation.start();
-                fabMenuExpanded = true;
-            }
-        };
-
-        menuBackground.setOnClickListener(expandCollapseClick);
-        menuBackground.setClickable(false);
-        fab.setOnClickListener(expandCollapseClick);
-
-        fabUpload.setOnClickListener(onUploadClicked);
-        fabDownload.setOnClickListener(onDownloadClicked);
+    private void initViews() {
+        FloatingActionButton uploadFab = findViewById(R.id.fab_main);
+        uploadFab.setOnClickListener(onUploadClicked);
     }
 
     private void populateContent() {

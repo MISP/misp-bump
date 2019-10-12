@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.util.Pair;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,6 +44,11 @@ public class HomeActivity extends AppCompatActivity {
     private SyncInfoAdapter syncInfoAdapter;
     private TextView emptyRecyclerView;
 
+    private OnRecyclerItemClickListener<Integer> onItemClick = (v, index) -> {
+        Intent detailActivity = new Intent(HomeActivity.this, SyncInfoDetailActivity.class);
+        detailActivity.putExtra(SyncInfoDetailActivity.EXTRA_SYNC_INFO_UUID, syncInformationList.get(index).getUuid());
+        startActivity(detailActivity);
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +110,7 @@ public class HomeActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
         syncInfoAdapter = new SyncInfoAdapter(HomeActivity.this);
-        syncInfoAdapter.setOnRecyclerPositionClickListener(onRecyclerItemClickListener());
+        syncInfoAdapter.setOnRecyclerPositionClickListener(onItemClick);
         recyclerView.setAdapter(syncInfoAdapter);
     }
 
@@ -260,15 +264,5 @@ public class HomeActivity extends AppCompatActivity {
                 Snackbar.make(recyclerView, error, Snackbar.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private OnRecyclerItemClickListener<Integer> onRecyclerItemClickListener() {
-        return (v, index) -> {
-            Intent i = new Intent(HomeActivity.this, SyncInfoDetailActivity.class);
-            i.putExtra(SyncInfoDetailActivity.EXTRA_SYNC_INFO_UUID, syncInformationList.get(index).getUuid());
-
-            ActivityOptionsCompat options = ActivityOptionsCompat.makeClipRevealAnimation(v.findViewById(R.id.rootLayout), (int) v.getX(), (int) v.getY(), v.getWidth(), v.getHeight());
-            startActivity(i, options.toBundle());
-        };
     }
 }

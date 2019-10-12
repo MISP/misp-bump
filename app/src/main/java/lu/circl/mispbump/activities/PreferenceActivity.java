@@ -13,10 +13,8 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
-import androidx.preference.SwitchPreference;
 
 import lu.circl.mispbump.R;
-import lu.circl.mispbump.auxiliary.PreferenceManager;
 
 
 public class PreferenceActivity extends AppCompatActivity {
@@ -42,11 +40,9 @@ public class PreferenceActivity extends AppCompatActivity {
     public static class PreferencesFragment extends PreferenceFragmentCompat {
 
         private Context context;
-        private PreferenceManager preferenceManager;
 
         PreferencesFragment(Context context) {
             this.context = context;
-            preferenceManager = PreferenceManager.getInstance(context);
         }
 
         @Override
@@ -56,21 +52,21 @@ public class PreferenceActivity extends AppCompatActivity {
 
             // General
 
-            PreferenceCategory generalCategory = new PreferenceCategory(context);
-            generalCategory.setTitle("General");
-            getPreferenceScreen().addPreference(generalCategory);
-
-            SwitchPreference fetchOnlyLocalSyncs = new SwitchPreference(context);
-            fetchOnlyLocalSyncs.setTitle("Display local syncs only");
-            fetchOnlyLocalSyncs.setSummaryOn("Only those syncs that were made with MISPbump are displayed.");
-            fetchOnlyLocalSyncs.setSummaryOff("Existing syncs from your MISP instance are fetched (experimental)");
-            fetchOnlyLocalSyncs.setChecked(preferenceManager.getShowLocalSyncsOnly());
-            fetchOnlyLocalSyncs.setOnPreferenceChangeListener((preference, newValue) -> {
-                preferenceManager.setShowLocalSyncsOnly((boolean) newValue);
-                return true;
-            });
-
-            generalCategory.addPreference(fetchOnlyLocalSyncs);
+//            PreferenceCategory generalCategory = new PreferenceCategory(context);
+//            generalCategory.setTitle("General");
+//            getPreferenceScreen().addPreference(generalCategory);
+//
+//            SwitchPreference fetchOnlyLocalSyncs = new SwitchPreference(context);
+//            fetchOnlyLocalSyncs.setTitle("Display local syncs only");
+//            fetchOnlyLocalSyncs.setSummaryOn("Only those syncs that were made with MISPbump are displayed.");
+//            fetchOnlyLocalSyncs.setSummaryOff("Existing syncs from your MISP instance are fetched (experimental)");
+//            fetchOnlyLocalSyncs.setChecked(preferenceManager.getShowLocalSyncsOnly());
+//            fetchOnlyLocalSyncs.setOnPreferenceChangeListener((preference, newValue) -> {
+//                preferenceManager.setShowLocalSyncsOnly((boolean) newValue);
+//                return true;
+//            });
+//
+//            generalCategory.addPreference(fetchOnlyLocalSyncs);
 
             // App Information
 
