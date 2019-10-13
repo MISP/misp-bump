@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="lu.circl.mispbump">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="false"
         android:hardwareAccelerated="true"
@@ -47,8 +50,5 @@
             android:parentActivityName=".activities.HomeActivity"
             android:theme="@style/AppTheme.Translucent" />
     </application>
-    <uses-permission android:name="android.permission.CAMERA" />
-
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

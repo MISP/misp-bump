@@ -3,8 +3,11 @@ package lu.circl.mispbump.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -25,6 +28,7 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
 
     public static String EXTRA_SYNC_INFO_UUID = "EXTRA_SYNC_INFO_UUID";
 
+    private UUID syncUUID;
     private PreferenceManager preferenceManager;
     private SyncInformation syncInformation;
 
@@ -42,15 +46,32 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sync_info_detail);
 
         preferenceManager = PreferenceManager.getInstance(SyncInfoDetailActivity.this);
-        syncInformation = preferenceManager.getSyncInformation(getExtraUuid());
+        syncUUID = getExtraUuid();
+        syncInformation = preferenceManager.getSyncInformation(syncUUID);
 
         if (syncInformation == null) {
-            throw new RuntimeException("Could not find UploadInformation with UUID {" + getExtraUuid().toString() + "}");
+            throw new RuntimeException("Could not find UploadInformation with UUID {" + syncUUID + "}");
         }
 
         initToolbar();
         initViews();
         populateContent();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_sync_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        //            preferenceManager.removeUploadInformation(syncUUID);
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        } else return item.getItemId() == R.id.menu_delete_sync;
+
     }
 
     @Override

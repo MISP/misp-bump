@@ -24,20 +24,15 @@ import lu.circl.mispbump.adapters.SyncInfoAdapter;
 import lu.circl.mispbump.auxiliary.MispRestClient;
 import lu.circl.mispbump.auxiliary.PreferenceManager;
 import lu.circl.mispbump.interfaces.OnRecyclerItemClickListener;
-import lu.circl.mispbump.models.ExchangeInformation;
 import lu.circl.mispbump.models.SyncInformation;
-import lu.circl.mispbump.models.restModels.MispServer;
-import lu.circl.mispbump.models.restModels.MispUser;
 import lu.circl.mispbump.models.restModels.Organisation;
 import lu.circl.mispbump.models.restModels.Role;
-import lu.circl.mispbump.models.restModels.Server;
 import lu.circl.mispbump.models.restModels.User;
 
 
 public class HomeActivity extends AppCompatActivity {
 
     private PreferenceManager preferenceManager;
-    private MispRestClient restClient;
 
     private List<SyncInformation> syncInformationList;
     private RecyclerView recyclerView;
@@ -56,8 +51,6 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         preferenceManager = PreferenceManager.getInstance(this);
-        Pair<String, String> credentials = preferenceManager.getUserCredentials();
-        restClient = MispRestClient.getInstance(credentials.first, credentials.second);
 
         initViews();
         initRecyclerView();
@@ -89,10 +82,6 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         refreshRecyclerView();
-
-        if (!preferenceManager.getShowLocalSyncsOnly()) {
-            fetchRemoteSyncs();
-        }
     }
 
 
@@ -170,99 +159,5 @@ public class HomeActivity extends AppCompatActivity {
                 }
             });
         }
-    }
-
-    private void fetchRemoteSyncs() {
-        restClient.getAllServers(new MispRestClient.AllRawServersCallback() {
-            @Override
-            public void success(List<MispServer> mispServers) {
-                if (mispServers.size() < 1) {
-                    return;
-                }
-
-                List<SyncInformation> syncInformationList = preferenceManager.getSyncInformationList();
-
-                for (MispServer mispServer : mispServers) {
-
-                    boolean existsOffline = false;
-
-                    for (SyncInformation syncInformation : syncInformationList) {
-                        int localServerId = syncInformation.getRemote().getServer().getId();
-                        int remoteServerId = mispServer.getServer().getId();
-
-                        if (remoteServerId == localServerId) {
-                            existsOffline = true;
-                            break;
-                        }
-                    }
-
-                    if (!existsOffline) {
-                        // mispServer is not locally available
-                        SyncInformation syncInformation = new SyncInformation();
-
-                        ExchangeInformation local = new ExchangeInformation();
-                        local.setOrganisation(preferenceManager.getUserOrganisation().toSyncOrganisation());
-                        User syncUser = preferenceManager.getUserInfo().toSyncUser();
-                        syncUser.setAuthkey("Could not be recovered");
-                        syncUser.setPassword("Could not be recovered");
-                        local.setSyncUser(syncUser);
-                        local.setServer(new Server(preferenceManager.getUserCredentials().first));
-
-                        ExchangeInformation remote = new ExchangeInformation();
-                        remote.setServer(mispServer.getServer());
-
-                        restClient.getOrganisation(mispServer.getRemoteOrganisation().getId(), new MispRestClient.OrganisationCallback() {
-                            @Override
-                            public void success(Organisation organisation) {
-                                remote.setOrganisation(organisation);
-
-                                restClient.getAllUsers(new MispRestClient.AllMispUsersCallback() {
-                                    @Override
-                                    public void success(List<MispUser> users) {
-                                        for (MispUser mispUser : users) {
-
-                                            boolean isSyncUserRole = false;
-
-                                            Role[] roles = preferenceManager.getRoles();
-
-                                            for (Role role : roles) {
-                                                if (role.getId().equals(mispUser.getRole().getId())) {
-                                                    isSyncUserRole = role.isSyncUserRole();
-                                                    break;
-                                                }
-                                            }
-
-                                            if (mispUser.getOrganisation().getId().equals(organisation.getId()) && isSyncUserRole) {
-                                                remote.setSyncUser(mispUser.getUser());
-
-                                                syncInformation.setLocal(local);
-                                                syncInformation.setRemote(remote);
-
-                                                preferenceManager.addSyncInformation(syncInformation);
-                                                refreshRecyclerView();
-                                            }
-                                        }
-                                    }
-                                    @Override
-                                    public void failure(String error) {
-                                        Snackbar.make(recyclerView, error, Snackbar.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void failure(String error) {
-                                Snackbar.make(recyclerView, error, Snackbar.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-                }
-            }
-
-            @Override
-            public void failure(String error) {
-                Snackbar.make(recyclerView, error, Snackbar.LENGTH_SHORT).show();
-            }
-        });
     }
 }

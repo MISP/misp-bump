@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -36,6 +38,17 @@ public class PreferenceActivity extends AppCompatActivity {
                 .add(R.id.fragmentContainer, new PreferencesFragment(PreferenceActivity.this))
                 .commit();
     }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+
+        return false;
+    }
+
 
     public static class PreferencesFragment extends PreferenceFragmentCompat {
 

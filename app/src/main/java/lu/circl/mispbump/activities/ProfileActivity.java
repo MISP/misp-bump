@@ -75,11 +75,15 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == R.id.menu_delete_profile) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        } else if (item.getItemId() == R.id.menu_delete_profile) {
             clearDeviceAndLogOut();
+            return true;
         }
 
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
 

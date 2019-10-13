@@ -60,7 +60,7 @@ public class MispRestClient {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create())
-                    .client(getCustomClient(true, true, authkey))
+                    .client(getCustomClient(false, false, authkey))
                     .build();
 
             mispService = retrofit.create(MispService.class);
