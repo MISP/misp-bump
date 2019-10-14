@@ -58,4 +58,5 @@
     <string name="upload_changes">Upload Changes</string>
     <string name="download_changes">Download Changes</string>
     <string name="label_delete_sync">Delete Synchronisation</string>
+    <string name="content_description_sync_status_icon">Shows if local changes are already uploaded to MISP instance</string>
 </resources>
