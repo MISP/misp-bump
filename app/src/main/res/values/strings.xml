@@ -57,4 +57,5 @@
     <string name="information">Information</string>
     <string name="upload_changes">Upload Changes</string>
     <string name="download_changes">Download Changes</string>
+    <string name="label_delete_sync">Delete Synchronisation</string>
 </resources>

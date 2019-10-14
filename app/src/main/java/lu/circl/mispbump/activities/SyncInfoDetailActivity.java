@@ -12,6 +12,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.UUID;
@@ -66,12 +67,22 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        //            preferenceManager.removeUploadInformation(syncUUID);
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
-        } else return item.getItemId() == R.id.menu_delete_sync;
+        } else if (item.getItemId() == R.id.menu_delete_sync) {
+            new MaterialAlertDialogBuilder(SyncInfoDetailActivity.this)
+                    .setTitle("Delete Sync Locally")
+                    .setMessage("This will not remove the information from your MISP instance.")
+                    .setPositiveButton("Remove", (dialog, which) -> {
+                        preferenceManager.removeUploadInformation(syncUUID);
+                    })
+                    .setNegativeButton("Discard", null)
+                    .show();
+            return true;
+        }
 
+        return false;
     }
 
     @Override

@@ -43,6 +43,29 @@ public class HomeActivity extends AppCompatActivity {
         Intent detailActivity = new Intent(HomeActivity.this, SyncInfoDetailActivity.class);
         detailActivity.putExtra(SyncInfoDetailActivity.EXTRA_SYNC_INFO_UUID, syncInformationList.get(index).getUuid());
         startActivity(detailActivity);
+
+//        SyncInformation syncInfo = preferenceManager.getSyncInformation(syncInformationList.get(index).getUuid());
+//
+//        View dialogContent = getLayoutInflater().inflate(R.layout.dialog_credentials, null);
+//
+//        MaterialPreferenceText url = dialogContent.findViewById(R.id.url);
+//        url.setSubtitle(syncInfo.getRemote().getServer().getUrl());
+//
+//        MaterialPreferenceText email = dialogContent.findViewById(R.id.email);
+//        email.setSubtitle(syncInfo.getLocal().getSyncUser().getEmail());
+//
+//        MaterialPasswordView authkey = dialogContent.findViewById(R.id.authkey);
+//        authkey.setPassword(syncInfo.getLocal().getSyncUser().getAuthkey());
+//
+//        MaterialPasswordView password = dialogContent.findViewById(R.id.password);
+//        password.setPassword(syncInfo.getLocal().getSyncUser().getPassword());
+//
+//        new MaterialAlertDialogBuilder(HomeActivity.this)
+//                .setTitle("Credentials")
+//                .setMessage("These credentials are valid for the sync user on your partners MISP instance")
+//                .setView(dialogContent)
+//                .setPositiveButton(android.R.string.ok, null)
+//                .show();
     };
 
     @Override

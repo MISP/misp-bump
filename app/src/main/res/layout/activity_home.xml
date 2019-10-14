@@ -39,8 +39,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        app:backgroundTint="@color/colorAccent"
-        android:tint="@color/white"
         android:src="@drawable/ic_qrcode_scan"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
