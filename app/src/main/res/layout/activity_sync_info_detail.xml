@@ -3,6 +3,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.SyncInfoDetailActivity"
@@ -129,54 +130,6 @@
                 app:offText="@string/settings_cache_off"
                 app:onText="@string/settings_cache_on" />
 
-            <!--            <androidx.constraintlayout.widget.ConstraintLayout-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="match_parent">-->
-
-            <!--                <CheckBox-->
-            <!--                    android:id="@+id/checkbox_self_signed"-->
-            <!--                    android:layout_width="wrap_content"-->
-            <!--                    android:layout_height="wrap_content"-->
-            <!--                    android:layout_marginStart="16dp"-->
-            <!--                    android:layout_marginTop="16dp"-->
-            <!--                    android:text="@string/settings_self_signed_title"-->
-            <!--                    app:layout_constraintStart_toStartOf="parent"-->
-            <!--                    app:layout_constraintTop_toTopOf="parent" />-->
-
-            <!--                <CheckBox-->
-            <!--                    android:id="@+id/checkbox_push"-->
-            <!--                    android:layout_width="wrap_content"-->
-            <!--                    android:layout_height="wrap_content"-->
-            <!--                    android:layout_marginStart="16dp"-->
-            <!--                    android:layout_marginTop="8dp"-->
-            <!--                    android:text="@string/settings_push_title"-->
-            <!--                    app:layout_constraintHorizontal_chainStyle="packed"-->
-            <!--                    app:layout_constraintStart_toStartOf="parent"-->
-            <!--                    app:layout_constraintTop_toBottomOf="@id/checkbox_self_signed" />-->
-
-            <!--                <CheckBox-->
-            <!--                    android:id="@+id/checkbox_pull"-->
-            <!--                    android:layout_width="wrap_content"-->
-            <!--                    android:layout_height="wrap_content"-->
-            <!--                    android:layout_marginStart="32dp"-->
-            <!--                    android:layout_marginTop="8dp"-->
-            <!--                    android:text="@string/settings_pull_title"-->
-            <!--                    app:layout_constraintStart_toEndOf="@+id/checkbox_push"-->
-            <!--                    app:layout_constraintTop_toBottomOf="@id/checkbox_self_signed" />-->
-
-            <!--                <CheckBox-->
-            <!--                    android:id="@+id/checkbox_cache"-->
-            <!--                    android:layout_width="wrap_content"-->
-            <!--                    android:layout_height="wrap_content"-->
-            <!--                    android:layout_marginStart="16dp"-->
-            <!--                    android:layout_marginTop="8dp"-->
-            <!--                    android:layout_marginBottom="16dp"-->
-            <!--                    android:text="@string/settings_cache_title"-->
-            <!--                    app:layout_constraintTop_toBottomOf="@id/checkbox_push"-->
-            <!--                    app:layout_constraintStart_toStartOf="parent"-->
-            <!--                    app:layout_constraintBottom_toBottomOf="parent" />-->
-            <!--            </androidx.constraintlayout.widget.ConstraintLayout>-->
-
             <View
                 android:background="@color/dividerColor"
                 android:layout_width="match_parent"
@@ -217,108 +170,12 @@
 
     </ScrollView>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_gravity="bottom|end"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <FrameLayout
-            android:id="@+id/menu_background"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="0"
-            android:background="@color/white"
-            android:clickable="false"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_main"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/animated_arrow_cloud_down"
-            android:tint="@color/white"
-            android:layout_margin="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
-        <LinearLayout
-            android:id="@+id/layout_upload"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:clipToPadding="false"
-            android:orientation="horizontal"
-            android:padding="24dp"
-            android:visibility="visible"
-            app:layout_constraintBottom_toTopOf="@id/fab_main"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <View
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent" />
-
-            <TextView
-                android:id="@+id/fab_upload_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/tooltip_background"
-                android:backgroundTint="@color/black_70"
-                android:padding="8dp"
-                android:text="@string/upload_changes"
-                android:textColor="@color/white" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab_upload"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_cloud_upload"
-                app:fabSize="mini" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layout_download"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:orientation="horizontal"
-            android:padding="24dp"
-            android:visibility="visible"
-            app:layout_constraintBottom_toTopOf="@id/layout_upload"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <View
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent" />
-
-            <TextView
-                android:id="@+id/fab_download_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/tooltip_background"
-                android:backgroundTint="@color/black_70"
-                android:padding="8dp"
-                android:text="@string/download_changes"
-                android:textColor="@color/white" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab_download"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_cloud_download"
-                app:fabSize="mini" />
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_main"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_cloud_upload"
+        android:layout_margin="16dp"
+        android:layout_gravity="bottom|end" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,22 +1,19 @@
 package lu.circl.mispbump.activities;
 
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.content.Intent;
-import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.UUID;
 
@@ -32,38 +29,65 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
 
     public static String EXTRA_SYNC_INFO_UUID = "EXTRA_SYNC_INFO_UUID";
 
+    private UUID syncUUID;
     private PreferenceManager preferenceManager;
     private SyncInformation syncInformation;
 
-    private boolean fabMenuExpanded;
-    private boolean dataLocallyChanged;
+    private View.OnClickListener onUploadClicked = v -> {
+        preferenceManager.addSyncInformation(syncInformation);
+        Intent upload = new Intent(SyncInfoDetailActivity.this, UploadActivity.class);
+        upload.putExtra(UploadActivity.EXTRA_SYNC_INFO_UUID, syncInformation.getUuid().toString());
+        startActivity(upload);
+    };
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sync_info_detail_v2);
+        setContentView(R.layout.activity_sync_info_detail);
 
         preferenceManager = PreferenceManager.getInstance(SyncInfoDetailActivity.this);
-        syncInformation = preferenceManager.getSyncInformation(getExtraUuid());
+        syncUUID = getExtraUuid();
+        syncInformation = preferenceManager.getSyncInformation(syncUUID);
 
         if (syncInformation == null) {
-            throw new RuntimeException("Could not find UploadInformation with UUID {" + getExtraUuid().toString() + "}");
+            throw new RuntimeException("Could not find UploadInformation with UUID {" + syncUUID + "}");
         }
 
         initToolbar();
-        initFabMenu();
+        initViews();
         populateContent();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_sync_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        } else if (item.getItemId() == R.id.menu_delete_sync) {
+            new MaterialAlertDialogBuilder(SyncInfoDetailActivity.this)
+                    .setTitle("Delete Sync Locally")
+                    .setMessage("This will not remove the information from your MISP instance.")
+                    .setPositiveButton("Remove", (dialog, which) -> {
+                        preferenceManager.removeUploadInformation(syncUUID);
+                    })
+                    .setNegativeButton("Discard", null)
+                    .show();
+            return true;
+        }
+
+        return false;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        if (dataLocallyChanged) {
-            syncInformation.setSyncedWithRemote(false);
-        }
-
         preferenceManager.addSyncInformation(syncInformation);
     }
 
@@ -82,139 +106,9 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
     }
 
-    private void initFabMenu() {
-        FloatingActionButton fab = findViewById(R.id.fab_main);
-        FloatingActionButton fabUpload = findViewById(R.id.fab_upload);
-        FloatingActionButton fabDownload = findViewById(R.id.fab_download);
-
-        LinearLayout uploadLayout = findViewById(R.id.layout_upload);
-        LinearLayout downloadLayout = findViewById(R.id.layout_download);
-
-        TextView uploadText = findViewById(R.id.fab_upload_text);
-        TextView downloadText = findViewById(R.id.fab_download_text);
-
-        View menuBackground = findViewById(R.id.menu_background);
-
-        uploadLayout.setVisibility(View.GONE);
-        downloadLayout.setVisibility(View.GONE);
-
-        int animationSpeed = 200;
-
-        ValueAnimator openAnimation = ValueAnimator.ofFloat(0f, 1f);
-        openAnimation.setDuration(animationSpeed);
-        openAnimation.setInterpolator(new DecelerateInterpolator());
-        openAnimation.addUpdateListener(updateAnimation -> {
-            float x = (float) updateAnimation.getAnimatedValue();
-
-            fabUpload.setAlpha(x);
-            fabUpload.setTranslationY((1 - x) * 50);
-            uploadText.setAlpha(x);
-            uploadText.setTranslationX((1 - x) * -200);
-
-            fabDownload.setAlpha(x);
-            fabDownload.setTranslationY((1 - x) * 50);
-            downloadText.setAlpha(x);
-            downloadText.setTranslationX((1 - x) * -200);
-
-            menuBackground.setAlpha(x * 0.9f);
-        });
-        openAnimation.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
-                uploadLayout.setVisibility(View.VISIBLE);
-                downloadLayout.setVisibility(View.VISIBLE);
-            }
-            @Override
-            public void onAnimationEnd(Animator animator) {
-            }
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        });
-
-        ValueAnimator closeAnimation = ValueAnimator.ofFloat(1f, 0f);
-        closeAnimation.setDuration(animationSpeed);
-        closeAnimation.setInterpolator(new DecelerateInterpolator());
-        closeAnimation.addUpdateListener(updateAnimation -> {
-            float x = (float) updateAnimation.getAnimatedValue();
-
-            fabUpload.setAlpha(x);
-            fabUpload.setTranslationY((1 - x) * 50);
-            uploadText.setAlpha(x);
-            uploadText.setTranslationX((1 - x) * -200);
-
-            fabDownload.setAlpha(x);
-            fabDownload.setTranslationY((1 - x) * 50);
-            downloadText.setAlpha(x);
-            downloadText.setTranslationX((1 - x) * -200);
-
-            menuBackground.setAlpha(x * 0.9f);
-        });
-        closeAnimation.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
-                uploadLayout.setVisibility(View.VISIBLE);
-                downloadLayout.setVisibility(View.VISIBLE);
-
-            }
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                uploadLayout.setVisibility(View.GONE);
-                downloadLayout.setVisibility(View.GONE);
-            }
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        });
-
-        AnimatedVectorDrawable open = (AnimatedVectorDrawable) getDrawable(R.drawable.animated_arrow_cloud_down);
-        AnimatedVectorDrawable close = (AnimatedVectorDrawable) getDrawable(R.drawable.animated_arrow_down_cloud);
-
-        View.OnClickListener expandCollapseClick = view -> {
-            if (fabMenuExpanded) {
-                menuBackground.setClickable(false);
-
-                fab.setImageDrawable(close);
-                close.start();
-
-                closeAnimation.start();
-                fabMenuExpanded = false;
-            } else {
-                menuBackground.setClickable(true);
-
-                fab.setImageDrawable(open);
-                open.start();
-
-                openAnimation.start();
-                fabMenuExpanded = true;
-            }
-        };
-
-        menuBackground.setOnClickListener(expandCollapseClick);
-        menuBackground.setClickable(false);
-        fab.setOnClickListener(expandCollapseClick);
-
-        fabUpload.setOnClickListener(view -> {
-            preferenceManager.addSyncInformation(syncInformation);
-            Intent upload = new Intent(SyncInfoDetailActivity.this, UploadActivity.class);
-            upload.putExtra(UploadActivity.EXTRA_SYNC_INFO_UUID, syncInformation.getUuid().toString());
-            startActivity(upload);
-        });
-
-        fabDownload.setOnClickListener(view -> {
-            // TODO download content from MISP instance
-            Snackbar.make(view, "Not implemented yet", Snackbar.LENGTH_LONG).show();
-        });
+    private void initViews() {
+        FloatingActionButton uploadFab = findViewById(R.id.fab_main);
+        uploadFab.setOnClickListener(onUploadClicked);
     }
 
     private void populateContent() {
@@ -239,28 +133,28 @@ public class SyncInfoDetailActivity extends AppCompatActivity {
         allowSelfSigned.setChecked(syncInformation.getRemote().getServer().getSelfSigned());
         allowSelfSigned.setOnCheckedChangeListener((cb, b) -> {
             syncInformation.getRemote().getServer().setSelfSigned(b);
-            dataLocallyChanged = true;
+            syncInformation.setHasUnpublishedChanges(true);
         });
 
         MaterialPreferenceSwitch allowPush = findViewById(R.id.switch_allow_push);
         allowPush.setChecked(syncInformation.getRemote().getServer().getPush());
         allowPush.setOnCheckedChangeListener((cb, b) -> {
             syncInformation.getRemote().getServer().setPush(b);
-            dataLocallyChanged = true;
+            syncInformation.setHasUnpublishedChanges(true);
         });
 
         MaterialPreferenceSwitch allowPull = findViewById(R.id.switch_allow_pull);
         allowPull.setChecked(syncInformation.getRemote().getServer().getPull());
         allowPull.setOnCheckedChangeListener((cb, b) -> {
             syncInformation.getRemote().getServer().setPull(b);
-            dataLocallyChanged = true;
+            syncInformation.setHasUnpublishedChanges(true);
         });
 
         MaterialPreferenceSwitch allowCache = findViewById(R.id.switch_allow_cache);
         allowCache.setChecked(syncInformation.getRemote().getServer().getCachingEnabled());
         allowCache.setOnCheckedChangeListener((cb, b) -> {
             syncInformation.getRemote().getServer().setCachingEnabled(b);
-            dataLocallyChanged = true;
+            syncInformation.setHasUnpublishedChanges(true);
         });
 
         // credentials

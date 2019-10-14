@@ -1,6 +1,8 @@
 package lu.circl.mispbump.models.restModels;
 
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.annotations.SerializedName;
 
 
@@ -301,5 +303,41 @@ public class Role {
 
     public void setPermissionDescription(String permissionDescription) {
         this.permissionDescription = permissionDescription;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Role{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", created='" + created + '\'' +
+                ", modified='" + modified + '\'' +
+                ", permAdd=" + permAdd +
+                ", permModify=" + permModify +
+                ", permModifyOrg=" + permModifyOrg +
+                ", permPublish=" + permPublish +
+                ", permDelegate=" + permDelegate +
+                ", permSync=" + permSync +
+                ", permAdmin=" + permAdmin +
+                ", permAudit=" + permAudit +
+                ", permAuth=" + permAuth +
+                ", permSiteAdmin=" + permSiteAdmin +
+                ", permRegexpAccess=" + permRegexpAccess +
+                ", permTagger=" + permTagger +
+                ", permTemplate=" + permTemplate +
+                ", permSharingGroup=" + permSharingGroup +
+                ", permTagEditor=" + permTagEditor +
+                ", permSighting=" + permSighting +
+                ", permObjectTemplate=" + permObjectTemplate +
+                ", defaultRole=" + defaultRole +
+                ", memoryLimit='" + memoryLimit + '\'' +
+                ", maxExecutionTime='" + maxExecutionTime + '\'' +
+                ", restrictedToSiteAdmin=" + restrictedToSiteAdmin +
+                ", permPublishZmq=" + permPublishZmq +
+                ", permPublishKafka=" + permPublishKafka +
+                ", permission='" + permission + '\'' +
+                ", permissionDescription='" + permissionDescription + '\'' +
+                '}';
     }
 }

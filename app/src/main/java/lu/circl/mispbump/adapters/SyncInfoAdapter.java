@@ -53,28 +53,13 @@ public class SyncInfoAdapter extends RecyclerView.Adapter<SyncInfoAdapter.ViewHo
 
         holder.orgName.setText(item.getRemote().getOrganisation().getName());
 
-        if (item.isSyncedWithRemote()) {
+        if (!item.getHasUnpublishedChanges()) {
             ImageViewCompat.setImageTintList(holder.syncStatus, ColorStateList.valueOf(context.getColor(R.color.status_green)));
             holder.syncStatus.setImageResource(R.drawable.ic_check_outline);
         } else {
             ImageViewCompat.setImageTintList(holder.syncStatus, ColorStateList.valueOf(context.getColor(R.color.status_amber)));
             holder.syncStatus.setImageResource(R.drawable.ic_error_outline);
         }
-
-//        switch (item.getCurrentSyncStatus()) {
-//            case COMPLETE:
-//                ImageViewCompat.setImageTintList(holder.syncStatus, ColorStateList.valueOf(context.getColor(R.color.status_green)));
-//                holder.syncStatus.setImageResource(R.drawable.ic_check_outline);
-//                break;
-//            case FAILURE:
-//                ImageViewCompat.setImageTintList(holder.syncStatus, ColorStateList.valueOf(context.getColor(R.color.status_red)));
-//                holder.syncStatus.setImageResource(R.drawable.ic_error_outline);
-//                break;
-//            case PENDING:
-//                ImageViewCompat.setImageTintList(holder.syncStatus, ColorStateList.valueOf(context.getColor(R.color.status_amber)));
-//                holder.syncStatus.setImageResource(R.drawable.ic_pending);
-//                break;
-//        }
 
         holder.rootView.setOnClickListener(view -> onRecyclerPositionClickListener.onClick(view, position));
     }

@@ -6,6 +6,7 @@ import android.graphics.Shader;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -74,11 +75,15 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == R.id.menu_delete_profile) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        } else if (item.getItemId() == R.id.menu_delete_profile) {
             clearDeviceAndLogOut();
+            return true;
         }
 
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
 
@@ -122,6 +127,11 @@ public class ProfileActivity extends AppCompatActivity {
 
         MaterialPreferenceText description = findViewById(R.id.description);
         description.setSubtitle(organisation.getDescription());
+
+        Role[] roles = preferenceManager.getRoles();
+        for (Role role : roles) {
+            Log.d("ROLES", role.toString());
+        }
     }
 
 
