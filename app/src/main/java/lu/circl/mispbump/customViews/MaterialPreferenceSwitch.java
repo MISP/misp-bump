@@ -7,10 +7,11 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import lu.circl.mispbump.R;
 
@@ -18,7 +19,7 @@ import lu.circl.mispbump.R;
 public class MaterialPreferenceSwitch extends ConstraintLayout {
 
     private TextView titleView, subTitleView;
-    private Switch switchView;
+    private SwitchMaterial switchView;
     private CompoundButton.OnCheckedChangeListener onCheckedChangeListener;
 
     public MaterialPreferenceSwitch(Context context, AttributeSet attrs) {
