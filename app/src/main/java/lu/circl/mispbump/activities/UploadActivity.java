@@ -168,7 +168,8 @@ public class UploadActivity extends AppCompatActivity {
         Server server = syncInformation.getRemote().getServer();
         server.setName(syncInformation.getRemote().getOrganisation().getName() + "'s Sync Server");
         server.setRemoteOrgId(syncInformation.getRemote().getOrganisation().getId());
-        server.setAuthkey(syncInformation.getRemote().getSyncUser().getAuthkey());
+        // the partner installed our local sync user, so only that authkey is valid on their instance
+        server.setAuthkey(syncInformation.getLocal().getSyncUser().getAuthkey());
         server.setPull(syncInformation.getRemote().getServer().getPull());
         server.setPush(syncInformation.getRemote().getServer().getPush());
         server.setCachingEnabled(syncInformation.getRemote().getServer().getCachingEnabled());
