@@ -256,36 +256,39 @@ public class ExchangeActivity extends AppCompatActivity {
         return qrData -> {
             cameraFragment.setReadQrEnabled(false);
 
-            switch (currentSyncState) {
-                case KEY_EXCHANGE:
-                    try {
-                        diffieHellman.setForeignPublicKey(DiffieHellman.publicKeyFromString(qrData));
-                        setSyncState(SyncState.KEY_EXCHANGE_DONE);
-                        dataQr = generateLocalSyncInfoBitmap();
-                    } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-                        if (currentReadQrStatus == ReadQrStatus.PENDING) {
-                            setReadQrStatus(ReadQrStatus.FAILURE);
-                            Snackbar.make(rootLayout, "Public key not parsable", Snackbar.LENGTH_LONG).show();
-                        }
+            // callback is invoked from the image processing thread
+            runOnUiThread(() -> {
+                switch (currentSyncState) {
+                    case KEY_EXCHANGE:
+                        try {
+                            diffieHellman.setForeignPublicKey(DiffieHellman.publicKeyFromString(qrData));
+                            setSyncState(SyncState.KEY_EXCHANGE_DONE);
+                            dataQr = generateLocalSyncInfoBitmap();
+                        } catch (InvalidKeySpecException | NoSuchAlgorithmException | IllegalArgumentException e) {
+                            if (currentReadQrStatus == ReadQrStatus.PENDING) {
+                                setReadQrStatus(ReadQrStatus.FAILURE);
+                                Snackbar.make(rootLayout, "Public key not parsable", Snackbar.LENGTH_LONG).show();
+                            }
 
-                        cameraFragment.setReadQrEnabled(true);
-                    }
-                    break;
-                case DATA_EXCHANGE:
-                    try {
-                        syncInformation.setRemote(new Gson().fromJson(diffieHellman.decrypt(qrData), ExchangeInformation.class));
-                        preferenceManager.addSyncInformation(syncInformation);
-                        setSyncState(SyncState.DATA_EXCHANGE_DONE);
-                    } catch (JsonSyntaxException e) {
-                        if (currentReadQrStatus == ReadQrStatus.PENDING) {
-                            setReadQrStatus(ReadQrStatus.FAILURE);
-                            Snackbar.make(rootLayout, "Sync information not parsable", Snackbar.LENGTH_LONG).show();
+                            cameraFragment.setReadQrEnabled(true);
                         }
+                        break;
+                    case DATA_EXCHANGE:
+                        try {
+                            syncInformation.setRemote(new Gson().fromJson(diffieHellman.decrypt(qrData), ExchangeInformation.class));
+                            preferenceManager.addSyncInformation(syncInformation);
+                            setSyncState(SyncState.DATA_EXCHANGE_DONE);
+                        } catch (JsonSyntaxException | IllegalArgumentException e) {
+                            if (currentReadQrStatus == ReadQrStatus.PENDING) {
+                                setReadQrStatus(ReadQrStatus.FAILURE);
+                                Snackbar.make(rootLayout, "Sync information not parsable", Snackbar.LENGTH_LONG).show();
+                            }
 
-                        cameraFragment.setReadQrEnabled(true);
-                    }
-                    break;
-            }
+                            cameraFragment.setReadQrEnabled(true);
+                        }
+                        break;
+                }
+            });
         };
     }
 
