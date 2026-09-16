@@ -142,7 +142,7 @@ public class LoginActivity extends AppCompatActivity {
                                         }
                                     }
 
-                                    mispRestClient.getOrganisation(user.getRoleId(), new MispRestClient.OrganisationCallback() {
+                                    mispRestClient.getOrganisation(user.getOrgId(), new MispRestClient.OrganisationCallback() {
                                         @Override
                                         public void success(Organisation organisation) {
                                             preferenceManager.setMyOrganisation(organisation);
