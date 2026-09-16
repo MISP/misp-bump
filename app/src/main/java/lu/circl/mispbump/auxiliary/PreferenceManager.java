@@ -303,6 +303,7 @@ public class PreferenceManager {
                     cachedSyncInformationList.remove(ui);
                     saveSyncInformationList();
                 }
+                return;
             }
         }
     }
